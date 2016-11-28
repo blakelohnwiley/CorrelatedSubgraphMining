@@ -6,7 +6,6 @@
 class GraphToMinDFSCode
 {
 protected:
-	Graph* m_Graph;
 	DFSCode m_MinDFSCode;
 	bool m_IsFound;
 
@@ -22,8 +21,8 @@ protected:
 	bool project_is_min(Projected& projected);
 
 public:
-	void init(Graph* graph);
-	void findMinimumDFSCode(DFSCode& dfs_code);
+	void init();
+	void findMinimumDFSCode(Graph* graph, DFSCode& dfs_code);
 };
 
 #endif

@@ -126,50 +126,5 @@ bool get_forward_rmpath(Graph&, Edge*, int, History&, EdgeList&);
 bool get_forward_root(Graph&, Vertex&, EdgeList&);
 Edge* get_backward(Graph&, Edge*, Edge*, History&);
 
-//class GraphCode
-//{
-//private:
-//	typedef map<int, map<int, map<int,Projected>>>						Projected_map3;
-//	typedef map<int, map<int, Projected>>								Projected_map2;
-//	typedef map<int, Projected>											Projected_map1;
-//	typedef map<int, map<int, map<int,Projected>>>::iterator			Projected_iterator3;
-//	typedef map<int, map<int, Projected>>::iterator						Projected_iterator2;
-//	typedef map<int, Projected>::iterator								Projected_iterator1;
-//	typedef map<int, map<int, map<int, Projected>>>::reverse_iterator	Projected_riterator3;
-//	
-//	vector<Graph>	TRANS;
-//	DFSCode			DFS_CODE;
-//	DFSCode			DFS_CODE_IS_MIN;
-//	Graph			GRAPH_IS_MIN;
-//	
-//	unsigned int ID;
-//	unsigned int minsup;
-//	unsigned int maxpat_min;
-//	unsigned int maxpat_max;
-//	
-//	bool where;
-//	bool enc;
-//	bool directed;
-//	ostream* os;
-//	ofstream fos;
-//	
-//	map<unsigned int, map<unsigned int, unsigned int>> singleVertex;
-//	map<unsigned int, unsigned int> singleVertexLabel;
-//	
-//	bool is_min();
-//	bool project_is_min(Projected&);
-//	
-//	map<unsigned int,unsigned int> support_counts(Projected& projected);
-//	unsigned int support(Projected&);
-//	void project (Projected&);
-//	void report (Projected&,unsigned int);
-//	
-//	void read(char*);
-//	void run_intern(void);
-//public:
-//	GraphCode(void);
-//	~GraphCode(void);
-//	void run(char* fname,std::ostream& _os,unsigned int _minsup,unsigned int _maxpat_min,unsigned int _maxpat_max,bool _enc,bool _where,bool _directed);
-//};
 
 #endif

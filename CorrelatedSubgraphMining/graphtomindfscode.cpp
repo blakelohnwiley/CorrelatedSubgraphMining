@@ -1,8 +1,7 @@
 #include "graphtomindfscode.h"
 
-void GraphToMinDFSCode::init (Graph* graph)
+void GraphToMinDFSCode::init ()
 {
-    m_Graph = graph;
     m_IsFound = false;
 
     TRANS.clear();
@@ -12,11 +11,13 @@ void GraphToMinDFSCode::init (Graph* graph)
     m_MinDFSCode.clear();
 }
 
-void GraphToMinDFSCode::findMinimumDFSCode (DFSCode& dfs_code)
+void GraphToMinDFSCode::findMinimumDFSCode (Graph* graph, DFSCode& dfs_code)
 {
-	Graph super_graph = *m_Graph;
+	init();
+
+	Graph super_graph = *graph;
     TRANS.push_back(super_graph);
-	graph_size = m_Graph->edge_size();
+	graph_size = graph->edge_size();
 
     Projected_map3 root;
     EdgeList edges;
