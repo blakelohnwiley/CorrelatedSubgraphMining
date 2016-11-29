@@ -2,7 +2,7 @@
  *  
  *
  */
-
+#include "graph.h"
 #include "graphcode.h"
 
 using namespace std;

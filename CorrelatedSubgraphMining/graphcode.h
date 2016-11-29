@@ -19,12 +19,12 @@ public:
 	int elabel;
 	int tolabel;
 
-	bool operator == (const DFS& d2)
+	bool operator == (const DFS& d2) const
 	{
 		return (from == d2.from && to == d2.to && fromlabel == d2.fromlabel && elabel == d2.elabel && tolabel == d2.tolabel);
 	}
 	
-	bool operator != (const DFS& d2)
+	bool operator != (const DFS& d2) const
 	{
 		return (!(*this == d2));
 	}
@@ -113,13 +113,13 @@ public:
 };
 
 typedef vector<Edge*> EdgeList;
-typedef map<int, map<int, map<int,Projected>>>						Projected_map3;
-typedef map<int, map<int, Projected>>								Projected_map2;
+typedef map<int, map<int, map<int,Projected> > >						Projected_map3;
+typedef map<int, map<int, Projected> >								Projected_map2;
 typedef map<int, Projected>											Projected_map1;
-typedef map<int, map<int, map<int,Projected>>>::iterator			Projected_iterator3;
-typedef map<int, map<int, Projected>>::iterator						Projected_iterator2;
+typedef map<int, map<int, map<int,Projected> > >::iterator			Projected_iterator3;
+typedef map<int, map<int, Projected> >::iterator						Projected_iterator2;
 typedef map<int, Projected>::iterator								Projected_iterator1;
-typedef map<int, map<int, map<int, Projected>>>::reverse_iterator	Projected_riterator3;
+typedef map<int, map<int, map<int, Projected> > >::reverse_iterator	Projected_riterator3;
 
 bool get_forward_pure(Graph&, Edge*, int, History&, EdgeList&);
 bool get_forward_rmpath(Graph&, Edge*, int, History&, EdgeList&);

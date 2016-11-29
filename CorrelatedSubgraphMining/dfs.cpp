@@ -1,3 +1,4 @@
+#include "graph.h"
 #include "graphcode.h"
 #include <cstring>
 #include <string>

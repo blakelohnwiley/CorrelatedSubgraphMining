@@ -125,6 +125,22 @@ void Graph::sortGaph()
 	}
 }
 
+bool Graph::overlap (Graph& g)
+{
+	for (unsigned int i = 0; i < size(); i++)
+	{
+		for (unsigned int j = 0; j < g.vertex_size(); j++)
+		{
+			if ((*this)[i] == g[j])
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool Graph::isDuplicated(const Graph& g)
 {
 	// check number of vertices and edges

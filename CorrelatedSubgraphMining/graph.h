@@ -38,12 +38,12 @@ public:
 		id = _id;
 	}
 
-	bool operator== (const Edge& e)
+	bool operator== (const Edge& e) const
 	{
 		return (((from == e.from && to == e.to) || (from == e.to && to == e.from)) && elabel == e.elabel);
 	}
 
-	bool operator != (const Edge& e)
+	bool operator != (const Edge& e) const
 	{
 		return (!(*this == e));
 	}
@@ -66,7 +66,7 @@ public:
 		edge[edge.size()-1].elabel = elabel;		
 	}
 
-	bool operator< (const Vertex& v)
+	bool operator< (const Vertex& v) const
 	{
 		if (id < v.id)
 		{
@@ -80,12 +80,12 @@ public:
 		return false;
 	}
 
-	bool operator== (const Vertex& v)
+	bool operator== (const Vertex& v) const
 	{
 		return (id == v.id && label == v.label);
 	}
 
-	bool operator!= (const Vertex& v)
+	bool operator!= (const Vertex& v) const
 	{
 		return (!((*this) == v));
 	}
@@ -116,15 +116,17 @@ public:
 	void insertEdge(Graph& g, const Edge& e);
 	int vertexLabel(int id);
 	// Read data of graph from file
-	int read (char*);
-	ostream& write (ostream &);
-	ofstream& write (ofstream &);
+	int read (char* filename);
+	ostream& write (ostream & os);
+	ofstream& write (ofstream & of);
 	void check(void);
 
 	//Check whether two graph are duplicated
-	bool isDuplicated(const Graph& );
+	bool isDuplicated(const Graph& g);
 	//sort all vertices of graph following ascendant order
 	void sortGaph();
+
+	bool overlap (Graph& g);
 
 	Graph() : edge_size_(0){};
 };
