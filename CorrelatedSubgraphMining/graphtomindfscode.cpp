@@ -22,6 +22,12 @@ void GraphToMinDFSCode::findMinimumDFSCode (Graph* graph, DFSCode& dfs_code)
     Projected_map3 root;
     EdgeList edges;
 
+	if (super_graph.size() == 1)
+	{
+		dfs_code.push(-1, 0, -1, -1, super_graph[0].label);
+		return;
+	}
+
     for (unsigned int from = 0; from < super_graph.size(); ++from)
 	{
       if (get_forward_root(super_graph, super_graph[from], edges))
@@ -45,7 +51,7 @@ void GraphToMinDFSCode::findMinimumDFSCode (Graph* graph, DFSCode& dfs_code)
         }
       }
     }
-
+	
     dfs_code = m_MinDFSCode;
 }
 

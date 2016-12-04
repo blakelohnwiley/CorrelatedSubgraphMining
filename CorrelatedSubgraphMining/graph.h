@@ -11,6 +11,7 @@
 #include<set>
 #include<algorithm>
 #include<fstream>
+#include<deque>
 
 using namespace std;
 
@@ -21,6 +22,16 @@ inline void _swap(T &x,T &y)
 	x = y;
 	y = z;
 }
+
+struct CodeId
+{
+	int id1, id2;
+
+	bool operator == (const CodeId & code) const
+	{
+		return ((id1 == code.id1 && id2 == code.id2) || (id1 == code.id2 && id2 == code.id1));
+	}
+};
 
 class Edge
 {
@@ -57,6 +68,7 @@ public:
 	int id;
 	int label;
 	vector<Edge> edge;
+	int depth;
 	
 	void push(int from, int to, int elabel)
 	{
@@ -97,11 +109,18 @@ private:
 	// mapping from id of vertex to index in the stored vector
 	map<int, int> mapIdToIndex;
 	unsigned int edge_size_;
+	bool _isSorted;
 
 public:
-	
+	vector<CodeId> sameHHop;
+
 	typedef std::vector<Vertex>::iterator vertex_iterator;
 	
+	bool isSorted() const
+	{
+		return this->_isSorted;
+	}
+
 	unsigned int edge_size() const
 	{ 
 		return edge_size_;
@@ -114,6 +133,8 @@ public:
 	int index(int id);
 	void buildEdge();
 	void insertEdge(Graph& g, const Edge& e);
+	void insertEdge(Edge& e, int vertexStartLable, int vertexEndLable);
+	void insertVertex(Vertex& v);
 	int vertexLabel(int id);
 	// Read data of graph from file
 	int read (char* filename);
@@ -126,9 +147,17 @@ public:
 	//sort all vertices of graph following ascendant order
 	void sortGaph();
 
+	// Check if an edge exists or not
+	bool isExist(Edge& e);
+
 	bool overlap (Graph& g);
 
-	Graph() : edge_size_(0){};
+	Graph() : edge_size_(0){ _isSorted = false; };
+	Graph(Graph* g);
+
+	void pushHHopCode(CodeId& id);
+
+	void findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>& results);
 };
 
 #endif

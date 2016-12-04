@@ -4,6 +4,7 @@
 #include <string>
 #include <iterator>
 #include <set>
+#include <sstream>
 using namespace std;
 
 bool DFSCode::toGraph(Graph& g)
@@ -56,4 +57,17 @@ ostream& DFSCode::write(ostream& os)
 
 	os << endl;
 	return os;
+}
+
+string DFSCode::toString()
+{
+	stringstream ss;
+
+	for(unsigned int i=0; i < (unsigned int) size(); ++i)
+	{
+		ss << "(" << (*this)[i].from << " " << (*this)[i].to << " " << (*this)[i].fromlabel << " " << (*this)[i].elabel << " " << (*this)[i].tolabel << ")";
+	}
+
+	return ss.str();
+
 }

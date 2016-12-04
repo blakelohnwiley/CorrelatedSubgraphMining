@@ -17,7 +17,12 @@ template <typename T,typename I>
 void tokenize(const char* str, I iterator)
 {
 	istrstream is (str, strlen(str));
-	copy (istream_iterator<T> (is), istream_iterator<T> (), iterator);
+	std::copy(istream_iterator<T> (is), istream_iterator<T> (), iterator);
+}
+
+Graph::Graph(Graph* g)
+{
+	*this = *g;
 }
 
 void Graph::buildEdge()
@@ -51,6 +56,11 @@ void Graph::buildEdge()
 	}
 	
 	edge_size_ = id;
+}
+
+void Graph::pushHHopCode(CodeId& id)
+{
+	sameHHop.push_back(id);
 }
 
 int Graph::index(int id)
@@ -90,11 +100,11 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 
 		if (!isFound)
 		{
-			// Insert a new vertex that is the start point of e
+			// Insert a new vertex that is the end point of e
 			resize(size() + 1);
 			(*this)[size() - 1].id = e.to;
 			(*this)[size() - 1].label = g.vertexLabel(e.to);
-			mapIdToIndex[e.from] = size() - 1;
+			mapIdToIndex[e.to] = size() - 1;
 		}
 	}
 	else
@@ -113,6 +123,64 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 	buildEdge();
 }
 
+void Graph::insertEdge(Edge& e, int vertexStartLable, int vertexEndLable)
+{
+	// check if start point and end point of e exist?
+	bool isFound = false;
+	for (int i = 0; i < size(); i++)
+	{
+		if ((*this)[i].id == e.from)
+		{
+			isFound = true;
+			break;
+		}
+	}
+
+	if (isFound == true)
+	{
+		isFound = false;
+		for (int i = 0; i < size(); i++)
+		{
+			if ((*this)[i].id == e.to)
+			{
+				isFound = true;
+				break;
+			}
+		}
+
+		if (!isFound)
+		{
+			// Insert a new vertex that is the end point of e
+			resize(size() + 1);
+			(*this)[size() - 1].id = e.to;
+			(*this)[size() - 1].label = vertexEndLable;
+			mapIdToIndex[e.to] = size() - 1;
+		}
+	}
+	else
+	{
+		// Insert a new vertex that is the start point of e
+		resize(size() + 1);
+		(*this)[size() - 1].id = e.from;
+		(*this)[size() - 1].label = vertexStartLable;
+		mapIdToIndex[e.from] = size() - 1;
+	}
+
+	// start point and end point of e existed, insert edge e
+	(*this)[mapIdToIndex[e.from]].push(e.from, e.to, e.elabel);
+	(*this)[mapIdToIndex[e.to]].push(e.to, e.from, e.elabel);
+
+	buildEdge();
+}
+
+void Graph::insertVertex(Vertex& v)
+{
+	this->resize(size() + 1);
+	(*this)[size() - 1].id = v.id;
+	(*this)[size() - 1].label = v.label;
+	mapIdToIndex[v.id] = size() - 1;
+}
+
 void Graph::sortGaph()
 {
 	sort(this->begin(), this->end());
@@ -123,6 +191,24 @@ void Graph::sortGaph()
 	{
 		mapIdToIndex[(*this)[i].id] = i;
 	}
+
+	this->_isSorted = true;
+}
+
+bool Graph::isExist(Edge& e)
+{
+	for (int i = 0; i < size(); i++)
+	{
+		for (Vertex::edge_iterator it = (*this)[i].edge.begin(); it != (*this)[i].edge.end(); ++it)
+		{
+			if (*it == e)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 bool Graph::overlap (Graph& g)
@@ -152,10 +238,16 @@ bool Graph::isDuplicated(const Graph& g)
 
 	// Check id and label of all vertices
 	Graph cp1 = *this;
-	cp1.sortGaph();
+	if (cp1.isSorted() == false)
+	{
+		cp1.sortGaph();
+	}
 
 	Graph cp2 = g;
-	cp2.sortGaph();
+	if (cp2.isSorted() == false)
+	{
+		cp2.sortGaph();
+	}
 
 	for (int i = 0; i < (int)cp1.size(); i++)
 	{
@@ -329,5 +421,65 @@ void Graph::check()
 		{
 			cout << "check edge from " << it->from << " to " << it->to << ", label " << it->elabel << endl; 
 		}
+	}
+}
+
+void Graph::findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>& results)
+{
+	int ind = mapIdToIndex[vertexId];
+
+	deque<Vertex> Queue;
+	(*this)[ind].depth = 0;
+	Queue.push_back((*this)[ind]);
+
+	while (!Queue.empty())
+	{
+		Vertex v = Queue.front();
+
+		for (int i = 0; i < v.edge.size(); i++)
+		{
+			int idex = mapIdToIndex[v.edge[i].to];
+			Vertex u = (*this)[idex];
+			bool notIn = true;
+
+			//check u is in results?
+			for (int j = 0; j < results.size(); j++)
+			{
+				if (results[j].id == u.id)
+				{
+					notIn = false;
+					break;
+				}
+			}
+
+			if (notIn)
+			{
+				// check u is in Queue?
+				for (int j = 0; j < Queue.size(); j++)
+				{
+					if (Queue[j].id == u.id)
+					{
+						notIn = false;
+						break;
+					}
+				}
+
+				if (notIn)
+				{
+					u.depth = v.depth + 1;
+					if (u.depth >= hop)
+					{
+						results.push_back(u);
+					}
+					else
+					{
+						Queue.push_back(u);
+					}
+				}
+			}
+		}
+
+		results.push_back(v);
+		Queue.pop_front();
 	}
 }

@@ -1,10 +1,13 @@
+#include "utility.h"
+#include "graph.h"
+#include "graphtomindfscode.h"
+#include "overlapgraph.h"
+#include "correlatedgraph.h"
+
 #include <iostream>
 #include <fstream>
 #include <fstream>
 #include <cstring>
-#include "graph.h"
-#include "graphtomindfscode.h"
-#include "overlapgraph.h"
 
 using namespace std;
 
@@ -12,9 +15,17 @@ int main (int argc, char * const  argv[]) {
 	
 	ifstream is;
 
-	char* fname;
-	fname = "graph2.txt";
-	char* fname1;
+	char* fname = "../Data/graph2.txt";
+
+	/*Graph graph;
+	graph.read(fname);
+
+	DFSCode dfsCode;
+	GraphToMinDFSCode convertGraphToDFSCode;
+	convertGraphToDFSCode.findMinimumDFSCode(&graph, dfsCode);
+	dfsCode.write(cout);*/
+
+	/*char* fname1;
 	fname1 = "graph3.txt";
 	char* fname2;
 	fname2 = "graph4.txt";
@@ -33,10 +44,13 @@ int main (int argc, char * const  argv[]) {
 	Graph graph3;
 	graph3.read(fname3);
 
-	/*DFSCode dfsCode;
+	Graph graph4;
+	graph4.read("graph1.txt");
+
+	DFSCode dfsCode;
 	GraphToMinDFSCode convertGraphToDFSCode;
-	convertGraphToDFSCode.findMinimumDFSCode(&graph1, dfsCode);
-	dfsCode.write(cout);*/
+	convertGraphToDFSCode.findMinimumDFSCode(&graph4, dfsCode);
+	dfsCode.write(cout);
 
 	OverlapGraph ograph(4);
 	ograph.add(&graph, 0);
@@ -53,6 +67,16 @@ int main (int argc, char * const  argv[]) {
 	{
 		cout << group[i] << "  ";
 	}
+*/
+	int theta;
+	double phi;
+	int hop;
+
+	char * configName = "../Data/config.txt";
+
+	Utility::readConfigFile(configName, theta, phi, hop);
+	CorrelatedGraph correlatedGraph;
+	correlatedGraph.baseLine(fname, "../Data/result_baseline.txt", theta, phi, hop);
 
 	cin.get();
 	return 0;

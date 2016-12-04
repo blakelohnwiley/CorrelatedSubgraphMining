@@ -7,6 +7,7 @@
 #include<map>
 #include<vector>
 #include<fstream>
+#include <string>
 
 using namespace std;
 
@@ -19,12 +20,12 @@ public:
 	int elabel;
 	int tolabel;
 
-	bool operator == (const DFS& d2) const
+	bool operator == (DFS& d2) const
 	{
 		return (from == d2.from && to == d2.to && fromlabel == d2.fromlabel && elabel == d2.elabel && tolabel == d2.tolabel);
 	}
 	
-	bool operator != (const DFS& d2) const
+	bool operator != (DFS& d2) const
 	{
 		return (!(*this == d2));
 	}
@@ -64,6 +65,7 @@ public:
 	/* Convert current DFS code into a graph.
 	 */
 	bool toGraph(Graph &);
+	string toString();
 };
 
 struct PDFS
@@ -91,7 +93,8 @@ public:
 		return (bool)vertex[id];
 	}
 
-	void build(Graph&, PDFS*);
+	void build(Graph& g, PDFS* pdfs);
+
 	History() {};
 	History(Graph& g, PDFS* p)
 	{
@@ -113,7 +116,7 @@ public:
 };
 
 typedef vector<Edge*> EdgeList;
-typedef map<int, map<int, map<int,Projected> > >						Projected_map3;
+typedef map<int, map<int, map<int,Projected> > >					Projected_map3;
 typedef map<int, map<int, Projected> >								Projected_map2;
 typedef map<int, Projected>											Projected_map1;
 typedef map<int, map<int, map<int,Projected> > >::iterator			Projected_iterator3;
@@ -121,10 +124,10 @@ typedef map<int, map<int, Projected> >::iterator						Projected_iterator2;
 typedef map<int, Projected>::iterator								Projected_iterator1;
 typedef map<int, map<int, map<int, Projected> > >::reverse_iterator	Projected_riterator3;
 
-bool get_forward_pure(Graph&, Edge*, int, History&, EdgeList&);
-bool get_forward_rmpath(Graph&, Edge*, int, History&, EdgeList&);
-bool get_forward_root(Graph&, Vertex&, EdgeList&);
-Edge* get_backward(Graph&, Edge*, Edge*, History&);
+bool get_forward_pure(Graph& g, Edge* e, int i, History& h, EdgeList& el);
+bool get_forward_rmpath(Graph& g, Edge* e, int i, History& h, EdgeList& el);
+bool get_forward_root(Graph& g, Vertex& v, EdgeList& el);
+Edge* get_backward(Graph& g, Edge* e1, Edge* e2, History& h);
 
 
 #endif
