@@ -31,6 +31,14 @@ struct CodeId
 	{
 		return ((id1 == code.id1 && id2 == code.id2) || (id1 == code.id2 && id2 == code.id1));
 	}
+
+	bool operator < (const CodeId & code) const
+	{
+		int min1 = (id1 < id2) ? id1 : id2;
+		int min2 = (code.id1 < code.id2) ? code.id1 : code.id2;
+
+		return (min1 < min2);
+	}
 };
 
 class Edge
@@ -112,7 +120,8 @@ private:
 	bool _isSorted;
 
 public:
-	vector<CodeId> sameHHop;
+	set<CodeId> sameHHop;
+	int idGraph;
 
 	typedef std::vector<Vertex>::iterator vertex_iterator;
 	

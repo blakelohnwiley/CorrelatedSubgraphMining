@@ -1,3 +1,8 @@
-v 6 1
-v 7 0
-e 6 7 0
+Thuat toan:
+O moi bước tính code và chèn vào hashtable, nếu find ra chỉ số thì đánh dấu false, ngược lại là true cho treenode.
+Duyệt từng treenode, nếu nó đánh dấu là true thì tìm ra id của nó trong hashtable và tính correlated value với từ đầu hashtable đến bé hơn nó.  Những đồ thị nào có cùng chỉ số sẽ ko cần gọi hàm kiểm tra h-hop. Những đồ thị nào ở trong cùng một h-hop thì đánh dấu cả hai cùng một chỉ số. 
+Sau đó find lại trong list của treenode để đánh dấu instance đó với code đã có dựa vào id của graph khớp với id của treenode.
+
+Khi tạo đồ thị con của treenode, nhớ insert list chỉ số của nó cho đồ thị mới tạo.
+
+có cách nào làm nhanh hơn nữa ko????

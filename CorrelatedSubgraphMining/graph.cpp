@@ -60,7 +60,7 @@ void Graph::buildEdge()
 
 void Graph::pushHHopCode(CodeId& id)
 {
-	sameHHop.push_back(id);
+	sameHHop.insert(id);
 }
 
 int Graph::index(int id)

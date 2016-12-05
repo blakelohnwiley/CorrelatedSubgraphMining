@@ -1,6 +1,9 @@
 #include "utility.h"
 #include <iterator>
 #include <strstream>
+#include <cstring>
+#include <string>
+#include <fstream>
 
 template <typename t,typename i>
 void token(const char* str, i iterator)

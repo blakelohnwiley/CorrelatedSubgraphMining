@@ -14,21 +14,25 @@ public:
 	Graph graph;
 	bool isStop;
 	int idnode;
-	set<string> childIDs;
-	string code;
+	set<DFSCode> childIDs;
+	DFSCode code;
+
+	bool isSavedToTable;
 	
 	TreeNode()
 	{
 		isStop = false;
+		isSavedToTable = false;
 	}
 
 	TreeNode(int id)
 	{
 		idnode = id;
 		isStop = false;
+		isSavedToTable = false;
 	}
 
-	string computeDFSCode();
+	DFSCode computeDFSCode();
 	bool isDuplicated(Graph& g);
 };
 

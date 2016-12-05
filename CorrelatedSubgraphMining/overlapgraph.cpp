@@ -216,8 +216,8 @@ int OverlapGraph::getMISSize (vector<int>& selectedGraph)
 		if (n <= 3)
 		{ 
 			/* If the connected component contains exactly three nodes,   */
-			/* it must be triangle, so exactly one node can be selected.  */
-			this->selectedGraph.push_back(buf[i]->index);
+			/* it must be triangle, so exactly one node can be selected.  */			
+			this->selectedGraph.push_back(buf[k - 1]->index);	
 			this->sel++;
 			continue;
 		}

@@ -10,17 +10,18 @@
 
 using namespace std;
 
-class Hashtable : public map<string, Instance>
+class Hashtable : public map<DFSCode, Instance>
 {
 public:
-	typedef map<string, Instance>::iterator hastable_iterator;
+	typedef map<DFSCode, Instance>::iterator hastable_iterator;
 
-	void push(string& dfs_code, Graph& g, set<string>& child);
-	void push(string& dfs_code, Graph& g);
+	void push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child);
+	void push(DFSCode& dfs_code, Graph& g);
 	void computeFrequency();
 	void computeFrequency(Hashtable::hastable_iterator start);
-	int freq(string dfs_code);
+	int freq(DFSCode dfs_code);
 	void computeCorrelatedValue (Graph & bigGraph, Instance & ins1, Instance & ins2, int & colocated, double & confidence, int hop, int& numTestCollocated);
+	void computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, Instance& ins2, int & colocated, double & confidence, int hop, int& numTestCollocated);
 };
 
 #endif

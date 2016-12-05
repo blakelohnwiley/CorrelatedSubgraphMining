@@ -78,6 +78,9 @@ int main (int argc, char * const  argv[]) {
 	CorrelatedGraph correlatedGraph;
 	correlatedGraph.baseLine(fname, "../Data/result_baseline.txt", theta, phi, hop);
 
+	CorrelatedGraph correlatedGraph1;
+	correlatedGraph1.pruning(fname, "../Data/result_pruning.txt", theta, phi, hop);
+
 	cin.get();
 	return 0;
 }

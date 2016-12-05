@@ -1,8 +1,8 @@
 #include "instance.h"
 
-bool Instance::isExist(string& dfsCode)
+bool Instance::isExist(DFSCode& dfsCode)
 {
-	for (set<string>::iterator it = childIDs.begin(); it != childIDs.end(); ++it)
+	for (set<DFSCode>::iterator it = childIDs.begin(); it != childIDs.end(); ++it)
 	{
 		if (*it == dfsCode)
 			return true;
@@ -11,7 +11,7 @@ bool Instance::isExist(string& dfsCode)
 	return false;
 }
 
-void Instance::push(Graph& g, set<string> child)
+void Instance::push(Graph& g, set<DFSCode> child)
 {
 	graphs.push_back(g);
 

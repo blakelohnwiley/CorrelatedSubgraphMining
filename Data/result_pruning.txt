@@ -179,5 +179,5 @@ e 0 1 0
 e 1 2 0
 
 Num pairs: 15
-No. call to H-hop Test: 132
-Finished! in 2 (s)
+No. call to H-hop Test: 124
+Finished! in 1 (s)

@@ -1,11 +1,9 @@
 #include "treenode.h"
 
-string TreeNode::computeDFSCode()
+DFSCode TreeNode::computeDFSCode()
 {
 	GraphToMinDFSCode convertGraphToDFSCode;
-	DFSCode dfscode;
-	convertGraphToDFSCode.findMinimumDFSCode(&graph, dfscode);
-	code = dfscode.toString();
+	convertGraphToDFSCode.findMinimumDFSCode(&graph, code);
 	return code;
 }
 

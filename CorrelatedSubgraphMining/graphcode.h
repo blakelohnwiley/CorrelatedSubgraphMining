@@ -20,15 +20,49 @@ public:
 	int elabel;
 	int tolabel;
 
-	bool operator == (DFS& d2) const
+	bool operator == (const DFS& d2) const
 	{
 		return (from == d2.from && to == d2.to && fromlabel == d2.fromlabel && elabel == d2.elabel && tolabel == d2.tolabel);
 	}
 	
-	bool operator != (DFS& d2) const
+	bool operator != (const DFS& d2) const
 	{
 		return (!(*this == d2));
 	}
+
+	bool operator < (const DFS& d2) const
+	{
+		if (from < d2.from)
+			return true;
+		else if (from == d2.from)
+		{
+			if (to < d2.to)
+				return true;
+			else if (to == d2.to)
+			{
+				if (fromlabel < d2.fromlabel)
+					return true;
+				else if (fromlabel == d2.fromlabel)
+				{
+					if (elabel < d2.elabel)
+						return true;
+					else if (elabel == d2.elabel)
+					{
+						return tolabel < d2.tolabel;
+					}
+					else
+						return false;
+				}
+				else
+					return false;
+			}
+			else 
+				return false;
+		}
+		else 
+			return false;
+	}
+
 	DFS() : from(-1), to(-1), fromlabel(-1), elabel(-1), tolabel(-1) {};
 };
 
@@ -56,6 +90,48 @@ public:
 		d.tolabel = tolabel;
 	}
 	
+	bool operator < (const DFSCode & d2) const
+	{
+		if (this->size() < d2.size())
+			return true;
+		else if (this->size() == d2.size())
+		{
+			for (int i = 0; i < this->size(); i++)
+			{
+				if ((*this)[i] < d2[i])
+				{
+					return true;
+				}
+				else if ((*this)[i] == d2[i])
+					continue;
+				else
+					return false;
+			}
+
+			return false;
+		}
+		else return false;
+	}
+
+	bool operator == (const DFSCode & d2) const
+	{
+		if (this->size() != d2.size())
+			return false;
+
+		for (int i = 0; i < this->size(); i++)
+		{
+			if ((*this)[i] != d2[i])
+				return false;
+		}
+
+		return true;
+	}
+
+	bool operator != (const DFSCode & d2) const
+	{
+		return (!(*this == d2));
+	}
+
 	void pop()
 	{ 
 		resize (size() - 1);
@@ -65,7 +141,6 @@ public:
 	/* Convert current DFS code into a graph.
 	 */
 	bool toGraph(Graph &);
-	string toString();
 };
 
 struct PDFS

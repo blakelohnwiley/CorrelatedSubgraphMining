@@ -16,7 +16,7 @@ class Instance
 {
 public:
 	vector<Graph> graphs;
-	set<string> childIDs;
+	set<DFSCode> childIDs;
 	int freq;
 	vector<int> independent_graphs;
 
@@ -25,8 +25,8 @@ public:
 		this->freq = 0;
 	}
 
-	bool isExist(string& dfsCode);
-	void push(Graph& g, set<string> child);
+	bool isExist(DFSCode& dfsCode);
+	void push(Graph& g, set<DFSCode> child);
 	void push(Graph& g);
 	int computeFrequency();
 };
