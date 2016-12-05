@@ -160,7 +160,7 @@ void CorrelatedGraph::constructHashTable(double theta, double phi, double hop)
 						newnode.childIDs.insert(current.code);
 						newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						tmpQ.push_back(newnode);
-						cout << "id = " << id << endl;
+						//cout << "id = " << id << endl;
 					}
 				}
 			}
@@ -373,7 +373,7 @@ void CorrelatedGraph::constructHashTableClosedGraph(char * filenameOuput, double
 						newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						newnode.graph.sameHHop.insert(current.graph.sameHHop.begin(), current.graph.sameHHop.end());
 						tmpQ.push_back(newnode);
-						cout << "id = " << id << endl;
+						//cout << "id = " << id << endl;
 					}
 				}
 			}
@@ -577,8 +577,8 @@ void CorrelatedGraph::mineCorrelatedGraphFromHashTable(char * filenameOutput, in
 			}
 		}
 
-		cout << count << " times" << endl;
-		cout << "Finish one element in hashtable" << endl;
+		//cout << count << " times" << endl;
+		//cout << "Finish one element in hashtable" << endl;
 	}
 
 	of << "Num pairs: " << count << endl;
