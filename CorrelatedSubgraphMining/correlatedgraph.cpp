@@ -8,8 +8,8 @@ void CorrelatedGraph::initGraph(char * filename)
 
 void CorrelatedGraph::baseLine(char * filenameInput, char * filenameOuput, int theta, double phi, int hop)
 {
-	cout << "Running......." << endl;
-
+	cout << "Running baseline" << endl;
+	time(0);
 	initGraph(filenameInput);
 	time_t start, end;
 
@@ -29,8 +29,8 @@ void CorrelatedGraph::baseLine(char * filenameInput, char * filenameOuput, int t
 
 void CorrelatedGraph::pruning(char * filenameInput, char * filenameOuput, int theta, double phi, int hop)
 {
-	cout << "Running......." << endl;
-
+	cout << "Running Forward pruning" << endl;
+	time(0);
 	initGraph(filenameInput);
 	time_t start, end;
 

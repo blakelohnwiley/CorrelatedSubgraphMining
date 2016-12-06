@@ -15,8 +15,12 @@ int main (int argc, char * const  argv[]) {
 	
 	ifstream is;
 
-	char* fname = "../Data/graph2.txt";
-
+	char* fname = new char [80];
+	strcpy(fname, "../Data/");
+	char * name = new char[50];
+	cout << "Input the graph file name: ";
+	cin.getline(name, 50);
+	fname = strcat(fname, name);
 	/*Graph graph;
 	graph.read(fname);
 
@@ -75,11 +79,24 @@ int main (int argc, char * const  argv[]) {
 	char * configName = "../Data/config.txt";
 
 	Utility::readConfigFile(configName, theta, phi, hop);
-	CorrelatedGraph correlatedGraph;
-	correlatedGraph.baseLine(fname, "../Data/result_baseline.txt", theta, phi, hop);
 
-	CorrelatedGraph correlatedGraph1;
-	correlatedGraph1.pruning(fname, "../Data/result_pruning.txt", theta, phi, hop);
+	cout << "1. Baseline" << endl;
+	cout << "2. Forward Pruning" << endl;
+	char c;
+	cout << "Choose?: ";
+	cin >> c;
+	
+	if (c == '1')
+	{
+		CorrelatedGraph correlatedGraph;
+		correlatedGraph.baseLine(fname, "../Data/result_baseline.txt", theta, phi, hop);
+	}
+	else
+	{
+		CorrelatedGraph correlatedGraph1;
+		correlatedGraph1.pruning(fname, "../Data/result_pruning.txt", theta, phi, hop);
+	}
+
 
 	cin.get();
 	return 0;
