@@ -29,6 +29,21 @@
     <ClCompile Include="graphtomindfscode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="overlapgraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="instance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hashtable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="correlatedgraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="treenode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graph.h">
@@ -41,6 +56,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphtomindfscode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="overlapgraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="treenode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="instance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hashtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="correlatedgraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

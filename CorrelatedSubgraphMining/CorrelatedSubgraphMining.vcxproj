@@ -69,17 +69,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="correlatedgraph.cpp" />
     <ClCompile Include="dfs.cpp" />
     <ClCompile Include="graph.cpp" />
     <ClCompile Include="graphtomindfscode.cpp" />
+    <ClCompile Include="hashtable.cpp" />
+    <ClCompile Include="instance.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="misc.cpp" />
+    <ClCompile Include="overlapgraph.cpp" />
+    <ClCompile Include="treenode.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="correlatedgraph.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="graphcode.h" />
     <ClInclude Include="graphtomindfscode.h" />
+    <ClInclude Include="hashtable.h" />
+    <ClInclude Include="instance.h" />
+    <ClInclude Include="overlapgraph.h" />
+    <ClInclude Include="treenode.h" />
     <ClInclude Include="utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
