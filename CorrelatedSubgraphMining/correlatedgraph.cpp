@@ -6,10 +6,12 @@ void CorrelatedGraph::initGraph(char * filename)
 	graph.read(filename);
 }
 
-void CorrelatedGraph::baseLine(char * filenameInput, char * filenameOuput, int theta, double phi, int hop)
+void CorrelatedGraph::baseLine(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop)
 {
 	cout << "Running baseline" << endl;
 	time(0);
+	this->directed = directed;
+	graph.directed = directed;
 	initGraph(filenameInput);
 	time_t start, end;
 
@@ -27,10 +29,12 @@ void CorrelatedGraph::baseLine(char * filenameInput, char * filenameOuput, int t
 	cout << "Finished! in " << duration << " (s)";
 }
 
-void CorrelatedGraph::pruning(char * filenameInput, char * filenameOuput, int theta, double phi, int hop)
+void CorrelatedGraph::pruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop)
 {
 	cout << "Running Forward pruning" << endl;
 	time(0);
+	this->directed = directed;
+	graph.directed = directed;
 	initGraph(filenameInput);
 	time_t start, end;
 
@@ -58,6 +62,7 @@ void CorrelatedGraph::constructHashTable(double theta, double phi, double hop)
 	for (int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
+		node.graph.directed = this->directed;
 		node.graph.insertVertex(graph[i]);
 		node.graph.idGraph = id;
 		++id;
@@ -135,6 +140,7 @@ void CorrelatedGraph::constructHashTable(double theta, double phi, double hop)
 				for (int ii = 0; ii < edges.size(); ii++)
 				{
 					Graph gtmp = current.graph;
+					gtmp.directed = this->directed;
 					gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
 					/*DFSCode code;
 					Utility::computeDFSCode(gtmp, code);*/
@@ -240,6 +246,7 @@ void CorrelatedGraph::constructHashTableClosedGraph(char * filenameOuput, double
 	for (int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
+		node.graph.directed = this->directed;
 		node.graph.insertVertex(graph[i]);
 		node.graph.idGraph = id;
 		++id;
@@ -345,6 +352,7 @@ void CorrelatedGraph::constructHashTableClosedGraph(char * filenameOuput, double
 				for (int ii = 0; ii < edges.size(); ii++)
 				{
 					Graph gtmp = current.graph;
+					gtmp.directed = this->directed;
 					gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
 					/*DFSCode code;
 					Utility::computeDFSCode(gtmp, code);*/

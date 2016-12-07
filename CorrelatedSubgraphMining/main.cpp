@@ -79,7 +79,25 @@ int main (int argc, char * const  argv[]) {
 	char * configName = "../Data/config.txt";
 
 	Utility::readConfigFile(configName, theta, phi, hop);
+	bool directed;
 
+	cout << "---GRAPH DATASET----" << endl;
+	cout << "1. Undirected" << endl;
+	cout << "2. Directed" << endl;
+	cout << "Choose?: ";
+	char cc;
+	cin >> cc;
+
+	if (cc == '2')
+	{
+		directed = true;
+	}
+	else
+	{
+		directed = false;
+	}
+
+	cout << endl << "---ALGORITHM----" << endl;
 	cout << "1. Baseline" << endl;
 	cout << "2. Forward Pruning" << endl;
 	char c;
@@ -89,12 +107,18 @@ int main (int argc, char * const  argv[]) {
 	if (c == '1')
 	{
 		CorrelatedGraph correlatedGraph;
-		correlatedGraph.baseLine(fname, "../Data/result_baseline.txt", theta, phi, hop);
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_baseline_");
+		resultfilename = strcat(resultfilename, name);
+		correlatedGraph.baseLine(directed, fname, resultfilename, theta, phi, hop);
 	}
 	else
 	{
 		CorrelatedGraph correlatedGraph1;
-		correlatedGraph1.pruning(fname, "../Data/result_pruning.txt", theta, phi, hop);
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_pruning_");
+		resultfilename = strcat(resultfilename, name);
+		correlatedGraph1.pruning(directed, fname, resultfilename, theta, phi, hop);
 	}
 
 

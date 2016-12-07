@@ -28,7 +28,11 @@ bool DFSCode::toGraph(Graph& g)
 		}
 
 		g[it->from].push(it->from, it->to, it->elabel);
-		g[it->to].push(it->to, it->from, it->elabel);
+
+		if(g.directed == false)
+		{
+			g[it->to].push(it->to, it->from, it->elabel);
+		}
 	}
 
 	g.buildEdge();

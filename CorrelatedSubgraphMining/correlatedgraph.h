@@ -17,11 +17,12 @@ class CorrelatedGraph
 private:
 	Graph graph;
 	Hashtable table;
+	bool directed;
 
 public:
 	void initGraph(char * filename);
-	void baseLine(char * filenameInput, char * filenameOuput, int theta, double phi, int hop);
-	void pruning(char * filenameInput, char * filenameOuput, int theta, double phi, int hop);
+	void baseLine(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop);
+	void pruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop);
 	void mineCorrelatedGraphFromHashTable(char * filenameOutput, int thetaThres, double phiThres, int hop);
 	void constructHashTable(double theta, double phi, double hop);
 	void constructHashTableClosedGraph(char * filenameOuput, double theta, double phi, double hop);

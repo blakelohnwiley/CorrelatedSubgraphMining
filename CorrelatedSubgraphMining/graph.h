@@ -59,7 +59,8 @@ public:
 
 	bool operator== (const Edge& e) const
 	{
-		return (((from == e.from && to == e.to) || (from == e.to && to == e.from)) && elabel == e.elabel);
+		//return (((from == e.from && to == e.to) || (from == e.to && to == e.from)) && elabel == e.elabel);
+		return (from == e.from && to == e.to && elabel == e.elabel);
 	}
 
 	bool operator != (const Edge& e) const
@@ -122,6 +123,7 @@ private:
 public:
 	set<CodeId> sameHHop;
 	int idGraph;
+	bool directed;
 
 	typedef std::vector<Vertex>::iterator vertex_iterator;
 	
@@ -162,6 +164,7 @@ public:
 	bool overlap (Graph& g);
 
 	Graph() : edge_size_(0){ _isSorted = false; };
+	Graph(bool directed) : edge_size_(0){ _isSorted = false; this->directed = directed; };
 	Graph(Graph* g);
 
 	void pushHHopCode(CodeId& id);

@@ -37,7 +37,7 @@ void Graph::buildEdge()
 	{
 		for (Vertex::edge_iterator it = (*this)[from].edge.begin(); it != (*this)[from].edge.end(); ++it)
 		{
-			if ((*this)[from].id <= it->to)
+			if (directed || (*this)[from].id <= it->to)
 				sprintf(buf,"%d %d %d", (*this)[from].id, it->to, it->elabel);
 			else
 				sprintf(buf,"%d %d %d", it->to, (*this)[from].id, it->elabel);
@@ -118,7 +118,11 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 
 	// start point and end point of e existed, insert edge e
 	(*this)[mapIdToIndex[e.from]].push(e.from, e.to, e.elabel);
-	(*this)[mapIdToIndex[e.to]].push(e.to, e.from, e.elabel);
+	
+	if (directed == false)
+	{
+		(*this)[mapIdToIndex[e.to]].push(e.to, e.from, e.elabel);
+	}
 
 	buildEdge();
 }
@@ -168,7 +172,11 @@ void Graph::insertEdge(Edge& e, int vertexStartLable, int vertexEndLable)
 
 	// start point and end point of e existed, insert edge e
 	(*this)[mapIdToIndex[e.from]].push(e.from, e.to, e.elabel);
-	(*this)[mapIdToIndex[e.to]].push(e.to, e.from, e.elabel);
+
+	if (directed == false)
+	{
+		(*this)[mapIdToIndex[e.to]].push(e.to, e.from, e.elabel);
+	}
 
 	buildEdge();
 }
@@ -340,7 +348,11 @@ int Graph::read(char* _fname)
 				}
 			
 				(*this)[mapIdToIndex[from]].push(from, to, elabel);
-				(*this)[mapIdToIndex[to]].push(to, from, elabel);
+				
+				if (directed == false)
+				{
+					(*this)[mapIdToIndex[to]].push(to, from, elabel);
+				}
 				//cout<<"edge added"<<std::endl;
 			}
 		}
@@ -362,7 +374,7 @@ ostream& Graph::write(ostream& os)
 
 		for(Vertex::edge_iterator it = (*this)[from].edge.begin(); it!=(*this)[from].edge.end(); ++it)
 		{
-			if((*this)[from].id <= it->to)
+			if(directed || (*this)[from].id <= it->to)
 			{
 				sprintf(buf,"%d %d %d", (*this)[from].id, it->to, it->elabel);
 			}
@@ -393,7 +405,7 @@ ofstream& Graph::write(ofstream& os)
 		
 		for(Vertex::edge_iterator it = (*this)[from].edge.begin(); it != (*this)[from].edge.end(); ++it)
 		{
-			if((*this)[from].id <= it->to)
+			if(directed || (*this)[from].id <= it->to)
 			{
 				sprintf(buf,"%d %d %d", (*this)[from].id, it->to, it->elabel);
 			}
