@@ -25,7 +25,7 @@ public:
 	void pruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop);
 	void mineCorrelatedGraphFromHashTable(char * filenameOutput, int thetaThres, double phiThres, int hop);
 	void constructHashTable(double theta, double phi, double hop);
-	void constructHashTableClosedGraph(char * filenameOuput, double theta, double phi, double hop);
+	void ImprovedComputeCorrelatedGraph(char * filenameOuput, double theta, double phi, double hop);
 	void write (ofstream & of, Graph& g1, Graph& g2, int id, double colocated, double confidence);
 };
 

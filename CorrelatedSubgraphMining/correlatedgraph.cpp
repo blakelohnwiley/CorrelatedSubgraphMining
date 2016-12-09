@@ -39,7 +39,7 @@ void CorrelatedGraph::pruning(bool directed, char * filenameInput, char * filena
 	time_t start, end;
 
 	time(&start);
-	constructHashTableClosedGraph(filenameOuput, theta, phi, hop);
+	ImprovedComputeCorrelatedGraph(filenameOuput, theta, phi, hop);
 	time(&end);
 
 	double duration = difftime(end, start);
@@ -142,8 +142,6 @@ void CorrelatedGraph::constructHashTable(double theta, double phi, double hop)
 					Graph gtmp = current.graph;
 					gtmp.directed = this->directed;
 					gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
-					/*DFSCode code;
-					Utility::computeDFSCode(gtmp, code);*/
 
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
@@ -166,7 +164,6 @@ void CorrelatedGraph::constructHashTable(double theta, double phi, double hop)
 						newnode.childIDs.insert(current.code);
 						newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						tmpQ.push_back(newnode);
-						//cout << "id = " << id << endl;
 					}
 				}
 			}
@@ -226,11 +223,10 @@ void CorrelatedGraph::constructHashTable(double theta, double phi, double hop)
 		}
 	}
 
-
 	//of.close();
 }
 
-void CorrelatedGraph::constructHashTableClosedGraph(char * filenameOuput, double theta, double phi, double hop)
+void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, double theta, double phi, double hop)
 {
 	cout << "Building hashtable....." << endl;
 	int id = 0;
@@ -354,9 +350,7 @@ void CorrelatedGraph::constructHashTableClosedGraph(char * filenameOuput, double
 					Graph gtmp = current.graph;
 					gtmp.directed = this->directed;
 					gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
-					/*DFSCode code;
-					Utility::computeDFSCode(gtmp, code);*/
-
+				
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
 					for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
@@ -381,7 +375,6 @@ void CorrelatedGraph::constructHashTableClosedGraph(char * filenameOuput, double
 						newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						newnode.graph.sameHHop.insert(current.graph.sameHHop.begin(), current.graph.sameHHop.end());
 						tmpQ.push_back(newnode);
-						//cout << "id = " << id << endl;
 					}
 				}
 			}
@@ -429,32 +422,6 @@ void CorrelatedGraph::constructHashTableClosedGraph(char * filenameOuput, double
 					}
 					else
 					{
-						//// check and remove child graphs having the same frequency
-						//set<string> saveStrChild = itFind->second.childIDs;
-						//set<string> deletedElements;
-						//for (set<string>::iterator setItr = saveStrChild.begin(); setItr != saveStrChild.end(); ++setItr)
-						//{
-						//	Hashtable::iterator itFind1 = table.find(*setItr);
-						//	if (itFind1 != table.end() && itFind1->second.freq == frequency)
-						//	{
-						//		table.erase(itFind1);
-						//		deletedElements.insert(*setItr);
-						//		cout << "Delete closed graph..." << endl;
-						//	}
-						//}
-
-						//if (deletedElements.size() > 0)
-						//{
-						//	itFind = table.find(itTmpQ->code);
-						//	for (set<string>::iterator setItr = deletedElements.begin(); setItr != deletedElements.end(); ++setItr)
-						//	{
-						//		set<string>::iterator tf = itFind->second.childIDs.find(*setItr);
-						//		if (tf != itFind->second.childIDs.end())
-						//		{
-						//			itFind->second.childIDs.erase(tf);
-						//		}
-						//	}
-						//}
 						if (itTmpQ->isSavedToTable == false)
 						{
 							// Compute Correlated value
@@ -536,8 +503,6 @@ void CorrelatedGraph::mineCorrelatedGraphFromHashTable(char * filenameOutput, in
 	int numTestHHop = 0;
 
 	Hashtable::iterator it1, it2;
-	//it1 = table.end();
-	//--it1;
 
 	it1 = table.begin();
 	++it1;
@@ -584,9 +549,6 @@ void CorrelatedGraph::mineCorrelatedGraphFromHashTable(char * filenameOutput, in
 				}
 			}
 		}
-
-		//cout << count << " times" << endl;
-		//cout << "Finish one element in hashtable" << endl;
 	}
 
 	of << "Num pairs: " << count << endl;
