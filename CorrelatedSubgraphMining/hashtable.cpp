@@ -5,6 +5,11 @@ void Hashtable::push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child)
 	(*this)[dfs_code].push(g, child);
 }
 
+void Hashtable::push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child, set<CodeId> & ignore)
+{
+	(*this)[dfs_code].push(g, child, ignore);
+}
+
 void Hashtable::push(DFSCode& dfs_code, Graph& g)
 {
 	(*this)[dfs_code].push(g);
@@ -100,7 +105,15 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 			bool isTested = false;
 			for (set<CodeId>::iterator it1 = ins1.graphs[ins1.independent_graphs[i]].sameHHop.begin(); it1 != ins1.graphs[ins1.independent_graphs[i]].sameHHop.end(); ++it1)
 			{
-				for (set<CodeId>::iterator it2 = ins2.graphs[ins2.independent_graphs[j]].sameHHop.begin(); it2 != ins2.graphs[ins2.independent_graphs[j]].sameHHop.end(); ++it2)
+				set<CodeId>::const_iterator got = ins2.graphs[ins2.independent_graphs[j]].sameHHop.find(*it1);
+				if (got != ins2.graphs[ins2.independent_graphs[j]].sameHHop.end())
+				{
+					isTested = true;
+					I1[i] = true;
+					I2[j] = true;
+					break;
+				}
+				/*for (set<CodeId>::iterator it2 = ins2.graphs[ins2.independent_graphs[j]].sameHHop.begin(); it2 != ins2.graphs[ins2.independent_graphs[j]].sameHHop.end(); ++it2)
 				{
 					if (*it1 == *it2)
 					{
@@ -112,7 +125,7 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 				}
 
 				if (isTested == true)
-					break;
+					break;*/
 			}
 			
 			if (isTested == false)
@@ -147,7 +160,14 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 				bool isTested = false;
 				for (set<CodeId>::iterator it1 = ins1.graphs[ins1.independent_graphs[j]].sameHHop.begin(); it1 != ins1.graphs[ins1.independent_graphs[j]].sameHHop.end(); ++it1)
 				{
-					for (set<CodeId>::iterator it2 = ins2.graphs[ins2.independent_graphs[i]].sameHHop.begin(); it2 != ins2.graphs[ins2.independent_graphs[i]].sameHHop.end(); ++it2)
+					set<CodeId>::const_iterator got = ins2.graphs[ins2.independent_graphs[i]].sameHHop.find(*it1);
+					if (got != ins2.graphs[ins2.independent_graphs[i]].sameHHop.end())
+					{
+						isTested = true;
+						I2[i] = true;
+						break;
+					}
+					/*for (set<CodeId>::iterator it2 = ins2.graphs[ins2.independent_graphs[i]].sameHHop.begin(); it2 != ins2.graphs[ins2.independent_graphs[i]].sameHHop.end(); ++it2)
 					{
 						if (*it1 == *it2)
 						{
@@ -158,7 +178,7 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 					}
 
 					if (isTested == true)
-						break;
+						break;*/
 				}
 
 				if (isTested == false)

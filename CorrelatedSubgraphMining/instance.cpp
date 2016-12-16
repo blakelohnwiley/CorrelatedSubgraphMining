@@ -18,6 +18,14 @@ void Instance::push(Graph& g, set<DFSCode> child)
 	childIDs.insert(child.begin(), child.end());
 }
 
+void Instance::push(Graph& g, set<DFSCode> child, set<CodeId> ignore)
+{
+	graphs.push_back(g);
+
+	childIDs.insert(child.begin(), child.end());
+	ignoreList.insert(ignore.begin(), ignore.end());
+}
+
 void Instance::push(Graph& g)
 {
 	graphs.push_back(g);

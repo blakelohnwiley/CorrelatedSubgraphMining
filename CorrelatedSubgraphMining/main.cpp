@@ -75,10 +75,11 @@ int main (int argc, char * const  argv[]) {
 	int theta;
 	double phi;
 	int hop;
+	int k;
 
 	char * configName = "../Data/config.txt";
 
-	Utility::readConfigFile(configName, theta, phi, hop);
+	Utility::readConfigFile(configName, theta, phi, hop, k);
 	bool directed;
 
 	cout << "---GRAPH DATASET----" << endl;
@@ -98,8 +99,12 @@ int main (int argc, char * const  argv[]) {
 	}
 
 	cout << endl << "---ALGORITHM----" << endl;
-	cout << "1. Baseline" << endl;
-	cout << "2. Forward Pruning" << endl;
+	cout << "1. Baseline - Exact Sugraphs" << endl;
+	cout << "2. Forward Pruning - Exact Subgraphs" << endl;
+	cout << "3. Top-K Pruning - Exact Subgraphs" << endl;
+	cout << "4. Baseline - Induced Subgraphs" << endl;
+	cout << "5. Forward Pruning - Induced Subgraphs" << endl;
+	cout << "6. Top-K Pruning - Induced Subgraphs" << endl;
 	char c;
 	cout << "Choose?: ";
 	cin >> c;
@@ -108,17 +113,49 @@ int main (int argc, char * const  argv[]) {
 	{
 		CorrelatedGraph correlatedGraph;
 		char * resultfilename = new char[256];
-		strcpy(resultfilename, "../Data/result_baseline_");
+		strcpy(resultfilename, "../Data/result_baseline_exact_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
-		correlatedGraph.baseLine(directed, fname, resultfilename, theta, phi, hop);
+		correlatedGraph.baseLine(directed, fname, resultfilename, theta, phi, hop, k);
 	}
-	else
+	else if (c == '2')
 	{
 		CorrelatedGraph correlatedGraph1;
 		char * resultfilename = new char[256];
-		strcpy(resultfilename, "../Data/result_pruning_");
+		strcpy(resultfilename, "../Data/result_forward_pruning_exact_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
-		correlatedGraph1.pruning(directed, fname, resultfilename, theta, phi, hop);
+		correlatedGraph1.forwardPruning(directed, fname, resultfilename, theta, phi, hop, k);
+	}
+	else if (c == '3')
+	{
+		CorrelatedGraph correlatedGraph2;
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_top_k_pruning_exact_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		correlatedGraph2.topkPruning(directed, fname, resultfilename, theta, phi, hop, k);
+	}
+	else if (c == '4')
+	{
+		CorrelatedGraph correlatedGraph3;
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_baseline_induced_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		correlatedGraph3.baseLineInducedSubgraph(directed, fname, resultfilename, theta, phi, hop, k);
+	}
+	else if (c == '5')
+	{
+		CorrelatedGraph correlatedGraph4;
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_forward_pruning_induced_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		correlatedGraph4.forwardPruningInducedSubgraph(directed, fname, resultfilename, theta, phi, hop, k);
+	}
+	else if (c == '6')
+	{
+		CorrelatedGraph correlatedGraph5;
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_topk_pruning_induced_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		correlatedGraph5.topKPruningInducedSubgraph(directed, fname, resultfilename, theta, phi, hop, k);
 	}
 
 

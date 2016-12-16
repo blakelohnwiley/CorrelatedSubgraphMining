@@ -13,9 +13,10 @@ class TreeNode
 public:
 	Graph graph;
 	bool isStop;
-	int idnode;
+	double idnode;
 	set<DFSCode> childIDs;
 	DFSCode code;
+	set<CodeId> ignoreList;
 
 	bool isSavedToTable;
 	
@@ -25,7 +26,7 @@ public:
 		isSavedToTable = false;
 	}
 
-	TreeNode(int id)
+	TreeNode(double id)
 	{
 		idnode = id;
 		isStop = false;

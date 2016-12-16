@@ -7,6 +7,7 @@
 #include "utility.h"
 #include <map>
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ public:
 	typedef map<DFSCode, Instance>::iterator hastable_iterator;
 
 	void push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child);
+	void push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child, set<CodeId> & ignore);
 	void push(DFSCode& dfs_code, Graph& g);
 	void computeFrequency();
 	void computeFrequency(Hashtable::hastable_iterator start);

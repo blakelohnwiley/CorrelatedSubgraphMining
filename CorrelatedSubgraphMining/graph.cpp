@@ -181,6 +181,56 @@ void Graph::insertEdge(Edge& e, int vertexStartLable, int vertexEndLable)
 	buildEdge();
 }
 
+void Graph::extendByVertex(Graph& g, Vertex& v)
+{
+	resize(size() + 1);
+	(*this)[size() - 1].id = v.id;
+	(*this)[size() - 1].label = v.label;
+	mapIdToIndex[v.id] = size() - 1;
+
+	// get all edges to and from this node from g
+	int indexBigGraph = g.mapIdToIndex[v.id];
+	if (!g.directed)
+	{
+		for (vector<Edge>::iterator it = g[indexBigGraph].edge.begin(); it != g[indexBigGraph].edge.end(); ++it)
+		{
+			map<int, int>::iterator itMap = mapIdToIndex.find(it->to);
+			if (itMap != mapIdToIndex.end())
+			{
+				(*this)[itMap->second].push(it->to, it->from, it->elabel);
+				(*this)[size() - 1].push(it->from, it->to, it->elabel);
+			}
+		}
+	}
+	else
+	{
+		// to v
+		for (int i = 0; i < size() - 1; i++)
+		{
+			int indexG = g.mapIdToIndex[(*this)[i].id];
+			for (vector<Edge>::iterator it = g[indexG].edge.begin(); it != g[indexG].edge.end(); ++it)
+			{
+				if (it->to == v.id)
+				{
+					(*this)[i].push(it->from, it->to, it->elabel);
+					break;
+				}
+			}
+		}
+		// from v
+		for (vector<Edge>::iterator it = g[indexBigGraph].edge.begin(); it != g[indexBigGraph].edge.end(); ++it)
+		{
+			map<int, int>::iterator itMap = mapIdToIndex.find(it->to);
+			if (itMap != mapIdToIndex.end())
+			{
+				(*this)[size() - 1].push(it->from, it->to, it->elabel);
+			}
+		}
+	}
+
+	buildEdge();
+}
+
 void Graph::insertVertex(Vertex& v)
 {
 	this->resize(size() + 1);
@@ -214,6 +264,17 @@ bool Graph::isExist(Edge& e)
 				return true;
 			}
 		}
+	}
+
+	return false;
+}
+
+bool Graph::isExisedVertice(Vertex& v)
+{
+	for (int i = 0; i < size(); i++)
+	{
+		if ((*this)[i] == v)
+			return true;
 	}
 
 	return false;

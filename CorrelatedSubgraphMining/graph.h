@@ -8,10 +8,10 @@
 #include<iostream>
 #include<map>
 #include<vector>
-#include<set>
 #include<algorithm>
 #include<fstream>
 #include<deque>
+#include <set>
 
 using namespace std;
 
@@ -23,9 +23,10 @@ inline void _swap(T &x,T &y)
 	y = z;
 }
 
-struct CodeId
+class CodeId
 {
-	int id1, id2;
+public:
+	double id1, id2;
 
 	bool operator == (const CodeId & code) const
 	{
@@ -38,6 +39,14 @@ struct CodeId
 		int min2 = (code.id1 < code.id2) ? code.id1 : code.id2;
 
 		return (min1 < min2);
+	}
+
+	bool operator > (const CodeId & code) const
+	{
+		int max1 = (id1 > id2) ? id1 : id2;
+		int max2 = (code.id1 > code.id2) ? code.id1 : code.id2;
+
+		return (max1 > max2);
 	}
 };
 
@@ -121,8 +130,8 @@ private:
 	bool _isSorted;
 
 public:
-	set<CodeId> sameHHop;
-	int idGraph;
+	set <CodeId> sameHHop;
+	double idGraph;
 	bool directed;
 
 	typedef std::vector<Vertex>::iterator vertex_iterator;
@@ -145,6 +154,7 @@ public:
 	void buildEdge();
 	void insertEdge(Graph& g, const Edge& e);
 	void insertEdge(Edge& e, int vertexStartLable, int vertexEndLable);
+	void extendByVertex(Graph& g, Vertex& v);
 	void insertVertex(Vertex& v);
 	int vertexLabel(int id);
 	// Read data of graph from file
@@ -160,6 +170,7 @@ public:
 
 	// Check if an edge exists or not
 	bool isExist(Edge& e);
+	bool isExisedVertice(Vertex& v);
 
 	bool overlap (Graph& g);
 

@@ -9,6 +9,7 @@
 #include "overlapgraph.h"
 #include <vector>
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -19,6 +20,7 @@ public:
 	set<DFSCode> childIDs;
 	int freq;
 	vector<int> independent_graphs;
+	set<CodeId> ignoreList;
 
 	Instance()
 	{
@@ -27,6 +29,7 @@ public:
 
 	bool isExist(DFSCode& dfsCode);
 	void push(Graph& g, set<DFSCode> child);
+	void push(Graph& g, set<DFSCode> child, set<CodeId> ignore);
 	void push(Graph& g);
 	int computeFrequency();
 };
