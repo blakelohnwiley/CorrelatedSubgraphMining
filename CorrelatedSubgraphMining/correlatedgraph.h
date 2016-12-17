@@ -26,8 +26,8 @@ public:
 	void initGraph(char * filename);
 	void baseLine(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k);
 	void forwardPruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k);
-	void mineCorrelatedGraphFromHashTable(char * filenameOutput, int thetaThres, double phiThres, int hop, int k);
-	void constructHashTable(char* filenameOuput, int theta, double phi, int hop, int k);
+
+	void computeCorrelatedValueBaseline(char* filenameOuput, int theta, double phi, int hop, int k);
 	void ImprovedComputeCorrelatedGraph(char * filenameOuput, int theta, double phi, int hop, int k);
 	void write (ofstream & of, Graph& g1, Graph& g2, int id, double colocated, double confidence);
 
