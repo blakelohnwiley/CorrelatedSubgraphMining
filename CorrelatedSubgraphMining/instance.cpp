@@ -43,7 +43,8 @@ int Instance::computeFrequency()
 			ovgraph.add(&graphs[i], i);
 		}
 
-		freq = ovgraph.getMISSize(independent_graphs);
+		//freq = ovgraph.getMISSize(independent_graphs);
+		freq = ovgraph.getMISSize();
 	}
 
 	return freq;

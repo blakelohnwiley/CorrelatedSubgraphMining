@@ -21,6 +21,7 @@ public:
 
 	// Check to ignore due to two graphs are parts of other graphs
 	static bool isIgnore (Instance &ins1, Instance &ins2);
+	static double pairFuntion (double k1, double k2);
 };
 
 #endif

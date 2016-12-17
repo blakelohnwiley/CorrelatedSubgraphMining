@@ -261,57 +261,6 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 						table.erase(itFind);
 						++count;
 					}
-					else
-					{
-						if (itTmpQ->isSavedToTable == false)
-						{
-							// Compute Correlated value
-							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
-							{
-								bool isChild = false;
-			
-								for (set<DFSCode>::iterator ch = itFind->second.childIDs.begin(); ch != itFind->second.childIDs.end(); ++ch)
-								{
-									if (*ch == iht->first)
-									{
-										isChild = true;
-										break;
-									}
-								}
-
-								if (isChild == false)
-								{
-									for (set<DFSCode>::iterator ch = iht->second.childIDs.begin(); ch != iht->second.childIDs.end(); ++ch)
-									{
-										if (*ch == itTmpQ->code)
-										{
-											isChild = true;
-											break;
-										}
-									}
-								}
-			
-								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-								{
-									colocated = 0;
-									confidence = 0;
-									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-									if (colocated >= theta && confidence >= phi)
-									{
-										++countPair;
-										CorrelatedResult res;
-										res.g1 = itFind->second.graphs[0];
-										res.g2 = iht->second.graphs[0];
-										res.colocatedvalue = colocated;
-										res.confidencevalue = confidence;
-										topKqueue.insert(res);
-										//write(of, itFind->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-									}
-								}
-							}
-						}
-					}
 				}
 				else
 				{
@@ -326,6 +275,51 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 			}
 			else
 			{
+				for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				{
+					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
+					{
+						Hashtable::iterator itFind = table.find(itTmpQ->code);
+						// Compute Correlated value
+						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						{
+							bool isChild = false;
+							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
+							if (got != itFind->second.childIDs.end())
+							{
+								isChild = true;
+							}
+								
+							if (isChild == false)
+							{
+								got = iht->second.childIDs.find(itTmpQ->code);
+								if (got != iht->second.childIDs.end())
+								{
+									isChild = true;
+								}
+							}
+			
+							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+							{
+								colocated = 0;
+								confidence = 0;
+								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+								if (colocated >= theta && confidence >= phi)
+								{
+									++countPair;
+									CorrelatedResult res;
+									res.g1 = itFind->second.graphs[0];
+									res.g2 = iht->second.graphs[0];
+									res.colocatedvalue = colocated;
+									res.confidencevalue = confidence;
+									topKqueue.insert(res);
+								}
+							}
+						}
+					}
+				}
+
 				mainQ = tmpQ;
 				tmpQ.clear();
 			}
@@ -546,57 +540,6 @@ void CorrelatedGraph::constructHashTable(char* filenameOuput, int theta, double 
 						table.erase(itFind);
 						++count;
 					}
-					else
-					{
-						if (itTmpQ->isSavedToTable == false)
-						{
-							// Compute Correlated value
-							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
-							{
-								bool isChild = false;
-			
-								for (set<DFSCode>::iterator ch = itFind->second.childIDs.begin(); ch != itFind->second.childIDs.end(); ++ch)
-								{
-									if (*ch == iht->first)
-									{
-										isChild = true;
-										break;
-									}
-								}
-
-								if (isChild == false)
-								{
-									for (set<DFSCode>::iterator ch = iht->second.childIDs.begin(); ch != iht->second.childIDs.end(); ++ch)
-									{
-										if (*ch == itTmpQ->code)
-										{
-											isChild = true;
-											break;
-										}
-									}
-								}
-			
-								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-								{
-									colocated = 0;
-									confidence = 0;
-									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-									if (colocated >= theta && confidence >= phi)
-									{
-										++countPair;
-										CorrelatedResult res;
-										res.g1 = itFind->second.graphs[0];
-										res.g2 = iht->second.graphs[0];
-										res.colocatedvalue = colocated;
-										res.confidencevalue = confidence;
-										saveResult.insert(res);
-										//write(of, itFind->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-									}
-								}
-							}
-						}
-					}
 				}
 				else
 				{
@@ -611,6 +554,51 @@ void CorrelatedGraph::constructHashTable(char* filenameOuput, int theta, double 
 			}
 			else
 			{
+				for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				{
+					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
+					{
+						Hashtable::iterator itFind = table.find(itTmpQ->code);
+						// Compute Correlated value
+						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						{
+							bool isChild = false;
+							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
+							if (got != itFind->second.childIDs.end())
+							{
+								isChild = true;
+							}
+								
+							if (isChild == false)
+							{
+								got = iht->second.childIDs.find(itTmpQ->code);
+								if (got != iht->second.childIDs.end())
+								{
+									isChild = true;
+								}
+							}
+			
+							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+							{
+								colocated = 0;
+								confidence = 0;
+								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+								if (colocated >= theta && confidence >= phi)
+								{
+									++countPair;
+									CorrelatedResult res;
+									res.g1 = itFind->second.graphs[0];
+									res.g2 = iht->second.graphs[0];
+									res.colocatedvalue = colocated;
+									res.confidencevalue = confidence;
+									saveResult.insert(res);
+								}
+							}
+						}
+					}
+				}
+
 				mainQ = tmpQ;
 				tmpQ.clear();
 			}
@@ -834,72 +822,11 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 				Hashtable::iterator itFind = table.find(itTmpQ->code);
 				if (itFind != table.end())
 				{
-					int frequency = itFind->second.freq;
-					if (frequency < theta)
+					if (itFind->second.freq < theta)
 					{
 						itTmpQ->isStop = true;
 						table.erase(itFind);
 						++count;
-					}
-					else
-					{
-						if (itTmpQ->isSavedToTable == false)
-						{
-							// Compute Correlated value
-							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
-							{
-								bool isChild = false;
-			
-								for (set<DFSCode>::iterator ch = itFind->second.childIDs.begin(); ch != itFind->second.childIDs.end(); ++ch)
-								{
-									if (*ch == iht->first)
-									{
-										isChild = true;
-										break;
-									}
-								}
-
-								if (isChild == false)
-								{
-									for (set<DFSCode>::iterator ch = iht->second.childIDs.begin(); ch != iht->second.childIDs.end(); ++ch)
-									{
-										if (*ch == itTmpQ->code)
-										{
-											isChild = true;
-											break;
-										}
-									}
-								}
-			
-								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-								{
-									colocated = 0;
-									confidence = 0;
-									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-									if (colocated >= theta && confidence >= phi)
-									{
-										++countPair;
-										CorrelatedResult res;
-										res.g1 = itFind->second.graphs[0];
-										res.g2 = iht->second.graphs[0];
-										res.colocatedvalue = colocated;
-										res.confidencevalue = confidence;
-										saveResult.insert(res);
-										//write(of, itFind->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-									}
-								}
-							}
-						}
-
-						for (vector<Graph>::iterator gg = itFind->second.graphs.begin(); gg != itFind->second.graphs.end(); ++gg)
-						{
-							if (gg->idGraph == itTmpQ->graph.idGraph)
-							{
-								itTmpQ->graph.sameHHop = gg->sameHHop;
-								break;
-							}
-						}
 					}
 				}
 				else
@@ -915,6 +842,51 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 			}
 			else
 			{
+				for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				{
+					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
+					{
+						Hashtable::iterator itFind = table.find(itTmpQ->code);
+						// Compute Correlated value
+						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						{
+							bool isChild = false;
+							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
+							if (got != itFind->second.childIDs.end())
+							{
+								isChild = true;
+							}
+								
+							if (isChild == false)
+							{
+								got = iht->second.childIDs.find(itTmpQ->code);
+								if (got != iht->second.childIDs.end())
+								{
+									isChild = true;
+								}
+							}
+			
+							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+							{
+								colocated = 0;
+								confidence = 0;
+								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+								if (colocated >= theta && confidence >= phi)
+								{
+									++countPair;
+									CorrelatedResult res;
+									res.g1 = itFind->second.graphs[0];
+									res.g2 = iht->second.graphs[0];
+									res.colocatedvalue = colocated;
+									res.confidencevalue = confidence;
+									saveResult.insert(res);
+								}
+							}
+						}
+					}
+				}
+
 				mainQ = tmpQ;
 				tmpQ.clear();
 			}
@@ -1238,57 +1210,6 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 						table.erase(itFind);
 						++count;
 					}
-					else
-					{
-						if (itTmpQ->isSavedToTable == false)
-						{
-							// Compute Correlated value
-							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
-							{
-								bool isChild = false;
-			
-								for (set<DFSCode>::iterator ch = itFind->second.childIDs.begin(); ch != itFind->second.childIDs.end(); ++ch)
-								{
-									if (*ch == iht->first)
-									{
-										isChild = true;
-										break;
-									}
-								}
-
-								if (isChild == false)
-								{
-									for (set<DFSCode>::iterator ch = iht->second.childIDs.begin(); ch != iht->second.childIDs.end(); ++ch)
-									{
-										if (*ch == itTmpQ->code)
-										{
-											isChild = true;
-											break;
-										}
-									}
-								}
-			
-								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-								{
-									colocated = 0;
-									confidence = 0;
-									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-									if (colocated >= theta && confidence >= phi)
-									{
-										++countPair;
-										CorrelatedResult res;
-										res.g1 = itFind->second.graphs[0];
-										res.g2 = iht->second.graphs[0];
-										res.colocatedvalue = colocated;
-										res.confidencevalue = confidence;
-										saveResult.insert(res);
-										//write(of, itFind->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-									}
-								}
-							}
-						}
-					}
 				}
 				else
 				{
@@ -1303,6 +1224,51 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 			}
 			else
 			{
+				for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				{
+					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
+					{
+						Hashtable::iterator itFind = table.find(itTmpQ->code);
+						// Compute Correlated value
+						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						{
+							bool isChild = false;
+							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
+							if (got != itFind->second.childIDs.end())
+							{
+								isChild = true;
+							}
+								
+							if (isChild == false)
+							{
+								got = iht->second.childIDs.find(itTmpQ->code);
+								if (got != iht->second.childIDs.end())
+								{
+									isChild = true;
+								}
+							}
+			
+							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+							{
+								colocated = 0;
+								confidence = 0;
+								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+								if (colocated >= theta && confidence >= phi)
+								{
+									++countPair;
+									CorrelatedResult res;
+									res.g1 = itFind->second.graphs[0];
+									res.g2 = iht->second.graphs[0];
+									res.colocatedvalue = colocated;
+									res.confidencevalue = confidence;
+									saveResult.insert(res);
+								}
+							}
+						}
+					}
+				}
+
 				mainQ = tmpQ;
 				tmpQ.clear();
 			}
@@ -1532,72 +1498,11 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 				Hashtable::iterator itFind = table.find(itTmpQ->code);
 				if (itFind != table.end())
 				{
-					int frequency = itFind->second.freq;
-					if (frequency < theta)
+					if (itFind->second.freq < theta)
 					{
 						itTmpQ->isStop = true;
 						table.erase(itFind);
 						++count;
-					}
-					else
-					{
-						if (itTmpQ->isSavedToTable == false)
-						{
-							// Compute Correlated value
-							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
-							{
-								bool isChild = false;
-			
-								for (set<DFSCode>::iterator ch = itFind->second.childIDs.begin(); ch != itFind->second.childIDs.end(); ++ch)
-								{
-									if (*ch == iht->first)
-									{
-										isChild = true;
-										break;
-									}
-								}
-
-								if (isChild == false)
-								{
-									for (set<DFSCode>::iterator ch = iht->second.childIDs.begin(); ch != iht->second.childIDs.end(); ++ch)
-									{
-										if (*ch == itTmpQ->code)
-										{
-											isChild = true;
-											break;
-										}
-									}
-								}
-			
-								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-								{
-									colocated = 0;
-									confidence = 0;
-									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-									if (colocated >= theta && confidence >= phi)
-									{
-										++countPair;
-										CorrelatedResult res;
-										res.g1 = itFind->second.graphs[0];
-										res.g2 = iht->second.graphs[0];
-										res.colocatedvalue = colocated;
-										res.confidencevalue = confidence;
-										saveResult.insert(res);
-										//write(of, itFind->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-									}
-								}
-							}
-						}
-
-						for (vector<Graph>::iterator gg = itFind->second.graphs.begin(); gg != itFind->second.graphs.end(); ++gg)
-						{
-							if (gg->idGraph == itTmpQ->graph.idGraph)
-							{
-								itTmpQ->graph.sameHHop = gg->sameHHop;
-								break;
-							}
-						}
 					}
 				}
 				else
@@ -1613,6 +1518,51 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 			}
 			else
 			{
+				for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				{
+					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
+					{
+						Hashtable::iterator itFind = table.find(itTmpQ->code);
+						// Compute Correlated value
+						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						{
+							bool isChild = false;
+							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
+							if (got != itFind->second.childIDs.end())
+							{
+								isChild = true;
+							}
+								
+							if (isChild == false)
+							{
+								got = iht->second.childIDs.find(itTmpQ->code);
+								if (got != iht->second.childIDs.end())
+								{
+									isChild = true;
+								}
+							}
+			
+							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+							{
+								colocated = 0;
+								confidence = 0;
+								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+								if (colocated >= theta && confidence >= phi)
+								{
+									++countPair;
+									CorrelatedResult res;
+									res.g1 = itFind->second.graphs[0];
+									res.g2 = iht->second.graphs[0];
+									res.colocatedvalue = colocated;
+									res.confidencevalue = confidence;
+									saveResult.insert(res);
+								}
+							}
+						}
+					}
+				}
+
 				mainQ = tmpQ;
 				tmpQ.clear();
 			}
@@ -1842,57 +1792,6 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 						table.erase(itFind);
 						++count;
 					}
-					else
-					{
-						if (itTmpQ->isSavedToTable == false)
-						{
-							// Compute Correlated value
-							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
-							{
-								bool isChild = false;
-			
-								for (set<DFSCode>::iterator ch = itFind->second.childIDs.begin(); ch != itFind->second.childIDs.end(); ++ch)
-								{
-									if (*ch == iht->first)
-									{
-										isChild = true;
-										break;
-									}
-								}
-
-								if (isChild == false)
-								{
-									for (set<DFSCode>::iterator ch = iht->second.childIDs.begin(); ch != iht->second.childIDs.end(); ++ch)
-									{
-										if (*ch == itTmpQ->code)
-										{
-											isChild = true;
-											break;
-										}
-									}
-								}
-			
-								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-								{
-									colocated = 0;
-									confidence = 0;
-									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-									if (colocated >= theta && confidence >= phi)
-									{
-										++countPair;
-										CorrelatedResult res;
-										res.g1 = itFind->second.graphs[0];
-										res.g2 = iht->second.graphs[0];
-										res.colocatedvalue = colocated;
-										res.confidencevalue = confidence;
-										topKqueue.insert(res);
-										//write(of, itFind->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-									}
-								}
-							}
-						}
-					}
 				}
 				else
 				{
@@ -1907,6 +1806,51 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 			}
 			else
 			{
+				for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				{
+					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
+					{
+						Hashtable::iterator itFind = table.find(itTmpQ->code);
+						// Compute Correlated value
+						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						{
+							bool isChild = false;
+							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
+							if (got != itFind->second.childIDs.end())
+							{
+								isChild = true;
+							}
+								
+							if (isChild == false)
+							{
+								got = iht->second.childIDs.find(itTmpQ->code);
+								if (got != iht->second.childIDs.end())
+								{
+									isChild = true;
+								}
+							}
+			
+							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+							{
+								colocated = 0;
+								confidence = 0;
+								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+								if (colocated >= theta && confidence >= phi)
+								{
+									++countPair;
+									CorrelatedResult res;
+									res.g1 = itFind->second.graphs[0];
+									res.g2 = iht->second.graphs[0];
+									res.colocatedvalue = colocated;
+									res.confidencevalue = confidence;
+									topKqueue.insert(res);
+								}
+							}
+						}
+					}
+				}
+
 				mainQ = tmpQ;
 				tmpQ.clear();
 			}

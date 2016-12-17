@@ -19,7 +19,7 @@ public:
 	vector<Graph> graphs;
 	set<DFSCode> childIDs;
 	int freq;
-	vector<int> independent_graphs;
+	//vector<int> independent_graphs;
 	set<CodeId> ignoreList;
 
 	Instance()

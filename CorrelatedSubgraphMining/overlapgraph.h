@@ -67,7 +67,7 @@ private:
 public:
 
 	//save index of selected nodes into MIS
-	vector<int> selectedGraph;
+	//vector<int> selectedGraph;
 
 	OverlapGraph (int size) { nodes = new OGNode* [size]; cnt = 0; buf = NULL; }
 	int size () { return this->cnt; }
@@ -104,7 +104,8 @@ public:
    *  @return the size of a maximum independent node set
    *  @since  2007.06.14 (Christian Borgelt) */
   /*------------------------------------------------------------------*/
-  int getMISSize(vector<int> & selectedGraph);
+  //int getMISSize(vector<int> & selectedGraph);
+  int getMISSize();
 
   /*------------------------------------------------------------------*/
   /** Select a safe node for an independent node set.

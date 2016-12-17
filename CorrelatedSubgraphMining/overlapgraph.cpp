@@ -99,7 +99,8 @@ void OverlapGraph::sort(OGNode** buffer, int numelement)
 	}
 }
 
-int OverlapGraph::getMISSize (vector<int>& selectedGraph)
+//int OverlapGraph::getMISSize (vector<int>& selectedGraph)
+int OverlapGraph::getMISSize ()
 {
 	int    i, k, n;             /* loop variables, number of nodes */
     int    c;                   /* number of connected components */
@@ -108,14 +109,14 @@ int OverlapGraph::getMISSize (vector<int>& selectedGraph)
     /* --- handle trivial cases --- */
     if (this->cnt <= 1) 
 	{
-		this->selectedGraph.push_back(this->nodes[0]->index);
-		selectedGraph = this->selectedGraph;
+		//this->selectedGraph.push_back(this->nodes[0]->index);
+		//selectedGraph = this->selectedGraph;
 		return this->cnt;
 	}
 
     if (this->cnt <= 2)
 	{
-		if (this->nodes[0]->deg > 0)
+		/*if (this->nodes[0]->deg > 0)
 		{
 			this->selectedGraph.push_back(this->nodes[0]->index);
 		}
@@ -124,7 +125,7 @@ int OverlapGraph::getMISSize (vector<int>& selectedGraph)
 			this->selectedGraph.push_back(this->nodes[0]->index);
 			this->selectedGraph.push_back(this->nodes[1]->index);
 		}
-		selectedGraph = this->selectedGraph;
+		selectedGraph = this->selectedGraph;*/
 		return (2 - this->nodes[0]->deg);
 	}
 
@@ -137,7 +138,7 @@ int OverlapGraph::getMISSize (vector<int>& selectedGraph)
 		if (s->deg <= 0)
 		{ 
 			s->mark =  0; 
-			this->selectedGraph.push_back(s->index);
+			//this->selectedGraph.push_back(s->index);
 			this->sel++;
 		}
 		else if (s->deg <= 1)
@@ -171,12 +172,12 @@ int OverlapGraph::getMISSize (vector<int>& selectedGraph)
 			{
 				if (this->nodes[i]->mark < 0)
 				{
-					this->selectedGraph.push_back(this->nodes[i]->index);
+					//this->selectedGraph.push_back(this->nodes[i]->index);
 					break;
 				}
 			}
 		}
-		selectedGraph = this->selectedGraph;
+		//selectedGraph = this->selectedGraph;
 		return this->sel += this->rem & 1;
 	}
 
@@ -217,7 +218,7 @@ int OverlapGraph::getMISSize (vector<int>& selectedGraph)
 		{ 
 			/* If the connected component contains exactly three nodes,   */
 			/* it must be triangle, so exactly one node can be selected.  */			
-			this->selectedGraph.push_back(buf[k - 1]->index);	
+			//this->selectedGraph.push_back(buf[k - 1]->index);	
 			this->sel++;
 			continue;
 		}
@@ -229,7 +230,7 @@ int OverlapGraph::getMISSize (vector<int>& selectedGraph)
 
     delete [] buf;          /* and the node buffer */
 
-	selectedGraph = this->selectedGraph;
+	//selectedGraph = this->selectedGraph;
     return this->sel;            /* return the size of an MIS */
 }
 
@@ -255,7 +256,7 @@ void OverlapGraph::greedy (int beg, int end)
 		buf[k]   = buf[end];
 		buf[end] = node;     /* swap the found node to the end */
 		node->mark = 0;            /* mark and count it as selected and */
-		selectedGraph.push_back(node->index);
+		//selectedGraph.push_back(node->index);
 		this->sel++; m++;          /* remove the node and its neighbors */
 
 		this->rem -= node->red +1;  /* from the remaining nodes */
@@ -296,7 +297,7 @@ void OverlapGraph::greedy (int beg, int end)
     }
 	while (this->rem > 3);     /* while the rest is not trivial */
     
-	if (this->rem > 0)
+	/*if (this->rem > 0)
 	{
 		for (i = beg; i <= end; i++)
 		{
@@ -306,7 +307,7 @@ void OverlapGraph::greedy (int beg, int end)
 				break;
 			}
 		}
-	}
+	}*/
 
 	this->sel += this->rem & 1;   /* process the trivial rest */
  }
@@ -317,7 +318,7 @@ void OverlapGraph::selectSafe (OGNode* node)
     OGNode *s, *d;                /* to traverse the nodes */
 
     node->mark = 0;              /* mark and count node as selected */
-	this->selectedGraph.push_back(node->index);
+	//this->selectedGraph.push_back(node->index);
     this->sel++; this->rem--;     /* and remove it from the rem. nodes */
     
 	if (node->red <= 0) 

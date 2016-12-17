@@ -141,29 +141,40 @@ bool Utility::isIgnore (Instance &ins1, Instance &ins2)
 
 	// Check the condition to be a part of another larger graph
 	vector< vector<int> > labelList;
-	vector<bool> mark(ins2.independent_graphs.size(), false);
+	//vector<bool> mark(ins2.independent_graphs.size(), false);
+	vector<bool> mark(ins2.graphs.size(), false);
 
-	for (int i = 0; i < ins1.independent_graphs.size(); i++)
+	//for (int i = 0; i < ins1.independent_graphs.size(); i++)
+	for (int i = 0; i < ins1.graphs.size(); i++)
 	{
-		vector<int> label;
+		bool isFound = false;
 		int j = 0;
-		for (; j < ins2.independent_graphs.size(); j++)
+		//for (; j < ins2.independent_graphs.size(); j++)
+		for (; j < ins2.graphs.size(); j++)
 		{
-			intersecPointTwoGraphs(ins1.graphs[ins1.independent_graphs[i]], ins2.graphs[ins2.independent_graphs[j]], label);
-			if (label.size() < 2)
+			if (ins1.graphs[0].size() > 2 && ins2.graphs[0].size() > 2)
 			{
-				label.clear();
+				if (ins1.graphs[0][1].label == 2 && ins1.graphs[0][2].label == 3 && ins2.graphs[0][1].label == 2 && ins2.graphs[0][2].label == 3)
+				{
+					int a = 1;
+				}
 			}
-			else
+			vector<int> label;
+			//intersecPointTwoGraphs(ins1.graphs[ins1.independent_graphs[i]], ins2.graphs[ins2.independent_graphs[j]], label);
+			intersecPointTwoGraphs(ins1.graphs[i], ins2.graphs[j], label);
+			
+			if (label.size() >= 2)
 			{
 				mark[j] = true;
+				isFound = true;
 				//sort(label.begin(), label.end());
 				labelList.push_back(label);
-				break;
+				//break;
 			}
 		}
 
-		if (j >= ins2.independent_graphs.size())
+		//if (j >= ins2.independent_graphs.size())
+		if (!isFound)
 		{
 			return false;
 		}
@@ -216,4 +227,16 @@ bool Utility::isIgnore (Instance &ins1, Instance &ins2)
 	ins1.ignoreList.insert(code);
 	ins2.ignoreList.insert(code);
 	return true;
+}
+
+double Utility::pairFuntion (double k1, double k2)
+{
+	if (k1 > k2)
+	{
+		double tmp = k1;
+		k1 = k2;
+		k2 = tmp;
+	}
+
+	return (k1 + k2) * (k1 + k2 + 1) / 2 + k2;
 }

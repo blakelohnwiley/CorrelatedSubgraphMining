@@ -58,10 +58,10 @@ void Graph::buildEdge()
 	edge_size_ = id;
 }
 
-void Graph::pushHHopCode(CodeId& id)
-{
-	sameHHop.insert(id);
-}
+//void Graph::pushHHopCode(CodeId& id)
+//{
+//	sameHHop.insert(id);
+//}
 
 int Graph::index(int id)
 {

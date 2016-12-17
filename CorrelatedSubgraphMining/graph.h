@@ -12,6 +12,7 @@
 #include<fstream>
 #include<deque>
 #include <set>
+#include <unordered_set>
 
 using namespace std;
 
@@ -130,7 +131,8 @@ private:
 	bool _isSorted;
 
 public:
-	set <CodeId> sameHHop;
+	//set <CodeId> sameHHop;
+	unordered_set <double> sameHHop;
 	double idGraph;
 	bool directed;
 
@@ -178,7 +180,7 @@ public:
 	Graph(bool directed) : edge_size_(0){ _isSorted = false; this->directed = directed; };
 	Graph(Graph* g);
 
-	void pushHHopCode(CodeId& id);
+	//void pushHHopCode(CodeId& id);
 
 	void findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>& results);
 };
