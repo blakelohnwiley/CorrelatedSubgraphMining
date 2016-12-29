@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <stdint.h>
 
 using namespace std;
 

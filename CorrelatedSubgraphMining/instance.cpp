@@ -14,6 +14,7 @@ bool Instance::isExist(DFSCode& dfsCode)
 void Instance::push(Graph& g, set<DFSCode> child)
 {
 	graphs.push_back(g);
+	mapIdToIndexGraph[g.idGraph] = graphs.size() - 1;
 
 	childIDs.insert(child.begin(), child.end());
 }
@@ -21,6 +22,7 @@ void Instance::push(Graph& g, set<DFSCode> child)
 void Instance::push(Graph& g, set<DFSCode> child, set<CodeId> ignore)
 {
 	graphs.push_back(g);
+	mapIdToIndexGraph[g.idGraph] = graphs.size() - 1;
 
 	childIDs.insert(child.begin(), child.end());
 	ignoreList.insert(ignore.begin(), ignore.end());
@@ -29,6 +31,7 @@ void Instance::push(Graph& g, set<DFSCode> child, set<CodeId> ignore)
 void Instance::push(Graph& g)
 {
 	graphs.push_back(g);
+	mapIdToIndexGraph[g.idGraph] = graphs.size() - 1;
 }
 
 int Instance::computeFrequency()

@@ -6,6 +6,8 @@
 #include "instance.h"
 #include <iostream>
 #include <vector> 
+#include <stdint.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -21,7 +23,15 @@ public:
 
 	// Check to ignore due to two graphs are parts of other graphs
 	static bool isIgnore (Instance &ins1, Instance &ins2);
-	static double pairFuntion (double k1, double k2);
+	static uint64_t pairFuntion (uint64_t k1, uint64_t k2);
+
+	static vector<int> intersect(vector<int> f1, vector<int> f2);
+	static vector<int> intersectSorted(vector<int> f1, vector<int> f2);
+	static vector<int> unionSet(vector<int> f1, vector<int> f2);
+	static vector<int> unionSortedSet(vector<int> f1, vector<int> f2);
+	static bool contains(vector<int> & f, int e);
+	static vector<int> removeElement(vector<int>& v, int e);
+	static bool contains(vector< vector<int> > f, int e, int row);
 };
 
 #endif

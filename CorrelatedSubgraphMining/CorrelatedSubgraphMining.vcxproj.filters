@@ -44,6 +44,21 @@
     <ClCompile Include="treenode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CorrelatedResult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TopKQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="labelcandidateselector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dualsimulation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dualiso.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graph.h">
@@ -71,6 +86,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="correlatedgraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="correlatedresult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TopKQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="labelcandidateselector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dualsimulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dualiso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

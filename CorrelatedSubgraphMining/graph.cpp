@@ -105,6 +105,7 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 			(*this)[size() - 1].id = e.to;
 			(*this)[size() - 1].label = g.vertexLabel(e.to);
 			mapIdToIndex[e.to] = size() - 1;
+			labelIdx[(*this)[size() - 1].label].push_back(size() - 1);
 		}
 	}
 	else
@@ -114,6 +115,7 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 		(*this)[size() - 1].id = e.from;
 		(*this)[size() - 1].label = g.vertexLabel(e.from);
 		mapIdToIndex[e.from] = size() - 1;
+		labelIdx[(*this)[size() - 1].label].push_back(size() - 1);
 	}
 
 	// start point and end point of e existed, insert edge e
@@ -127,7 +129,7 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 	buildEdge();
 }
 
-void Graph::insertEdge(Edge& e, int vertexStartLable, int vertexEndLable)
+void Graph::insertEdge(Edge& e, int vertexStartLabel, int vertexEndLabel)
 {
 	// check if start point and end point of e exist?
 	bool isFound = false;
@@ -157,8 +159,9 @@ void Graph::insertEdge(Edge& e, int vertexStartLable, int vertexEndLable)
 			// Insert a new vertex that is the end point of e
 			resize(size() + 1);
 			(*this)[size() - 1].id = e.to;
-			(*this)[size() - 1].label = vertexEndLable;
+			(*this)[size() - 1].label = vertexEndLabel;
 			mapIdToIndex[e.to] = size() - 1;
+			labelIdx[vertexEndLabel].push_back(size() - 1);
 		}
 	}
 	else
@@ -166,8 +169,9 @@ void Graph::insertEdge(Edge& e, int vertexStartLable, int vertexEndLable)
 		// Insert a new vertex that is the start point of e
 		resize(size() + 1);
 		(*this)[size() - 1].id = e.from;
-		(*this)[size() - 1].label = vertexStartLable;
+		(*this)[size() - 1].label = vertexStartLabel;
 		mapIdToIndex[e.from] = size() - 1;
+		labelIdx[vertexStartLabel].push_back(size() - 1);
 	}
 
 	// start point and end point of e existed, insert edge e
@@ -187,6 +191,7 @@ void Graph::extendByVertex(Graph& g, Vertex& v)
 	(*this)[size() - 1].id = v.id;
 	(*this)[size() - 1].label = v.label;
 	mapIdToIndex[v.id] = size() - 1;
+	labelIdx[v.label].push_back(size() - 1);
 
 	// get all edges to and from this node from g
 	int indexBigGraph = g.mapIdToIndex[v.id];
@@ -237,6 +242,7 @@ void Graph::insertVertex(Vertex& v)
 	(*this)[size() - 1].id = v.id;
 	(*this)[size() - 1].label = v.label;
 	mapIdToIndex[v.id] = size() - 1;
+	labelIdx[v.label].push_back(size() - 1);
 }
 
 void Graph::sortGaph()
@@ -244,10 +250,12 @@ void Graph::sortGaph()
 	sort(this->begin(), this->end());
 	// rebuild the mapping table from Id to Index
 	mapIdToIndex.clear();
+	labelIdx.clear();
 
 	for (int i = 0; i < (int)size(); i++)
 	{
 		mapIdToIndex[(*this)[i].id] = i;
+		labelIdx[(*this)[i].label].push_back(i);
 	}
 
 	this->_isSorted = true;
@@ -296,7 +304,7 @@ bool Graph::overlap (Graph& g)
 	return false;
 }
 
-bool Graph::isDuplicated(const Graph& g)
+bool Graph::isDuplicated(const Graph& g) const
 {
 	// check number of vertices and edges
 	if (size() != g.vertex_size())
@@ -352,6 +360,7 @@ bool Graph::isDuplicated(const Graph& g)
 int Graph::read(char* _fname)
 {
 	mapIdToIndex.clear();
+	labelIdx.clear();
 
 	vector <string> result;
 	char line[1024];
@@ -369,17 +378,15 @@ int Graph::read(char* _fname)
 	
 	clear();
 	
-	while (true)
+	while(!is.eof())
 	{
 		//cout << "Read in : ";
 		unsigned int pos = is.tellg();
-		if (!is.getline(line,1024))
-		{
-			cerr << "read all lines in file" << endl;
-			break;
-		}
+		is.getline(line,1024, '\n');
+		if (strlen(line) == 0)
+			continue;
+
 		linecnt++;
-		
 		result.clear();
 		tokenize<string>(line, back_inserter(result));
 		
@@ -394,6 +401,7 @@ int Graph::read(char* _fname)
 				(*this)[size() - 1].id = id;
 				(*this)[size() - 1].label = atoi(result[2].c_str());
 				mapIdToIndex[id] = size() - 1;
+				labelIdx[id].push_back(size() - 1);
 				//cout<<"v "<< atoi(result[1].c_str()) << " " << atoi(result[2].c_str()) << " " << (*this)[id].label <<" added"<< endl;
 			}
 			else if (result[0] == "e" && result.size() >= 4) 
@@ -555,4 +563,334 @@ void Graph::findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>
 		results.push_back(v);
 		Queue.pop_front();
 	}
+}
+
+vector<int> Graph::getNeighbor(int id)
+{
+	int indexSource = index(id);
+	vector<int> result;
+
+	for (int i = 0; i < (*this)[indexSource].edge.size(); ++i)
+	{
+		result.push_back(index((*this)[indexSource].edge[i].to));
+	}
+
+	sort(result.begin(), result.end());
+
+	return result;
+}
+
+vector<int> Graph::getVerticesByLabel(int label)
+{
+	return labelIdx[label];
+}
+
+bool Graph::operator==(const Graph& g) const
+{
+	return isDuplicated(g);
+}
+
+vector<Graph> Graph::getDownNeighborsExactGraph()
+{
+	if (this->size() <= 1)
+		return vector<Graph>();
+	vector<Graph> result;
+
+	if (this->size() == 2)
+	{
+		if (directed)
+		{
+			Graph g(this->directed);
+
+			if ((*this)[0].edge.size() > 0)
+			{
+				Vertex v1;
+				v1.id = (*this)[0].id;
+				v1.label = (*this)[0].label;
+				g.insertVertex(v1);
+			}
+			else
+			{
+				Vertex v1;
+				v1.id = (*this)[1].id;
+				v1.label = (*this)[1].label;
+				g.insertVertex(v1);
+			}
+
+			result.push_back(g);
+		}
+		else
+		{
+			Graph g1(this->directed);
+			Graph g2(this->directed);
+
+			Vertex v1;
+			v1.id = (*this)[0].id;
+			v1.label = (*this)[0].label;
+			g1.insertVertex(v1);
+			result.push_back(g1);
+
+			Vertex v2;
+			v2.id = (*this)[1].id;
+			v2.label = (*this)[1].label;
+			g2.insertVertex(v2);
+			result.push_back(g2);
+		}
+
+		return result;
+	}
+
+	//if undirect graph, remove edges having id to > id from (at the same time removing 2 directions)
+	// after removing edge, if vertex is isolated, then removing vertex
+	for (int i = 0; i < size(); i++)
+	{
+		for (int j = 0; j < (*this)[i].edge.size(); j++)
+		{
+			if (directed)
+			{
+				bool isDeleted = false;
+				Graph g = *this;
+				g._isSorted = false;
+				g[i].edge.erase(g[i].edge.begin() + j);
+
+				int idx = g.index((*this)[i].edge[j].to);
+				//if no edge to vertex[idx], delete it
+				bool isFound = false;
+
+				for (int tt = 0; tt < g.size(); tt++)
+				{
+					if (tt != idx)
+					{
+						for (int kk = 0; kk < g[tt].edge.size(); kk++)
+						{
+							if (g[tt].edge[kk].to == g[idx].id)
+							{
+								isFound = true;
+								break;
+							}
+						}
+
+						if (isFound == true)
+							break;
+					}
+				}
+
+				if (g[i].edge.size() == 0)
+				{
+					// remove i from g
+					g.erase(g.begin() + i);
+					isDeleted = true;
+				}
+
+				if (isFound == false)
+				{
+					g.erase(g.begin() + idx);
+					isDeleted = true;
+				}
+
+				if (isDeleted == false)
+				{
+					// Check connected property
+					if (g.isReachable(g[i].id, g[idx].id))
+					{
+						g.buildEdge();
+						result.push_back(g);
+					}
+				}
+				else
+				{
+					g.buildEdge();
+					result.push_back(g);
+				}
+			}
+			else
+			{
+				if ((*this)[i].edge[j].to > (*this)[i].id)
+				{
+					bool isDeleted = false;
+					Graph g = *this;
+					g._isSorted = false;
+
+					g[i].edge.erase(g[i].edge.begin() + j);
+
+					int idx = g.index((*this)[i].edge[j].to);
+					for (int k = 0; k < g[idx].edge.size(); k++)
+					{
+						if (g[idx].edge[k].to == (*this)[i].id)
+						{
+							g[idx].edge.erase(g[idx].edge.begin() + k);
+							break;
+						}
+					}
+
+					if (g[i].edge.size() == 0)
+					{
+						// remove i from g
+						g.erase(g.begin() + i);
+						isDeleted = true;
+					}
+
+					if (g[idx].edge.size() == 0)
+					{
+						g.erase(g.begin() + idx);
+						isDeleted = true;
+					}
+
+					if (isDeleted == false)
+					{
+						// Check connected property
+						if (g.isReachable(g[i].id, g[idx].id))
+						{
+							g.buildEdge();
+							result.push_back(g);
+						}
+					}
+					else
+					{
+						g.buildEdge();
+						result.push_back(g);
+					}
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+vector<Graph> Graph::getUpNeigborsExactGraph(Graph& database)
+{
+	vector<Graph> result;
+
+	unordered_set<int> idCurrentGraph;
+	for (int i = 0; i < this->size(); i++)
+	{
+		idCurrentGraph.insert((*this)[i].id);
+	}
+
+	for (int i = 0; i < this->size(); i++)
+	{
+		int indexSource = database.index((*this)[i].id);
+
+		for (int k = 0; k < database[indexSource].edge.size(); ++k)
+		{
+			int idDes = database[indexSource].edge[k].to;
+			unordered_set<int>::const_iterator itFi = idCurrentGraph.find(idDes);
+
+			if (itFi != idCurrentGraph.end())
+			{
+				// just add new edge
+				if (database.directed == false)
+				{
+					if (idDes > (*this)[i].id)
+					{
+						// insert new edge (2 directions)
+						// check if the edge belonged to the current graph
+						bool isExisted = false;
+						for (int tt = 0; tt < (*this)[i].edge.size(); tt++)
+						{
+							if ((*this)[i].edge[tt].to == idDes && (*this)[i].edge[tt].elabel == database[indexSource].edge[k].elabel)
+							{
+								isExisted = true;
+								break;
+							}
+						}
+
+						if (!isExisted)
+						{
+							Graph g = *this;
+							g[i].push((*this)[i].id, idDes, database[indexSource].edge[k].elabel);
+							int idx = this->index(idDes);
+							g[idx].push(idDes, (*this)[i].id, database[indexSource].edge[k].elabel);
+							g.buildEdge();
+
+							result.push_back(g);
+						}
+					}
+				}
+				else
+				{
+					bool isExisted = false;
+					for (int tt = 0; tt < (*this)[i].edge.size(); tt++)
+					{
+						if ((*this)[i].edge[tt].to == idDes && (*this)[i].edge[tt].elabel == database[indexSource].edge[k].elabel)
+						{
+							isExisted = true;
+							break;
+						}
+					}
+
+					if (!isExisted)
+					{
+						// insert new edge
+						Graph g = *this;
+						g[i].push((*this)[i].id, idDes, database[indexSource].edge[k].elabel);
+						g.buildEdge();
+
+						result.push_back(g);
+					}
+				}
+			}
+			else
+			{
+				// add new edge and new vertex
+				Graph g = *this;
+				g._isSorted = false;
+
+				int idx = database.index(idDes);
+				Vertex v;
+				v.id = idDes;
+				v.label = database[idx].label;
+
+				g.insertVertex(v);
+				g[i].push((*this)[i].id, idDes, database[indexSource].edge[k].elabel);
+
+				if (database.directed == false)
+					g[g.size() - 1].push(idDes, (*this)[i].id, database[indexSource].edge[k].elabel);
+				
+				g.buildEdge();
+
+				result.push_back(g);
+			}
+		}
+	}
+
+	return result;
+}
+
+bool Graph::isReachable(int idSource, int idDes)
+{
+	if (idSource == idDes)
+		return true;
+	unordered_set<int> visited;
+
+	// Create a queue for BFS
+    deque<int> queue;
+ 
+    // Mark the current node as visited and enqueue it
+	visited.insert(idSource);
+	queue.push_back(idSource);
+
+	while(!queue.empty())
+	{
+		int indx = index(queue.front());
+		queue.pop_front();
+
+		for (int i = 0; i < (*this)[indx].edge.size(); i++)
+		{
+			// If this adjacent node is the destination node, then 
+            // return true
+			if ((*this)[indx].edge[i].to == idDes)
+                return true;
+ 
+            // Else, continue to do BFS
+			if (visited.find((*this)[indx].edge[i].to) == visited.end())
+			{
+				visited.insert((*this)[indx].edge[i].to);
+				queue.push_back((*this)[indx].edge[i].to);
+			}
+		}
+	}
+
+	return false;
 }

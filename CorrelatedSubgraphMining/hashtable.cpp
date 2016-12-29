@@ -257,39 +257,43 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 	{
 		for (int j = 0; j < ins2.graphs.size(); j++)
 		{
-			bool isTested = false;
-			for (unordered_set<double>::iterator it1 = ins1.graphs[i].sameHHop.begin(); it1 != ins1.graphs[i].sameHHop.end(); ++it1)
+			for (unordered_set<uint64_t>::iterator it1 = ins1.graphs[i].sameHHop.begin(); it1 != ins1.graphs[i].sameHHop.end(); ++it1)
 			{
-				unordered_set<double>::const_iterator got = ins2.graphs[j].sameHHop.find(*it1);
+				unordered_set<uint64_t>::const_iterator got = ins2.graphs[j].sameHHop.find(*it1);
 				if (got != ins2.graphs[j].sameHHop.end())
 				{
-					isTested = true;
 					I1[i] = true;
 					I2[j] = true;
 					break;
 				}
 			}
-			
-			if (isTested == false)
+		}
+	}
+
+	for (int i = 0; i < ins1.graphs.size(); i++)
+	{
+		if (I1[i] == false)
+		{
+			for (int j = 0; j < ins2.graphs.size(); j++)
 			{
-				++numTestCollocated;
+			
+					++numTestCollocated;
 
-				if (Utility::isInHHop(bigGraph, ins1.graphs[i], ins2.graphs[j], hop) == true)
-				{
-					// create same code ID for each graph
-					double codeId;
+					if (Utility::isInHHop(bigGraph, ins1.graphs[i], ins2.graphs[j], hop) == true)
+					{
+						// create same code ID for each graph
+						uint64_t codeId;
 				
-					codeId = Utility::pairFuntion(ins1.graphs[i].idGraph, ins2.graphs[j].idGraph);
-					ins1.graphs[i].sameHHop.insert(codeId);
-					ins2.graphs[j].sameHHop.insert(codeId);
+						codeId = Utility::pairFuntion(ins1.graphs[i].idGraph, ins2.graphs[j].idGraph);
+						ins1.graphs[i].sameHHop.insert(codeId);
+						ins2.graphs[j].sameHHop.insert(codeId);
 
-					I1[i] = true;
-					I2[j] = true;
-					break;
-				}
+						I1[i] = true;
+						I2[j] = true;
+						break;
+					}
+			
 			}
-			else
-				break;
 		}
 	}
 
@@ -299,27 +303,33 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 		{
 			for (int j = 0; j < ins1.graphs.size(); j++)
 			{
-				bool isTested = false;
-			
-				for (unordered_set<double>::iterator it1 = ins1.graphs[j].sameHHop.begin(); it1 != ins1.graphs[j].sameHHop.end(); ++it1)
+			for (unordered_set<uint64_t>::iterator it1 = ins1.graphs[j].sameHHop.begin(); it1 != ins1.graphs[j].sameHHop.end(); ++it1)
+			{
+				unordered_set<uint64_t>::const_iterator got = ins2.graphs[i].sameHHop.find(*it1);
+				if (got != ins2.graphs[i].sameHHop.end())
 				{
-					unordered_set<double>::const_iterator got = ins2.graphs[i].sameHHop.find(*it1);
-					if (got != ins2.graphs[i].sameHHop.end())
-					{
-						isTested = true;
-						I2[i] = true;
-						break;
-					}
+					//isTested = true;
+					I2[i] = true;
+					break;
 				}
+			}
+			}
+		}
+	}
 
-				if (isTested == false)
-				{
+	for (int i = 0; i < ins2.graphs.size(); i++)
+	{
+		if (I2[i] == false)
+		{
+			for (int j = 0; j < ins1.graphs.size(); j++)
+			{
+				
 					++numTestCollocated;
 
 					if (Utility::isInHHop(bigGraph, ins1.graphs[j], ins2.graphs[i], hop) == true)
 					{
 						// create same code ID for each graph
-						double codeId;
+						uint64_t codeId;
 						
 						codeId = Utility::pairFuntion(ins1.graphs[j].idGraph, ins2.graphs[i].idGraph);
 						ins1.graphs[j].sameHHop.insert(codeId);
@@ -328,9 +338,7 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 						I2[i] = true;
 						break;
 					}
-				}
-				else
-					break;
+				
 			}
 		}
 	}

@@ -16,7 +16,7 @@ void CorrelatedGraph::baseLine(bool directed, char * filenameInput, char * filen
 	clock_t start, end;
 
 	start = clock();
-	constructHashTable(filenameOuput, theta, phi, hop, k);
+	computeCorrelatedValueBaseline(filenameOuput, theta, phi, hop, k);
 	//mineCorrelatedGraphFromHashTable(filenameOuput, theta, phi, hop, k);
 	end = clock();
 
@@ -77,7 +77,7 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 {
 	TopKQueue topKqueue(k);
 
-	double id = 0;
+	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
 	for (int i = 0; i < graph.vertex_size(); i++)
@@ -126,37 +126,40 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 				it->isStop = true;
 				table.erase(itTable);
 			}
-			else
-			{
-				if (it->isSavedToTable == false)
-				{
-					// Compute Correlated value
-					for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
-					{
-						colocated = 0;
-						confidence = 0;
-						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-						if (colocated >= theta && confidence >= phi)
-						{
-							++countPair;
-							CorrelatedResult res;
-							res.g1 = itTable->second.graphs[0];
-							res.g2 = iht->second.graphs[0];
-							res.colocatedvalue = colocated;
-							res.confidencevalue = confidence;
-							topKqueue.insert(res);
-							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-						}
-					}
-				}
-			}
 		}
 		else
 		{
 			it->isStop = true;
 		}
 	}
+
+	for (deque<TreeNode>::iterator it = mainQ.begin(); it != mainQ.end(); ++it)
+	{
+		if (it->isStop == false && it->isSavedToTable == false)
+		{
+			Hashtable::iterator itTable = table.find(it->code);
+			// Compute Correlated value
+			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			{
+				colocated = 0;
+				confidence = 0;
+				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+				if (colocated >= theta && confidence >= phi)
+				{
+					++countPair;
+					CorrelatedResult res;
+					res.g1 = itTable->second.graphs[0];
+					res.g2 = iht->second.graphs[0];
+					res.colocatedvalue = colocated;
+					res.confidencevalue = confidence;
+					topKqueue.insert(res);
+					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+				}
+			}
+		}
+	}
+
 	bool stop = false;
 
 	deque<TreeNode> tmpQ;
@@ -303,7 +306,7 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 							{
 								colocated = 0;
 								confidence = 0;
-								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
 
 								if (colocated >= theta && confidence >= phi)
 								{
@@ -338,14 +341,14 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 	of.close();
 }
 
-void CorrelatedGraph::constructHashTable(char* filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int theta, double phi, int hop, int k)
 {
 	TopKQueue saveResult(k);
 	
 	//ofstream of;
 	//of.open("result1.txt");
 	cout << "Building hashtable....." << endl;
-	double id = 0;
+	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
 	for (int i = 0; i < graph.vertex_size(); i++)
@@ -394,37 +397,40 @@ void CorrelatedGraph::constructHashTable(char* filenameOuput, int theta, double 
 				it->isStop = true;
 				table.erase(itTable);
 			}
-			else
-			{
-				if (it->isSavedToTable == false)
-				{
-					// Compute Correlated value
-					for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
-					{
-						colocated = 0;
-						confidence = 0;
-						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-						if (colocated >= theta && confidence >= phi)
-						{
-							++countPair;
-							CorrelatedResult res;
-							res.g1 = itTable->second.graphs[0];
-							res.g2 = iht->second.graphs[0];
-							res.colocatedvalue = colocated;
-							res.confidencevalue = confidence;
-							saveResult.insert(res);
-							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-						}
-					}
-				}
-			}
 		}
 		else
 		{
 			it->isStop = true;
 		}
 	}
+
+	for (deque<TreeNode>::iterator it = mainQ.begin(); it != mainQ.end(); ++it)
+	{
+		if (it->isStop == false && it->isSavedToTable == false)
+		{
+			Hashtable::iterator itTable = table.find(it->code);
+			// Compute Correlated value
+			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			{
+				colocated = 0;
+				confidence = 0;
+				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+				if (colocated >= theta && confidence >= phi)
+				{
+					++countPair;
+					CorrelatedResult res;
+					res.g1 = itTable->second.graphs[0];
+					res.g2 = iht->second.graphs[0];
+					res.colocatedvalue = colocated;
+					res.confidencevalue = confidence;
+					saveResult.insert(res);
+					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+				}
+			}
+		}
+	}
+
 	bool stop = false;
 
 	deque<TreeNode> tmpQ;
@@ -582,7 +588,7 @@ void CorrelatedGraph::constructHashTable(char* filenameOuput, int theta, double 
 							{
 								colocated = 0;
 								confidence = 0;
-								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
 
 								if (colocated >= theta && confidence >= phi)
 								{
@@ -621,7 +627,7 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 	TopKQueue saveResult(k);
 
 	cout << "Building hashtable....." << endl;
-	double id = 0;
+	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 	int numTestHHop = 0;
 	int colocated = 0;
@@ -670,46 +676,40 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 				it->isStop = true;
 				table.erase(itTable);
 			}
-			else
-			{
-				if (it->isSavedToTable == false)
-				{
-					// Compute Correlated value
-					for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
-					{
-						colocated = 0;
-						confidence = 0;
-						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-						if (colocated >= theta && confidence >= phi)
-						{
-							++countPair;
-							CorrelatedResult res;
-							res.g1 = itTable->second.graphs[0];
-							res.g2 = iht->second.graphs[0];
-							res.colocatedvalue = colocated;
-							res.confidencevalue = confidence;
-							saveResult.insert(res);
-							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-						}
-					}
-				}
-
-				for (vector<Graph>::iterator gg = itTable->second.graphs.begin(); gg != itTable->second.graphs.end(); ++gg)
-				{
-					if (gg->idGraph == it->graph.idGraph)
-					{
-						it->graph.sameHHop = gg->sameHHop;
-						break;
-					}
-				}
-			}
 		}
 		else
 		{
 			it->isStop = true;
 		}
 	}
+
+	for (deque<TreeNode>::iterator it = mainQ.begin(); it != mainQ.end(); ++it)
+	{
+		if (it->isStop == false && it->isSavedToTable == false)
+		{
+			Hashtable::iterator itTable = table.find(it->code);
+			// Compute Correlated value
+			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			{
+				colocated = 0;
+				confidence = 0;
+				table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+				if (colocated >= theta && confidence >= phi)
+				{
+					++countPair;
+					CorrelatedResult res;
+					res.g1 = itTable->second.graphs[0];
+					res.g2 = iht->second.graphs[0];
+					res.colocatedvalue = colocated;
+					res.confidencevalue = confidence;
+					saveResult.insert(res);
+					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+				}
+			}
+		}
+	}
+
 	bool stop = false;
 
 	deque<TreeNode> tmpQ;
@@ -726,8 +726,8 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 				current.ignoreList = iht->second.ignoreList;
 
 				// Find current h-hop of current node
-				/*Hashtable::iterator iht = table.find(current.code);
-				for (vector<Graph>::iterator gg = iht->second.graphs.begin(); gg != iht->second.graphs.end(); ++gg)
+				//Hashtable::iterator iht = table.find(current.code);
+				/*for (vector<Graph>::iterator gg = iht->second.graphs.begin(); gg != iht->second.graphs.end(); ++gg)
 				{
 					if (gg->idGraph == current.graph.idGraph)
 					{
@@ -735,6 +735,7 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 						break;
 					}
 				}*/
+				current.graph.sameHHop = iht->second.graphs[iht->second.mapIdToIndexGraph[current.graph.idGraph]].sameHHop;
 
 				// find all neighbouring edges of the graph in current node
 				vector<Edge> edges;
@@ -846,45 +847,57 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 				{
 					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
 					{
-						Hashtable::iterator itFind = table.find(itTmpQ->code);
-						// Compute Correlated value
-						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
-						{
-							bool isChild = false;
-							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
-							if (got != itFind->second.childIDs.end())
+						//if (itTmpQ->isSavedToTable == false)
+						//{
+							Hashtable::iterator itFind = table.find(itTmpQ->code);
+							// Compute Correlated value
+							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
 							{
-								isChild = true;
-							}
-								
-							if (isChild == false)
-							{
-								got = iht->second.childIDs.find(itTmpQ->code);
-								if (got != iht->second.childIDs.end())
+								bool isChild = false;
+								set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
+								if (got != itFind->second.childIDs.end())
 								{
 									isChild = true;
 								}
-							}
-			
-							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-							{
-								colocated = 0;
-								confidence = 0;
-								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-								if (colocated >= theta && confidence >= phi)
+								
+								if (isChild == false)
 								{
-									++countPair;
-									CorrelatedResult res;
-									res.g1 = itFind->second.graphs[0];
-									res.g2 = iht->second.graphs[0];
-									res.colocatedvalue = colocated;
-									res.confidencevalue = confidence;
-									saveResult.insert(res);
+									got = iht->second.childIDs.find(itTmpQ->code);
+									if (got != iht->second.childIDs.end())
+									{
+										isChild = true;
+									}
+								}
+			
+								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+								{
+									colocated = 0;
+									confidence = 0;
+									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+									if (colocated >= theta && confidence >= phi)
+									{
+										++countPair;
+										CorrelatedResult res;
+										res.g1 = itFind->second.graphs[0];
+										res.g2 = iht->second.graphs[0];
+										res.colocatedvalue = colocated;
+										res.confidencevalue = confidence;
+										saveResult.insert(res);
+									}
 								}
 							}
 						}
-					}
+
+						/*for (vector<Graph>::iterator gg = itFind->second.graphs.begin(); gg != itFind->second.graphs.end(); ++gg)
+						{
+							if (gg->idGraph == itTmpQ->graph.idGraph)
+							{
+								itTmpQ->graph.sameHHop = gg->sameHHop;
+								break;
+							}
+						}*/
+					//}
 				}
 
 				mainQ = tmpQ;
@@ -903,87 +916,6 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 	saveResult.print(of);
 
 	//of << "Num pairs: " << countPair << endl;
-	of << "No. call to H-hop Test: " << numTestHHop;
-	of.close();
-}
-
-void CorrelatedGraph::mineCorrelatedGraphFromHashTable(char * filenameOutput, int thetaThres, double phiThres, int hop, int k)
-{
-	std::priority_queue<CorrelatedResult> saveResult;
-
-	cout << "Computing correlated values....." << endl;
-	ofstream of;
-	of.open(filenameOutput);
-	int count = 0;
-	int numTestHHop = 0;
-
-	Hashtable::iterator it1, it2;
-
-	it1 = table.begin();
-	++it1;
-
-	for (; it1 != table.end(); ++it1)
-	{
-		for (it2 = table.begin(); it2 != it1; ++it2)
-		{
-			bool isChild = false;
-			
-			for (set<DFSCode>::iterator ch = it1->second.childIDs.begin(); ch != it1->second.childIDs.end(); ++ch)
-			{
-				if (*ch == it2->first)
-				{
-					isChild = true;
-					break;
-				}
-			}
-
-			if (isChild == false)
-			{
-				for (set<DFSCode>::iterator ch = it2->second.childIDs.begin(); ch != it2->second.childIDs.end(); ++ch)
-				{
-					if (*ch == it1->first)
-					{
-						isChild = true;
-						break;
-					}
-				}
-			}
-			
-			if (isChild == false)
-			{
-				// compute correlated value
-				int colocated;
-				double confidence;
-
-				table.computeCorrelatedValue(graph, it1->second, it2->second, colocated, confidence, hop, numTestHHop);
-
-				if (colocated >= thetaThres && confidence >= phiThres)
-				{
-					++count;
-					//write(of, it1->second.graphs[0], it2->second.graphs[0], count, colocated, confidence);
-					CorrelatedResult res;
-					res.g1 = it1->second.graphs[0];
-					res.g2 = it2->second.graphs[0];
-					res.colocatedvalue = colocated;
-					res.confidencevalue = confidence;
-					saveResult.push(res);
-				}
-			}
-		}
-	}
-
-	int num = 0;
-	while (!saveResult.empty())
-	{
-		CorrelatedResult top = saveResult.top();
-		top.report_result(of, num + 1);
-		saveResult.pop();
-		++num;
-		if (num >= k)
-			break;
-	}
-
-	//of << "Num pairs: " << count << endl;
 	of << "No. call to H-hop Test: " << numTestHHop;
 	of.close();
 }
@@ -1025,7 +957,7 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 {
 	TopKQueue saveResult(k);
 	
-	double id = 0;
+	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
 	for (int i = 0; i < graph.vertex_size(); i++)
@@ -1075,37 +1007,40 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 				it->isStop = true;
 				table.erase(itTable);
 			}
-			else
-			{
-				if (it->isSavedToTable == false)
-				{
-					// Compute Correlated value
-					for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
-					{
-						colocated = 0;
-						confidence = 0;
-						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-						if (colocated >= theta && confidence >= phi)
-						{
-							++countPair;
-							CorrelatedResult res;
-							res.g1 = itTable->second.graphs[0];
-							res.g2 = iht->second.graphs[0];
-							res.colocatedvalue = colocated;
-							res.confidencevalue = confidence;
-							saveResult.insert(res);
-							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-						}
-					}
-				}
-			}
 		}
 		else
 		{
 			it->isStop = true;
 		}
 	}
+
+	for (deque<TreeNode>::iterator it = mainQ.begin(); it != mainQ.end(); ++it)
+	{
+		if (it->isStop == false && it->isSavedToTable == false)
+		{
+			Hashtable::iterator itTable = table.find(it->code);
+			// Compute Correlated value
+			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			{
+				colocated = 0;
+				confidence = 0;
+				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+				if (colocated >= theta && confidence >= phi)
+				{
+					++countPair;
+					CorrelatedResult res;
+					res.g1 = itTable->second.graphs[0];
+					res.g2 = iht->second.graphs[0];
+					res.colocatedvalue = colocated;
+					res.confidencevalue = confidence;
+					saveResult.insert(res);
+					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+				}
+			}
+		}
+	}
+
 	bool stop = false;
 
 	deque<TreeNode> tmpQ;
@@ -1252,7 +1187,7 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 							{
 								colocated = 0;
 								confidence = 0;
-								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
 
 								if (colocated >= theta && confidence >= phi)
 								{
@@ -1311,7 +1246,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 {
 	TopKQueue saveResult(k);
 
-	double id = 0;
+	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 	int numTestHHop = 0;
 	int colocated = 0;
@@ -1360,46 +1295,41 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 				it->isStop = true;
 				table.erase(itTable);
 			}
-			else
-			{
-				if (it->isSavedToTable == false)
-				{
-					// Compute Correlated value
-					for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
-					{
-						colocated = 0;
-						confidence = 0;
-						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-						if (colocated >= theta && confidence >= phi)
-						{
-							++countPair;
-							CorrelatedResult res;
-							res.g1 = itTable->second.graphs[0];
-							res.g2 = iht->second.graphs[0];
-							res.colocatedvalue = colocated;
-							res.confidencevalue = confidence;
-							saveResult.insert(res);
-							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-						}
-					}
-				}
-
-				for (vector<Graph>::iterator gg = itTable->second.graphs.begin(); gg != itTable->second.graphs.end(); ++gg)
-				{
-					if (gg->idGraph == it->graph.idGraph)
-					{
-						it->graph.sameHHop = gg->sameHHop;
-						break;
-					}
-				}
-			}
 		}
 		else
 		{
 			it->isStop = true;
 		}
 	}
+
+	for (deque<TreeNode>::iterator it = mainQ.begin(); it != mainQ.end(); ++it)
+	{
+		if (it->isStop == false && it->isSavedToTable == false)
+		{
+			Hashtable::iterator itTable = table.find(it->code);
+			
+			// Compute Correlated value
+			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			{
+				colocated = 0;
+				confidence = 0;
+				table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+				if (colocated >= theta && confidence >= phi)
+				{
+					++countPair;
+					CorrelatedResult res;
+					res.g1 = itTable->second.graphs[0];
+					res.g2 = iht->second.graphs[0];
+					res.colocatedvalue = colocated;
+					res.confidencevalue = confidence;
+					saveResult.insert(res);
+					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+				}
+			}
+		}
+	}
+
 	bool stop = false;
 
 	deque<TreeNode> tmpQ;
@@ -1414,6 +1344,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 			{
 				Hashtable::iterator iht = table.find(current.code);
 				current.ignoreList = iht->second.ignoreList;
+				current.graph.sameHHop = iht->second.graphs[iht->second.mapIdToIndexGraph[current.graph.idGraph]].sameHHop;
 
 				// find all neighbouring nodes of the graph in current node
 				vector<Vertex> vertices;
@@ -1523,6 +1454,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 					if (itTmpQ->isStop == false && itTmpQ->isSavedToTable == false)
 					{
 						Hashtable::iterator itFind = table.find(itTmpQ->code);
+			
 						// Compute Correlated value
 						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
 						{
@@ -1608,7 +1540,7 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 {
 	TopKQueue topKqueue(k);
 
-	double id = 0;
+	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
 	for (int i = 0; i < graph.vertex_size(); i++)
@@ -1657,37 +1589,40 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 				it->isStop = true;
 				table.erase(itTable);
 			}
-			else
-			{
-				if (it->isSavedToTable == false)
-				{
-					// Compute Correlated value
-					for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
-					{
-						colocated = 0;
-						confidence = 0;
-						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-						if (colocated >= theta && confidence >= phi)
-						{
-							++countPair;
-							CorrelatedResult res;
-							res.g1 = itTable->second.graphs[0];
-							res.g2 = iht->second.graphs[0];
-							res.colocatedvalue = colocated;
-							res.confidencevalue = confidence;
-							topKqueue.insert(res);
-							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
-						}
-					}
-				}
-			}
 		}
 		else
 		{
 			it->isStop = true;
 		}
 	}
+
+	for (deque<TreeNode>::iterator it = mainQ.begin(); it != mainQ.end(); ++it)
+	{
+		if (it->isStop == false && it->isSavedToTable == false)
+		{
+			Hashtable::iterator itTable = table.find(it->code);
+			// Compute Correlated value
+			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			{
+				colocated = 0;
+				confidence = 0;
+				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+				if (colocated >= theta && confidence >= phi)
+				{
+					++countPair;
+					CorrelatedResult res;
+					res.g1 = itTable->second.graphs[0];
+					res.g2 = iht->second.graphs[0];
+					res.colocatedvalue = colocated;
+					res.confidencevalue = confidence;
+					topKqueue.insert(res);
+					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+				}
+			}
+		}
+	}
+
 	bool stop = false;
 
 	deque<TreeNode> tmpQ;
@@ -1834,7 +1769,7 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 							{
 								colocated = 0;
 								confidence = 0;
-								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
 
 								if (colocated >= theta && confidence >= phi)
 								{

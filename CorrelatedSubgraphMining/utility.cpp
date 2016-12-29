@@ -229,14 +229,191 @@ bool Utility::isIgnore (Instance &ins1, Instance &ins2)
 	return true;
 }
 
-double Utility::pairFuntion (double k1, double k2)
+uint64_t Utility::pairFuntion (uint64_t k1, uint64_t k2)
 {
 	if (k1 > k2)
 	{
-		double tmp = k1;
+		uint64_t tmp = k1;
 		k1 = k2;
 		k2 = tmp;
 	}
 
 	return (k1 + k2) * (k1 + k2 + 1) / 2 + k2;
+}
+
+vector<int> Utility::intersect(vector<int> f1, vector<int> f2)
+{
+	vector<int> result;
+
+	for (int i = 0; i < (int)f1.size(); i++)
+	{
+		for (int j = 0; j < f2.size(); j++)
+		{
+			if (f1[i] == f2[j])
+			{
+				result.push_back(f1[i]);
+			}
+		}
+	}
+
+	return result;
+}
+
+vector<int> Utility::intersectSorted(vector<int> f1, vector<int> f2)
+{
+	vector<int> result;
+
+	int i = 0;
+    int j = 0;
+	int m = (int)f1.size();
+	int n = (int)f2.size();
+    int previous = -1;
+
+	while (i < m && j < n)
+	{
+		if (f1[i] < f2[j])
+			++i;
+		else if (f2[j] < f1[i])
+			++j;
+		else
+		{
+			if (f1[i] != previous)
+			{
+				result.push_back(f1[i]);
+			}
+			++i;
+			++j;
+		}
+	}
+
+	return result;
+}
+
+vector<int> Utility::unionSet(vector<int> f1, vector<int> f2)
+{
+	vector<int> result;
+
+	for (int i = 0; i < f1.size(); i++)
+	{
+		if (!contains(result, f1[i]))
+		{
+			result.push_back(f1[i]);
+		}
+    }
+
+	for (int j = 0; j < f2.size(); j++)
+	{
+		if (!contains(result, f2[j]))
+		{
+			result.push_back(f2[j]);
+		}
+    }
+
+	return result;
+}
+
+vector<int> Utility::unionSortedSet(vector<int> f1, vector<int> f2)
+{
+	vector<int> result;
+
+	int i = 0;
+    int j = 0;
+	int m = (int)f1.size();
+	int n = (int)f2.size();
+    int previous = -1;
+    
+    while (i < m && j < n)
+	{
+		if (f1[i] < f2[j])
+		{
+			if (previous < f1[i])
+			{
+				previous = f1[i];
+				result.push_back(previous);
+			}
+
+			i++;
+		}
+		else if (f1[i] > f2[j])
+		{
+			if (previous < f2[j])
+			{
+				previous = f2[j];
+				result.push_back(previous);
+			}
+
+			j++;
+		}
+		else
+		{
+			if (previous < f1[i])
+			{
+				previous = f1[i];
+				result.push_back(previous);
+			}
+
+			i++;
+			j++;
+		}
+    }
+
+    while (i < m)
+	{
+		result.push_back(f1[i]);
+		++i;
+    }
+
+    while (j < n)
+	{
+		result.push_back(f2[j]);
+		++j;
+    }
+
+	return result;
+}
+
+bool Utility::contains(vector<int> & f, int e)
+{
+	bool res = false;
+
+	for (int i = 0; i < (int)f.size(); i++)
+	{
+		if (f[i] == e)
+		{
+			res = true;
+			break;
+		}
+    }
+
+    return res;
+}
+
+vector<int> Utility::removeElement(vector<int>& v, int e)
+{
+	vector<int>::iterator position = std::find(v.begin(), v.end(), e);
+	if (position != v.end())
+		v.erase(position);
+
+	return v;
+}
+
+bool Utility::contains(vector< vector<int> > f, int e, int row)
+{
+	bool res = false;
+
+    int bound = (int)f.size();
+	bound = bound - 1;
+	if (bound > row)
+		bound = row;
+
+    for (int i = 0; i <= bound; i++)
+	{
+		if (contains(f[i], e))
+		{
+			res = true;
+			break;
+		}
+    }
+
+    return res;
 }

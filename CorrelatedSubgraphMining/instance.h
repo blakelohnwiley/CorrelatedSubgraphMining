@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ public:
 	int freq;
 	//vector<int> independent_graphs;
 	set<CodeId> ignoreList;
+	unordered_map<double, int> mapIdToIndexGraph;
 
 	Instance()
 	{

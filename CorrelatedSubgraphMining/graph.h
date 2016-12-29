@@ -5,6 +5,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include <stdint.h>
 #include<iostream>
 #include<map>
 #include<vector>
@@ -13,6 +14,7 @@
 #include<deque>
 #include <set>
 #include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -132,9 +134,12 @@ private:
 
 public:
 	//set <CodeId> sameHHop;
-	unordered_set <double> sameHHop;
-	double idGraph;
+	unordered_set <uint64_t> sameHHop;
+	uint64_t idGraph;
 	bool directed;
+
+	// hashtable with key: label of vertex, value: a list of index of vertices containing the same lable with key
+	unordered_map < int, vector<int> > labelIdx;
 
 	typedef std::vector<Vertex>::iterator vertex_iterator;
 	
@@ -166,7 +171,7 @@ public:
 	void check(void);
 
 	//Check whether two graph are duplicated
-	bool isDuplicated(const Graph& g);
+	bool isDuplicated(const Graph& g) const;
 	//sort all vertices of graph following ascendant order
 	void sortGaph();
 
@@ -183,6 +188,16 @@ public:
 	//void pushHHopCode(CodeId& id);
 
 	void findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>& results);
+
+	// get neighbor of a node, return a list of index of neighboring vertices
+	vector<int> getNeighbor(int id);
+	vector<int> getVerticesByLabel(int label);
+
+	bool operator==(const Graph& g) const;
+
+	vector<Graph> getDownNeighborsExactGraph();
+	vector<Graph> getUpNeigborsExactGraph(Graph& database);
+	bool isReachable(int idSource, int idDes);
 };
 
 #endif
