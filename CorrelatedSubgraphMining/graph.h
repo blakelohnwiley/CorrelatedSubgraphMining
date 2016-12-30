@@ -15,6 +15,8 @@
 #include <set>
 #include <unordered_set>
 #include <unordered_map>
+#include <time.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -198,6 +200,14 @@ public:
 	vector<Graph> getDownNeighborsExactGraph();
 	vector<Graph> getUpNeigborsExactGraph(Graph& database);
 	bool isReachable(int idSource, int idDes);
+
+	vector<Graph> getDownNeighborsInducedGraph();
+	vector<Graph> getUpNeighborsInducedGraph(Graph& database);
+	bool isConnected();
+	void convertDigraph2Undirect(unordered_set<int> & visitedId);
+	void DFSTraversal(int vId, unordered_set<int> & visitedId);
+
+	Graph initAnyFrequentGraph(int threshold);
 };
 
 #endif

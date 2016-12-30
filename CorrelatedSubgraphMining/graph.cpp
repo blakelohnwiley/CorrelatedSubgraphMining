@@ -894,3 +894,284 @@ bool Graph::isReachable(int idSource, int idDes)
 
 	return false;
 }
+
+vector<Graph> Graph::getDownNeighborsInducedGraph()
+{
+	if (this->size() <= 1)
+		return vector<Graph>();
+	vector<Graph> result;
+
+	if (this->size() == 2)
+	{
+		if (directed)
+		{
+			Graph g(this->directed);
+
+			if ((*this)[0].edge.size() > 0)
+			{
+				Vertex v1;
+				v1.id = (*this)[0].id;
+				v1.label = (*this)[0].label;
+				g.insertVertex(v1);
+			}
+			else
+			{
+				Vertex v1;
+				v1.id = (*this)[1].id;
+				v1.label = (*this)[1].label;
+				g.insertVertex(v1);
+			}
+
+			result.push_back(g);
+		}
+		else
+		{
+			Graph g1(this->directed);
+			Graph g2(this->directed);
+
+			Vertex v1;
+			v1.id = (*this)[0].id;
+			v1.label = (*this)[0].label;
+			g1.insertVertex(v1);
+			result.push_back(g1);
+
+			Vertex v2;
+			v2.id = (*this)[1].id;
+			v2.label = (*this)[1].label;
+			g2.insertVertex(v2);
+			result.push_back(g2);
+		}
+
+		return result;
+	}
+
+	for (int i = 0; i < size(); i++)
+	{
+		Graph g = *this;
+		// remove all edge to g[i]
+		if (directed == false)
+		{
+			for(int j = 0; j < g[i].edge.size(); j++)
+			{
+				int indxTo = g.index(g[i].edge[j].to);
+				for (int k = 0; k < g[indxTo].edge.size(); k++)
+				{
+					if (g[indxTo].edge[k].to == g[i].id)
+					{
+						g[indxTo].edge.erase(g[indxTo].edge.begin() + k);
+						break;
+					}
+				}
+			}
+
+			g.erase(g.begin() + i);
+		}
+		else
+		{
+			for (int j = 0; j < size(); j++)
+			{
+				if (j != i)
+				{
+					for (int k = 0; k < g[j].edge.size(); k++)
+					{
+						if (g[j].edge[k].to == g[i].id)
+						{
+							g[j].edge.erase(g[j].edge.begin() + k);
+							break;
+						}
+					}
+				}
+			}
+
+			g.erase(g.begin() + i);
+		}
+
+		g.buildEdge();
+
+		if (g.isConnected())
+		{
+			result.push_back(g);
+		}
+	}
+
+	return result;
+}
+
+bool Graph::isConnected()
+{
+	unordered_set<int> visitedId;
+
+	if (directed)
+	{
+		convertDigraph2Undirect(visitedId);
+	}
+	else
+	{
+		DFSTraversal((*this)[0].id, visitedId);
+	}
+
+	if (visitedId.size() == this->size())
+		return true;
+
+	return false;
+}
+
+void Graph::DFSTraversal(int vId, unordered_set<int> & visitedId)
+{
+	if (visitedId.find(vId) != visitedId.end())
+		return;
+	visitedId.insert(vId);
+
+	int indx = this->index(vId);
+
+	for (int i = 0; i < (*this)[indx].edge.size(); i++)
+	{
+		if (visitedId.find((*this)[indx].edge[i].to) == visitedId.end())
+			DFSTraversal((*this)[indx].edge[i].to, visitedId);
+	}
+}
+
+void Graph::convertDigraph2Undirect(unordered_set<int> & visitedId)
+{
+	Graph g = *this;
+
+	for (int i = 0; i < size(); i++)
+	{
+		for (Vertex::edge_iterator it = (*this)[i].edge.begin(); it != (*this)[i].edge.end(); ++it)
+		{
+			int indxTo = index(it->to);
+			bool isFound = false;
+			for (Vertex::edge_iterator it1 = g[indxTo].edge.begin(); it1 != g[indxTo].edge.end(); ++it1)
+			{
+				if (it1->to == (*this)[i].id)
+				{
+					isFound = true;
+					break;
+				}
+			}
+
+			if (!isFound)
+			{
+				g[indxTo].push(it->to, (*this)[i].id, it->elabel);
+			}
+		}
+	}
+
+	g.DFSTraversal(g[0].id, visitedId);
+}
+
+vector<Graph> Graph::getUpNeighborsInducedGraph(Graph& database)
+{
+	vector<Graph> result;
+
+	unordered_set<int> idCurrentGraph;
+	unordered_set<int> visited;
+
+	for (int i = 0; i < this->size(); i++)
+	{
+		idCurrentGraph.insert((*this)[i].id);
+	}
+
+	for (int i = 0; i < this->size(); i++)
+	{
+		int indexSource = database.index((*this)[i].id);
+
+		for (int k = 0; k < database[indexSource].edge.size(); ++k)
+		{
+			int idDes = database[indexSource].edge[k].to;
+			unordered_set<int>::const_iterator itFi = idCurrentGraph.find(idDes);
+			
+			if (itFi == idCurrentGraph.end())
+			{
+				unordered_set<int>::const_iterator itVis = visited.find(idDes);
+				if (itVis == visited.end())
+				{
+					Graph g = *this;
+					g._isSorted = false;
+
+					int idx = database.index(idDes);
+					Vertex v;
+					v.id = idDes;
+					v.label = database[idx].label;
+
+					g.insertVertex(v);
+				
+					// find all edges from v to current vertices in the graph
+					for (int tt = 0; tt < database[idx].edge.size(); tt++)
+					{
+						if (idCurrentGraph.find(database[idx].edge[tt].to) != idCurrentGraph.end())
+						{
+							g[g.size() - 1].push(idDes, database[idx].edge[tt].to, database[idx].edge[tt].elabel);
+							if (directed == false)
+							{
+								int vind = g.index(database[idx].edge[tt].to);
+								g[vind].push(database[idx].edge[tt].to, idDes, database[idx].edge[tt].elabel);
+							}
+						}
+					}
+					
+					if (directed)
+					{
+						// find all edges from the current vertices to v
+						g[i].push((*this)[i].id, idDes, database[indexSource].edge[k].elabel);
+						
+						for (int tt = 0; tt < this->size(); tt++)
+						{
+							if (tt != i)
+							{
+								int idSour = database.index((*this)[tt].id);
+								for (int uu = 0; uu < database[idSour].edge.size(); uu++)
+								{
+									if (database[idSour].edge[uu].to == idDes)
+									{
+										g[tt].push(g[tt].id, idDes, database[idSour].edge[uu].elabel);
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					g.buildEdge();
+
+					result.push_back(g);
+					visited.insert(idDes);
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+
+Graph Graph::initAnyFrequentGraph(int threshold)
+{
+	vector<int> label;
+
+	for (unordered_map< int, vector<int> >::const_iterator it = labelIdx.begin(); it != labelIdx.end(); ++it)
+	{
+		if (it->second.size() >= threshold)
+			label.push_back(it->first);
+	}
+
+	Graph g(this->directed);
+
+	if (label.size() > 0)
+	{
+		int idSelect = rand() % label.size();
+		// select vertex
+		vector<int> vertices = labelIdx[label[idSelect]];
+
+		double rndDouble = rand() / (1.0 * RAND_MAX);
+		int indx = (int) (rndDouble * vertices.size());
+
+		Vertex vert;
+		vert.id = (*this)[vertices[indx]].id;
+		vert.label = (*this)[vertices[indx]].label;
+
+		g.insertVertex(vert);
+	}
+
+	return g;
+}
