@@ -20,6 +20,9 @@ public:
 	void push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child);
 	void push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child, set<CodeId> & ignore);
 	void push(DFSCode& dfs_code, Graph& g);
+	void assign(DFSCode& dfs_code, vector<Graph>& listGraph);
+	void assign(DFSCode& dfs_code, vector<Graph>& listGraph, set<CodeId> & ignore);
+	void insertIgnoreList(DFSCode& dfs_code, set<CodeId> & ignore);
 	void computeFrequency();
 	void computeFrequency(Hashtable::hastable_iterator start);
 	int freq(DFSCode dfs_code);

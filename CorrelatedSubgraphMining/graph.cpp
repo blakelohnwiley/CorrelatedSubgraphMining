@@ -1145,7 +1145,7 @@ vector<Graph> Graph::getUpNeighborsInducedGraph(Graph& database)
 }
 
 
-Graph Graph::initAnyFrequentGraph(int threshold)
+Graph Graph::initAnyFrequentGraph(int threshold, int & outFreq)
 {
 	vector<int> label;
 
@@ -1169,6 +1169,8 @@ Graph Graph::initAnyFrequentGraph(int threshold)
 		Vertex vert;
 		vert.id = (*this)[vertices[indx]].id;
 		vert.label = (*this)[vertices[indx]].label;
+
+		outFreq = labelIdx[vert.label].size();
 
 		g.insertVertex(vert);
 	}

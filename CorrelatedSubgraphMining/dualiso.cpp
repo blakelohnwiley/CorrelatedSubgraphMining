@@ -1,16 +1,19 @@
 #include "dualiso.h"
 
-vector<Graph> DualISO::match(Graph database, Graph pattern)
+vector<Graph> DualISO::match(Graph & database, Graph & pattern)
 {
+	matches.clear();
+
 	vector< vector<int> > cand_0 = candidateSelector.getCandidates(database, pattern);
     cand_0 = dualSimulation.simulate(database, pattern, cand_0);
 
-    search(database, pattern, cand_0, 0);
+	if (!cand_0.empty())
+		search(database, pattern, cand_0, 0);
 
     return matches;
 }
 
-void DualISO::search(Graph database, Graph pattern, vector< vector<int> > candidates, int depth)
+void DualISO::search(Graph & database, Graph & pattern, vector< vector<int> > candidates, int depth)
 {
 	if (depth == pattern.size())
 	{
@@ -55,7 +58,7 @@ vector<int> DualISO::getCandidate(vector< vector<int> > candidates)
 	return result;
 }
 
-Graph DualISO::toGraph(Graph database, Graph pattern, vector<int> candidate)
+Graph DualISO::toGraph(Graph & database, Graph & pattern, vector<int> candidate)
 {
 	Graph g(database.directed);
 
@@ -85,4 +88,47 @@ Graph DualISO::toGraph(Graph database, Graph pattern, vector<int> candidate)
 	g.buildEdge();
 
 	return g;
+}
+
+bool DualISO::isChild(Graph & database, Graph & pattern)
+{
+	vector< vector<int> > cand_0 = candidateSelector.getCandidates(database, pattern);
+    cand_0 = dualSimulation.simulate(database, pattern, cand_0);
+
+	bool ok = false;
+	if (!cand_0.empty())
+		ok = isFound(database, pattern, cand_0, 0);
+
+	return ok;
+}
+
+bool DualISO::isFound(Graph & database, Graph & pattern, vector< vector<int> > candidates, int depth)
+{
+	if (depth == pattern.size())
+	{
+		return true;
+    }
+	else
+	{
+		for (int v_G = 0; v_G < candidates[depth].size(); v_G++)
+		{
+			if (Utility::contains(candidates, candidates[depth][v_G], depth - 1) == false)
+			{
+				vector< vector<int> > cand_copy = candidates;
+				vector<int> tmp;
+				tmp.push_back(candidates[depth][v_G]);
+				cand_copy[depth] = tmp;
+				cand_copy = dualSimulation.simulate(database, pattern, cand_copy);
+
+				if(!cand_copy.empty())
+				{
+					bool ok = isFound(database, pattern, cand_copy, depth + 1);
+					if (ok == true)
+						return true;
+				}
+			}
+		}
+    }
+
+	return false;
 }

@@ -4,6 +4,7 @@
 #include "overlapgraph.h"
 #include "correlatedgraph.h"
 #include "dualiso.h"
+#include "Sampling.h"
 
 #include <iostream>
 #include <fstream>
@@ -18,11 +19,10 @@ void testSubgraphMatching()
 {
 	char* fname = new char [80];
 	strcpy(fname, "../Data/");
-	char * name = new char[50];
-	cout << "Input the graph file name: ";
-	cin.getline(name, 50);
+	char * name = "graph2.txt";
 	fname = strcat(fname, name);
-	Graph database(true);
+
+	Graph database(false);
 	database.read(fname);
 
 	Graph pattern(true);
@@ -61,6 +61,121 @@ void testSubgraphMatching()
 	{
 		cout << "Result: " << (i + 1) << endl;
 		res[i].write(cout);
+	}
+}
+
+void testIsChild()
+{
+	char* fname = new char [80];
+	strcpy(fname, "../Data/");
+	char * name = "graph2.txt";
+	fname = strcat(fname, name);
+
+	Graph database(false);
+	database.read(fname);
+
+	Graph pattern(false);
+
+	Vertex v1;
+	v1.id = 0;
+	v1.label = 1;
+	pattern.insertVertex(v1);
+	pattern[0].push(0, 1, 0);
+	pattern[0].push(0, 2, 0);
+
+	Vertex v2;
+	v2.id = 1;
+	v2.label = 2;
+	pattern.insertVertex(v2);
+	pattern[1].push(1, 0, 0);
+
+	Vertex v3;
+	v3.id = 2;
+	v3.label = 3;
+	pattern.insertVertex(v3);
+	pattern[2].push(2, 0, 0);
+
+	pattern.buildEdge();
+	
+	DualISO dualISO;
+	if (dualISO.isChild(database, pattern))
+	{
+		cout << "Is Child" << endl;
+	}
+	else
+	{
+		cout << "No Child" << endl;
+	}
+
+	Graph pattern1(false);
+
+	Vertex u1;
+	u1.id = 0;
+	u1.label = 3;
+	pattern1.insertVertex(u1);
+	pattern1[0].push(0, 1, 0);
+	pattern1[0].push(0, 2, 0);
+
+	Vertex u2;
+	u2.id = 1;
+	u2.label = 2;
+	pattern1.insertVertex(u2);
+	pattern1[1].push(1, 0, 0);
+
+	Vertex u3;
+	u3.id = 2;
+	u3.label = 3;
+	pattern1.insertVertex(u3);
+	pattern1[2].push(2, 0, 0);
+
+	pattern1.buildEdge();
+
+	if (dualISO.isChild(database, pattern1))
+	{
+		cout << "Is Child" << endl;
+	}
+	else
+	{
+		cout << "No Child" << endl;
+	}
+
+	Graph pattern2(false);
+
+	Vertex u4;
+	u4.id = 0;
+	u4.label = 1;
+	pattern2.insertVertex(u4);
+	pattern2[0].push(0, 1, 0);
+	pattern2[0].push(0, 2, 0);
+	pattern2[0].push(0, 3, 0);
+
+	Vertex u5;
+	u5.id = 1;
+	u5.label = 2;
+	pattern2.insertVertex(u5);
+	pattern2[1].push(1, 0, 0);
+
+	Vertex u6;
+	u6.id = 2;
+	u6.label = 3;
+	pattern2.insertVertex(u6);
+	pattern2[2].push(2, 0, 0);
+
+	Vertex u7;
+	u7.id = 3;
+	u7.label = 1;
+	pattern2.insertVertex(u7);
+	pattern2[3].push(3, 0, 0);
+
+	pattern2.buildEdge();
+
+	if (dualISO.isChild(database, pattern2))
+	{
+		cout << "Is Child" << endl;
+	}
+	else
+	{
+		cout << "No Child" << endl;
 	}
 }
 
@@ -624,10 +739,10 @@ void TestGetAnyGraph()
 
 	Graph graph(false);
 	graph.read(fname);
-
+	int freq = 0;
 	for (int i = 0; i < 5; i++)
 	{
-		Graph res = graph.initAnyFrequentGraph(2);
+		Graph res = graph.initAnyFrequentGraph(2, freq);
 		res.write(cout);
 	}
 }
@@ -636,64 +751,14 @@ int main (int argc, char * const  argv[]) {
 	
 	srand(time(0));
 
-	/*char* fname = new char [80];
+	char* fname = new char [80];
 	strcpy(fname, "../Data/");
 	char * name = new char[50];
 	cout << "Input the graph file name: ";
 	cin.getline(name, 50);
-	fname = strcat(fname, name);*/
-	/*Graph graph;
-	graph.read(fname);
-
-	DFSCode dfsCode;
-	GraphToMinDFSCode convertGraphToDFSCode;
-	convertGraphToDFSCode.findMinimumDFSCode(&graph, dfsCode);
-	dfsCode.write(cout);*/
-
-	/*char* fname1;
-	fname1 = "graph3.txt";
-	char* fname2;
-	fname2 = "graph4.txt";
-	char* fname3;
-	fname3 = "graph5.txt";
-
-	Graph graph;
-	graph.read(fname);
-
-	Graph graph1;
-	graph1.read(fname1);
-
-	Graph graph2;
-	graph2.read(fname2);
-
-	Graph graph3;
-	graph3.read(fname3);
-
-	Graph graph4;
-	graph4.read("graph1.txt");
-
-	DFSCode dfsCode;
-	GraphToMinDFSCode convertGraphToDFSCode;
-	convertGraphToDFSCode.findMinimumDFSCode(&graph4, dfsCode);
-	dfsCode.write(cout);
-
-	OverlapGraph ograph(4);
-	ograph.add(&graph, 0);
-	ograph.add(&graph1, 1);
-	ograph.add(&graph2, 2);
-	ograph.add(&graph3, 3);
-
-	vector<int> group;
-	int t = ograph.getMISSize(group);
-
-	cout << "Num MIS = " << t << endl;
-	cout << "group: ";
-	for (int i = 0; i < group.size(); i++)
-	{
-		cout << group[i] << "  ";
-	}
-*/
-	/*int theta;
+	fname = strcat(fname, name);
+	
+	int theta;
 	double phi;
 	int hop;
 	int k;
@@ -726,6 +791,10 @@ int main (int argc, char * const  argv[]) {
 	cout << "4. Baseline - Induced Subgraphs" << endl;
 	cout << "5. Forward Pruning - Induced Subgraphs" << endl;
 	cout << "6. Top-K Pruning - Induced Subgraphs" << endl;
+	cout << "7. Uniform Sampling - Exact Graph" << endl;
+	cout << "8. Support-biased Sampling - Exact Graph" << endl;
+	cout << "9. Uniform Sampling - Induced Graph" << endl;
+	cout << "10.Support-biased Sampling - Induced Graph" << endl;
 	int c;
 	cout << "Choose?: ";
 	cin >> c;
@@ -777,14 +846,71 @@ int main (int argc, char * const  argv[]) {
 		strcpy(resultfilename, "../Data/result_topk_pruning_induced_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
 		correlatedGraph5.topKPruningInducedSubgraph(directed, fname, resultfilename, theta, phi, hop, k);
-	}*/
+	}
+	else if (c == 7)
+	{
+		cout << "Number of random work steps: ";
+		int minIter;
+		cin >> minIter;
+		cout << "Maximal number of samples: ";
+		int maxIter;
+		cin >> maxIter;
+		Sampling sampl(fname, directed);
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_uniform_sampling_exact_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		sampl.computeCorrelatedValueUniformSamplingExactGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+	}
+	else if (c == 8)
+	{
+		cout << "Number of random work steps: ";
+		int minIter;
+		cin >> minIter;
+		cout << "Maximal number of samples: ";
+		int maxIter;
+		cin >> maxIter;
+		Sampling sampl(fname, directed);
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_supportbiased_sampling_exact_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		sampl.computeCorrelatedValueSupportBiasedSamplingExactGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+	}
+	else if (c == 9)
+	{
+		cout << "Number of random work steps: ";
+		int minIter;
+		cin >> minIter;
+		cout << "Maximal number of samples: ";
+		int maxIter;
+		cin >> maxIter;
+		Sampling sampl(fname, directed);
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_uniform_sampling_induced_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		sampl.computeCorrelatedValueUniformSamplingInducedGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+	}
+	else if (c == 10)
+	{
+		cout << "Number of random work steps: ";
+		int minIter;
+		cin >> minIter;
+		cout << "Maximal number of samples: ";
+		int maxIter;
+		cin >> maxIter;
+		Sampling sampl(fname, directed);
+		char * resultfilename = new char[256];
+		strcpy(resultfilename, "../Data/result_supportbiased_sampling_induced_subgraphs_");
+		resultfilename = strcat(resultfilename, name);
+		sampl.computeCorrelatedValueSupportBiasedSamplingInducedGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+	}
 
 	//testGetDownNeighborsExactGraph();
 	//testGetUpNeighborsExactGraph();
 	//TestConnectedGraph();
 	//TestGetDownNeighborsInducedGraph();
 	//TestGetUpNeighborsInducedGraph();
-	TestGetAnyGraph();
+	//TestGetAnyGraph();
+	//testIsChild();
 
 	getchar();
 	return 0;

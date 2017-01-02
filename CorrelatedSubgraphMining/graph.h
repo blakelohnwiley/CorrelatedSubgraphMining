@@ -31,7 +31,7 @@ inline void _swap(T &x,T &y)
 class CodeId
 {
 public:
-	double id1, id2;
+	uint64_t id1, id2;
 
 	bool operator == (const CodeId & code) const
 	{
@@ -207,7 +207,7 @@ public:
 	void convertDigraph2Undirect(unordered_set<int> & visitedId);
 	void DFSTraversal(int vId, unordered_set<int> & visitedId);
 
-	Graph initAnyFrequentGraph(int threshold);
+	Graph initAnyFrequentGraph(int threshold, int & outFreq);
 };
 
 #endif

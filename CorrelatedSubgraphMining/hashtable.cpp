@@ -15,6 +15,21 @@ void Hashtable::push(DFSCode& dfs_code, Graph& g)
 	(*this)[dfs_code].push(g);
 }
 
+void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph)
+{
+	(*this)[dfs_code].assign(listGraph);
+}
+
+void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph, set<CodeId> & ignore)
+{
+	(*this)[dfs_code].assign(listGraph, ignore);
+}
+
+void Hashtable::insertIgnoreList(DFSCode& dfs_code, set<CodeId> & ignore_)
+{
+	(*this)[dfs_code].insertIgnoreList(ignore_);
+}
+
 void Hashtable::computeFrequency()
 {
 	for (Hashtable::hastable_iterator it = this->begin(); it != this->end(); ++it)

@@ -33,6 +33,9 @@ public:
 	void push(Graph& g, set<DFSCode> child);
 	void push(Graph& g, set<DFSCode> child, set<CodeId> ignore);
 	void push(Graph& g);
+	void assign(vector<Graph>& listGraph);
+	void assign(vector<Graph>& listGraph, set<CodeId> ignore);
+	void insertIgnoreList(set<CodeId>& ignore);
 	int computeFrequency();
 };
 

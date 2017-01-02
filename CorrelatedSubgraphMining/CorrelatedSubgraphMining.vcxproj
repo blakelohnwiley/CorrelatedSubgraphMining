@@ -82,6 +82,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="misc.cpp" />
     <ClCompile Include="overlapgraph.cpp" />
+    <ClCompile Include="Sampling.cpp" />
     <ClCompile Include="TopKQueue.cpp" />
     <ClCompile Include="treenode.cpp" />
     <ClCompile Include="utility.cpp" />
@@ -98,6 +99,7 @@
     <ClInclude Include="instance.h" />
     <ClInclude Include="labelcandidateselector.h" />
     <ClInclude Include="overlapgraph.h" />
+    <ClInclude Include="Sampling.h" />
     <ClInclude Include="TopKQueue.h" />
     <ClInclude Include="treenode.h" />
     <ClInclude Include="utility.h" />

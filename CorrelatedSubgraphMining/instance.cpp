@@ -34,6 +34,32 @@ void Instance::push(Graph& g)
 	mapIdToIndexGraph[g.idGraph] = graphs.size() - 1;
 }
 
+void Instance::assign(vector<Graph>& listGraph)
+{
+	graphs = listGraph;
+	mapIdToIndexGraph.clear();
+	for (int i = 0; i < (int) graphs.size(); i++)
+	{
+		mapIdToIndexGraph[graphs[i].idGraph] = i;
+	}
+}
+
+void Instance::assign(vector<Graph>& listGraph, set<CodeId> ignore)
+{
+	graphs = listGraph;
+	mapIdToIndexGraph.clear();
+	for (int i = 0; i < (int) graphs.size(); i++)
+	{
+		mapIdToIndexGraph[graphs[i].idGraph] = i;
+	}
+	ignoreList.insert(ignore.begin(), ignore.end());
+}
+
+void Instance::insertIgnoreList(set<CodeId>& ignore)
+{
+	ignoreList.insert(ignore.begin(), ignore.end());
+}
+
 int Instance::computeFrequency()
 {
 	if (this->freq <= 0)

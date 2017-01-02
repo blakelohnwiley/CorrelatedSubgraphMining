@@ -1,6 +1,6 @@
 #include "dualsimulation.h"
 
-vector< vector<int> > DualSimulation::simulate(Graph g, Graph q, vector< vector<int> > candidates)
+vector< vector<int> > DualSimulation::simulate(Graph & g, Graph & q, vector< vector<int> > candidates)
 {
 	bool  changed = true;
 
