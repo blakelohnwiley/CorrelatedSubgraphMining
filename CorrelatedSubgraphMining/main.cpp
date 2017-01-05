@@ -19,7 +19,7 @@ void testSubgraphMatching()
 {
 	char* fname = new char [80];
 	strcpy(fname, "../Data/");
-	char * name = "graph2.txt";
+	char * name = "MCF7_1.txt";
 	fname = strcat(fname, name);
 
 	Graph database(false);
@@ -29,19 +29,19 @@ void testSubgraphMatching()
 
 	Vertex v1;
 	v1.id = 0;
-	v1.label = 1;
+	v1.label = 0;
 	pattern.insertVertex(v1);
-	pattern[0].push(0, 1, 0);
+	pattern[0].push(0, 1, 1);
 
 	Vertex v2;
 	v2.id = 1;
 	v2.label = 2;
 	pattern.insertVertex(v2);
-	pattern[1].push(1, 0, 0);
-	pattern[1].push(1, 2, 0);
-	pattern[1].push(1, 3, 0);
+	pattern[1].push(1, 0, 1);
+	//pattern[1].push(1, 2, 0);
+	//pattern[1].push(1, 3, 0);
 
-	Vertex v3;
+	/*Vertex v3;
 	v3.id = 2;
 	v3.label = 3;
 	pattern.insertVertex(v3);
@@ -49,7 +49,7 @@ void testSubgraphMatching()
 	Vertex v4;
 	v4.id = 3;
 	v4.label = 3;
-	pattern.insertVertex(v4);
+	pattern.insertVertex(v4);*/
 	
 
 	pattern.buildEdge();
@@ -57,7 +57,7 @@ void testSubgraphMatching()
 	DualISO dualISO;
 	vector<Graph> res = dualISO.match(database, pattern);
 
-	for (int i = 0; i < res.size(); i++)
+	for (unsigned int i = 0; i < res.size(); i++)
 	{
 		cout << "Result: " << (i + 1) << endl;
 		res[i].write(cout);
@@ -212,7 +212,7 @@ void testGetDownNeighborsExactGraph()
 
 	vector<Graph> res1 = pattern.getDownNeighborsExactGraph();
 	cout << "Test Result 1: " << endl;
-	for (int i = 0; i < res1.size(); ++i)
+	for (unsigned int i = 0; i < res1.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res1[i].write(cout);
@@ -244,7 +244,7 @@ void testGetDownNeighborsExactGraph()
 
 	vector<Graph> res2 = pattern1.getDownNeighborsExactGraph();
 	cout << "Test Result 2: " << endl;
-	for (int i = 0; i < res2.size(); ++i)
+	for (unsigned int i = 0; i < res2.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res2[i].write(cout);
@@ -272,7 +272,7 @@ void testGetDownNeighborsExactGraph()
 
 	vector<Graph> res3 = pattern2.getDownNeighborsExactGraph();
 	cout << "Test Result 3: " << endl;
-	for (int i = 0; i < res3.size(); ++i)
+	for (unsigned int i = 0; i < res3.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res3[i].write(cout);
@@ -297,7 +297,7 @@ void testGetDownNeighborsExactGraph()
 
 	vector<Graph> res4 = pattern3.getDownNeighborsExactGraph();
 	cout << "Test Result 4: " << endl;
-	for (int i = 0; i < res4.size(); ++i)
+	for (unsigned int i = 0; i < res4.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res4[i].write(cout);
@@ -318,7 +318,7 @@ void testGetDownNeighborsExactGraph()
 
 	vector<Graph> res5 = pattern4.getDownNeighborsExactGraph();
 	cout << "Test Result 5: " << endl;
-	for (int i = 0; i < res5.size(); ++i)
+	for (unsigned int i = 0; i < res5.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res5[i].write(cout);
@@ -338,7 +338,7 @@ void testGetDownNeighborsExactGraph()
 
 	vector<Graph> res6 = pattern5.getDownNeighborsExactGraph();
 	cout << "Test Result 6: " << endl;
-	for (int i = 0; i < res6.size(); ++i)
+	for (unsigned int i = 0; i < res6.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res6[i].write(cout);
@@ -377,7 +377,7 @@ void testGetUpNeighborsExactGraph()
 
 	vector<Graph> res1 = pattern1.getUpNeigborsExactGraph(graph);
 	cout << "Test Result 1: " << endl;
-	for (int i = 0; i < res1.size(); ++i)
+	for (unsigned int i = 0; i < res1.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res1[i].write(cout);
@@ -411,7 +411,7 @@ void testGetUpNeighborsExactGraph()
 	
 	vector<Graph> res2 = pattern2.getUpNeigborsExactGraph(graph1);
 	cout << "Test Result 2: " << endl;
-	for (int i = 0; i < res2.size(); ++i)
+	for (unsigned int i = 0; i < res2.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res2[i].write(cout);
@@ -432,7 +432,7 @@ void testGetUpNeighborsExactGraph()
 
 	vector<Graph> res3 = pattern3.getUpNeigborsExactGraph(graph);
 	cout << "Test Result 3: " << endl;
-	for (int i = 0; i < res3.size(); ++i)
+	for (unsigned int i = 0; i < res3.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res3[i].write(cout);
@@ -537,7 +537,7 @@ void TestGetDownNeighborsInducedGraph()
 
 	vector<Graph> res1 = pattern.getDownNeighborsInducedGraph();
 	cout << "Test Result 1: " << endl;
-	for (int i = 0; i < res1.size(); ++i)
+	for (unsigned int i = 0; i < res1.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res1[i].write(cout);
@@ -569,7 +569,7 @@ void TestGetDownNeighborsInducedGraph()
 
 	vector<Graph> res2 = pattern1.getDownNeighborsInducedGraph();
 	cout << "Test Result 2: " << endl;
-	for (int i = 0; i < res2.size(); ++i)
+	for (unsigned int i = 0; i < res2.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res2[i].write(cout);
@@ -597,7 +597,7 @@ void TestGetDownNeighborsInducedGraph()
 
 	vector<Graph> res3 = pattern2.getDownNeighborsInducedGraph();
 	cout << "Test Result 3: " << endl;
-	for (int i = 0; i < res3.size(); ++i)
+	for (unsigned int i = 0; i < res3.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res3[i].write(cout);
@@ -622,7 +622,7 @@ void TestGetDownNeighborsInducedGraph()
 
 	vector<Graph> res4 = pattern3.getDownNeighborsInducedGraph();
 	cout << "Test Result 4: " << endl;
-	for (int i = 0; i < res4.size(); ++i)
+	for (unsigned int i = 0; i < res4.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res4[i].write(cout);
@@ -643,7 +643,7 @@ void TestGetDownNeighborsInducedGraph()
 
 	vector<Graph> res5 = pattern4.getDownNeighborsInducedGraph();
 	cout << "Test Result 5: " << endl;
-	for (int i = 0; i < res5.size(); ++i)
+	for (unsigned int i = 0; i < res5.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res5[i].write(cout);
@@ -663,7 +663,7 @@ void TestGetDownNeighborsInducedGraph()
 
 	vector<Graph> res6 = pattern5.getDownNeighborsInducedGraph();
 	cout << "Test Result 6: " << endl;
-	for (int i = 0; i < res6.size(); ++i)
+	for (unsigned int i = 0; i < res6.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res6[i].write(cout);
@@ -695,7 +695,7 @@ void TestGetUpNeighborsInducedGraph()
 
 	vector<Graph> res1 = pattern1.getUpNeighborsInducedGraph(graph);
 	cout << "Test Result 1: " << endl;
-	for (int i = 0; i < res1.size(); ++i)
+	for (unsigned int i = 0; i < res1.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res1[i].write(cout);
@@ -723,7 +723,7 @@ void TestGetUpNeighborsInducedGraph()
 	
 	vector<Graph> res2 = pattern2.getUpNeighborsInducedGraph(graph1);
 	cout << "Test Result 2: " << endl;
-	for (int i = 0; i < res2.size(); ++i)
+	for (unsigned int i = 0; i < res2.size(); ++i)
 	{
 		cout << "Graph " << (i + 1) << endl;
 		res2[i].write(cout);
@@ -748,7 +748,7 @@ void TestGetAnyGraph()
 }
 
 int main (int argc, char * const  argv[]) {
-	
+
 	srand(time(0));
 
 	char* fname = new char [80];
@@ -761,7 +761,7 @@ int main (int argc, char * const  argv[]) {
 	int theta;
 	double phi;
 	int hop;
-	int k;
+	unsigned int k;
 
 	char * configName = "../Data/config.txt";
 
@@ -860,6 +860,7 @@ int main (int argc, char * const  argv[]) {
 		strcpy(resultfilename, "../Data/result_uniform_sampling_exact_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
 		sampl.computeCorrelatedValueUniformSamplingExactGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+		Sampling::clearStaticVariable();
 	}
 	else if (c == 8)
 	{
@@ -874,6 +875,7 @@ int main (int argc, char * const  argv[]) {
 		strcpy(resultfilename, "../Data/result_supportbiased_sampling_exact_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
 		sampl.computeCorrelatedValueSupportBiasedSamplingExactGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+		Sampling::clearStaticVariable();
 	}
 	else if (c == 9)
 	{
@@ -888,6 +890,7 @@ int main (int argc, char * const  argv[]) {
 		strcpy(resultfilename, "../Data/result_uniform_sampling_induced_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
 		sampl.computeCorrelatedValueUniformSamplingInducedGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+		Sampling::clearStaticVariable();
 	}
 	else if (c == 10)
 	{
@@ -902,6 +905,7 @@ int main (int argc, char * const  argv[]) {
 		strcpy(resultfilename, "../Data/result_supportbiased_sampling_induced_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
 		sampl.computeCorrelatedValueSupportBiasedSamplingInducedGraph(resultfilename, theta, phi, hop, k, minIter, maxIter);
+		Sampling::clearStaticVariable();
 	}
 
 	//testGetDownNeighborsExactGraph();

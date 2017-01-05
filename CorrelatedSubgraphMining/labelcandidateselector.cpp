@@ -4,7 +4,7 @@ vector< vector<int> > LabelCandidateSelector::getCandidates(Graph database, Grap
 {
 	vector< vector<int> > result(pattern.size());
 
-	for (int id = 0; id < pattern.size(); id++)
+	for (unsigned int id = 0; id < pattern.size(); id++)
 	{
 		int label = pattern[id].label;
 		result[id] = database.getVerticesByLabel(label);

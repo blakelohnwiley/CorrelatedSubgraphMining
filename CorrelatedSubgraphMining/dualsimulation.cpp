@@ -1,6 +1,6 @@
 #include "dualsimulation.h"
 
-vector< vector<int> > DualSimulation::simulate(Graph & g, Graph & q, vector< vector<int> > candidates)
+vector< vector<int> > DualSimulation::simulate(Graph & g, Graph & q, vector< vector<int> > & candidates)
 {
 	bool  changed = true;
 
@@ -8,19 +8,19 @@ vector< vector<int> > DualSimulation::simulate(Graph & g, Graph & q, vector< vec
 	{
 		changed = false;
 		// for each vertex u_Q in the pattern
-		for (int u_Q = 0; u_Q < q.size(); u_Q++)
+		for (unsigned int u_Q = 0; u_Q < q.size(); u_Q++)
 		{
 			// for each neighbor of u_Q (v_Q)
 			vector<int> indexNeighbor = q.getNeighbor(q[u_Q].id);
 
-			for (int v_Q = 0; v_Q < indexNeighbor.size();  v_Q++)
+			for (unsigned int v_Q = 0; v_Q < indexNeighbor.size();  v_Q++)
 			{
 				// keep track of candidates that have a parent in cand(u_Q)
 				vector<int> v_Q_candidates;
 
 				vector<int> indxCandLargeGraph = candidates[u_Q];
 				// for each candidate of u_Q (u_G)
-				for (int u_G = 0; u_G < indxCandLargeGraph.size(); u_G++)
+				for (unsigned int u_G = 0; u_G < indxCandLargeGraph.size(); u_G++)
 				{
 					vector<int> intersect = Utility::intersectSorted(g.getNeighbor(g[indxCandLargeGraph[u_G]].id), candidates[indexNeighbor[v_Q]]);
 					// check if edge exists in the database

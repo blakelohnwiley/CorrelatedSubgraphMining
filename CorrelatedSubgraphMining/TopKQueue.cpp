@@ -6,7 +6,7 @@ void TopKQueue::insert(CorrelatedResult & result)
 	{
 		_queue.push(result);
 	}
-	else if (result.colocatedvalue > _queue.top().colocatedvalue)
+	else if (result.colocatedvalue > _queue.top().colocatedvalue || (result.colocatedvalue == _queue.top().colocatedvalue && result.confidencevalue > _queue.top().confidencevalue))
 	{
 		_queue.pop();
 		_queue.push(result);
@@ -16,7 +16,7 @@ void TopKQueue::insert(CorrelatedResult & result)
 void TopKQueue::print(ofstream & of)
 {
 	vector<CorrelatedResult> result = reverse();
-	for (int i = 0; i < result.size(); i++)
+	for (unsigned int i = 0; i < result.size(); i++)
 	{
 		result[i].report_result(of, i + 1);
 	}

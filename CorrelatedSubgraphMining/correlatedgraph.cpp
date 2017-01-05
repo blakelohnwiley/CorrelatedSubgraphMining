@@ -7,7 +7,7 @@ void CorrelatedGraph::initGraph(char * filename)
 	graph.read(filename);
 }
 
-void CorrelatedGraph::baseLine(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::baseLine(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	cout << "Running baseline" << endl;
 	this->directed = directed;
@@ -29,7 +29,7 @@ void CorrelatedGraph::baseLine(bool directed, char * filenameInput, char * filen
 	cout << "Finished! in " << duration << " (s)";
 }
 
-void CorrelatedGraph::forwardPruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::forwardPruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	cout << "Running Forward pruning" << endl;
 	this->directed = directed;
@@ -51,7 +51,7 @@ void CorrelatedGraph::forwardPruning(bool directed, char * filenameInput, char *
 	cout << "Finished! in " << duration << " (s)";
 }
 
-void CorrelatedGraph::topkPruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::topkPruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	cout << "Running Top-k Pruning" << endl;
 	this->directed = directed;
@@ -73,14 +73,14 @@ void CorrelatedGraph::topkPruning(bool directed, char * filenameInput, char * fi
 	cout << "Finished! in " << duration << " (s)";
 }
 
-void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	TopKQueue topKqueue(k);
 
 	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
-	for (int i = 0; i < graph.vertex_size(); i++)
+	for (unsigned int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
 		node.graph.directed = this->directed;
@@ -176,43 +176,69 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 				current.ignoreList = iht->second.ignoreList;
 
 				// find all neighbouring edges of the graph in current node
-				vector<Edge> edges;
-				for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
-				{
-					int idNode = graph.index(itG->id);
-					for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
-					{
-						if (!current.graph.isExist(*itE) && !Utility::isExistEdgeInList(edges, *itE))
-						{
-							// add new edge into the candidate set
-							edges.push_back(*itE);
-						}
-					}
-				}
+				//vector<Edge> edges;
+				//for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
+				//{
+				//	int idNode = graph.index(itG->id);
+				//	for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
+				//	{
+				//		if (!current.graph.isExist(*itE) && !Utility::isExistEdgeInList(edges, *itE))
+				//		{
+				//			// add new edge into the candidate set
+				//			edges.push_back(*itE);
+				//		}
+				//	}
+				//}
 
-				// Create new graph from the candidate set of edges
-				for (int ii = 0; ii < edges.size(); ii++)
-				{
-					Graph gtmp = current.graph;
-					gtmp.directed = this->directed;
-					gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
+				//// Create new graph from the candidate set of edges
+				//for (unsigned int ii = 0; ii < (unsigned int)edges.size(); ii++)
+				//{
+				//	Graph gtmp = current.graph;
+				//	gtmp.directed = this->directed;
+				//	gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
 
+				//	// Check new graph exists in tmpQ or not?
+				//	bool isExist = false;
+				//	for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				//	{
+				//		if (itTmpQ->isDuplicated(gtmp))
+				//		{
+				//			isExist = true;
+				//			itTmpQ->childIDs.insert(current.code);
+				//			itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		}
+				//	}
+
+				//	if (!isExist)
+				//	{
+				//		TreeNode newnode(id);
+				//		newnode.graph = gtmp;
+				//		newnode.graph.idGraph = id;
+				//		newnode.ignoreList = current.ignoreList;
+				//		++id;
+				//		newnode.childIDs.insert(current.code);
+				//		newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		tmpQ.push_back(newnode);
+				//	}
+				//}
+				vector<Graph> upGraphs = current.graph.getUpNeigborsExactGraph(graph);
+				for (vector<Graph>::iterator itGr = upGraphs.begin(); itGr != upGraphs.end(); itGr++)
+				{
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
 					for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
 					{
-						if (itTmpQ->isDuplicated(gtmp))
+						if (itTmpQ->isDuplicated(*itGr))
 						{
 							isExist = true;
 							itTmpQ->childIDs.insert(current.code);
 							itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						}
 					}
-
 					if (!isExist)
 					{
 						TreeNode newnode(id);
-						newnode.graph = gtmp;
+						newnode.graph = *itGr;
 						newnode.graph.idGraph = id;
 						newnode.ignoreList = current.ignoreList;
 						++id;
@@ -252,7 +278,7 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 			}
 
 			// check which candidates are able to extend in tmpQ
-			int count = 0;
+			unsigned int count = 0;
 			for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
 			{
 				Hashtable::iterator itFind = table.find(itTmpQ->code);
@@ -287,13 +313,17 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
 						{
 							bool isChild = false;
-							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
-							if (got != itFind->second.childIDs.end())
+							set<DFSCode>::const_iterator got;
+
+							if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
 							{
-								isChild = true;
+								got = itFind->second.childIDs.find(iht->first);
+								if (got != itFind->second.childIDs.end())
+								{
+									isChild = true;
+								}
 							}
-								
-							if (isChild == false)
+							else
 							{
 								got = iht->second.childIDs.find(itTmpQ->code);
 								if (got != iht->second.childIDs.end())
@@ -302,7 +332,7 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 								}
 							}
 			
-							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+							if (isChild == false  && Utility::isIgnore(itFind->second, iht->second) == false)
 							{
 								colocated = 0;
 								confidence = 0;
@@ -341,7 +371,7 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 	of.close();
 }
 
-void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	TopKQueue saveResult(k);
 	
@@ -351,7 +381,7 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
-	for (int i = 0; i < graph.vertex_size(); i++)
+	for (unsigned int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
 		node.graph.directed = this->directed;
@@ -457,44 +487,70 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 				Hashtable::iterator iht = table.find(current.code);
 				current.ignoreList = iht->second.ignoreList;
 
-				// find all neighbouring edges of the graph in current node
-				vector<Edge> edges;
-				for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
-				{
-					int idNode = graph.index(itG->id);
-					for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
-					{
-						if (!current.graph.isExist(*itE) && !Utility::isExistEdgeInList(edges, *itE))
-						{
-							// add new edge into the candidate set
-							edges.push_back(*itE);
-						}
-					}
-				}
+				//// find all neighbouring edges of the graph in current node
+				//vector<Edge> edges;
+				//for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
+				//{
+				//	int idNode = graph.index(itG->id);
+				//	for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
+				//	{
+				//		if (!current.graph.isExist(*itE) && !Utility::isExistEdgeInList(edges, *itE))
+				//		{
+				//			// add new edge into the candidate set
+				//			edges.push_back(*itE);
+				//		}
+				//	}
+				//}
 
-				// Create new graph from the candidate set of edges
-				for (int ii = 0; ii < edges.size(); ii++)
-				{
-					Graph gtmp = current.graph;
-					gtmp.directed = this->directed;
-					gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
+				//// Create new graph from the candidate set of edges
+				//for (unsigned int ii = 0; ii < edges.size(); ii++)
+				//{
+				//	Graph gtmp = current.graph;
+				//	gtmp.directed = this->directed;
+				//	gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
 
+				//	// Check new graph exists in tmpQ or not?
+				//	bool isExist = false;
+				//	for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				//	{
+				//		if (itTmpQ->isDuplicated(gtmp))
+				//		{
+				//			isExist = true;
+				//			itTmpQ->childIDs.insert(current.code);
+				//			itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		}
+				//	}
+
+				//	if (!isExist)
+				//	{
+				//		TreeNode newnode(id);
+				//		newnode.graph = gtmp;
+				//		newnode.graph.idGraph = id;
+				//		newnode.ignoreList = current.ignoreList;
+				//		++id;
+				//		newnode.childIDs.insert(current.code);
+				//		newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		tmpQ.push_back(newnode);
+				//	}
+				//}
+				vector<Graph> upGraphs = current.graph.getUpNeigborsExactGraph(graph);
+				for (vector<Graph>::iterator itGr = upGraphs.begin(); itGr != upGraphs.end(); itGr++)
+				{
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
 					for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
 					{
-						if (itTmpQ->isDuplicated(gtmp))
+						if (itTmpQ->isDuplicated(*itGr))
 						{
 							isExist = true;
 							itTmpQ->childIDs.insert(current.code);
 							itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						}
 					}
-
 					if (!isExist)
 					{
 						TreeNode newnode(id);
-						newnode.graph = gtmp;
+						newnode.graph = *itGr;
 						newnode.graph.idGraph = id;
 						newnode.ignoreList = current.ignoreList;
 						++id;
@@ -569,13 +625,17 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
 						{
 							bool isChild = false;
-							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
-							if (got != itFind->second.childIDs.end())
+							set<DFSCode>::const_iterator got;
+
+							if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
 							{
-								isChild = true;
+								got = itFind->second.childIDs.find(iht->first);
+								if (got != itFind->second.childIDs.end())
+								{
+									isChild = true;
+								}
 							}
-								
-							if (isChild == false)
+							else
 							{
 								got = iht->second.childIDs.find(itTmpQ->code);
 								if (got != iht->second.childIDs.end())
@@ -622,7 +682,7 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 	of.close();
 }
 
-void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	TopKQueue saveResult(k);
 
@@ -634,7 +694,7 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 	double confidence = 0;
 	int countPair = 0;
 
-	for (int i = 0; i < graph.vertex_size(); i++)
+	for (unsigned int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
 		node.graph.directed = this->directed;
@@ -738,45 +798,73 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 				current.graph.sameHHop = iht->second.graphs[iht->second.mapIdToIndexGraph[current.graph.idGraph]].sameHHop;
 
 				// find all neighbouring edges of the graph in current node
-				vector<Edge> edges;
-				for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
-				{
-					int idNode = graph.index(itG->id);
-					for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
-					{
-						if (!current.graph.isExist(*itE) && !Utility::isExistEdgeInList(edges, *itE))
-						{
-							// add new edge into the candidate set
-							edges.push_back(*itE);
-						}
-					}
-				}
+				//vector<Edge> edges;
+				//for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
+				//{
+				//	int idNode = graph.index(itG->id);
+				//	for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
+				//	{
+				//		if (!current.graph.isExist(*itE) && !Utility::isExistEdgeInList(edges, *itE))
+				//		{
+				//			// add new edge into the candidate set
+				//			edges.push_back(*itE);
+				//		}
+				//	}
+				//}
 
-				// Create new graph from the candidate set of edges
-				for (int ii = 0; ii < edges.size(); ii++)
+				//// Create new graph from the candidate set of edges
+				//for (unsigned int ii = 0; ii < edges.size(); ii++)
+				//{
+				//	Graph gtmp = current.graph;
+				//	gtmp.directed = this->directed;
+				//	gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
+				//
+				//	// Check new graph exists in tmpQ or not?
+				//	bool isExist = false;
+				//	for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				//	{
+				//		if (itTmpQ->isDuplicated(gtmp))
+				//		{
+				//			isExist = true;
+				//			itTmpQ->childIDs.insert(current.code);
+				//			itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+
+				//			itTmpQ->graph.sameHHop.insert(current.graph.sameHHop.begin(), current.graph.sameHHop.end());
+				//		}
+				//	}
+
+				//	if (!isExist)
+				//	{
+				//		TreeNode newnode(id);
+				//		newnode.graph = gtmp;
+				//		newnode.graph.idGraph = id;
+				//		++id;
+				//		newnode.ignoreList = current.ignoreList;
+				//		newnode.childIDs.insert(current.code);
+				//		newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		newnode.graph.sameHHop.insert(current.graph.sameHHop.begin(), current.graph.sameHHop.end());
+				//		tmpQ.push_back(newnode);
+				//	}
+				//}
+
+				vector<Graph> upGraphs = current.graph.getUpNeigborsExactGraph(graph);
+				for (vector<Graph>::iterator itGr = upGraphs.begin(); itGr != upGraphs.end(); itGr++)
 				{
-					Graph gtmp = current.graph;
-					gtmp.directed = this->directed;
-					gtmp.insertEdge(edges[ii], graph[graph.index(edges[ii].from)].label, graph[graph.index(edges[ii].to)].label);
-				
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
 					for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
 					{
-						if (itTmpQ->isDuplicated(gtmp))
+						if (itTmpQ->isDuplicated(*itGr))
 						{
 							isExist = true;
 							itTmpQ->childIDs.insert(current.code);
 							itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
-
-							itTmpQ->graph.sameHHop.insert(current.graph.sameHHop.begin(), current.graph.sameHHop.end());
 						}
 					}
-
 					if (!isExist)
 					{
 						TreeNode newnode(id);
-						newnode.graph = gtmp;
+						newnode.graph = *itGr;
 						newnode.graph.idGraph = id;
 						++id;
 						newnode.ignoreList = current.ignoreList;
@@ -854,13 +942,17 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
 							{
 								bool isChild = false;
-								set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
-								if (got != itFind->second.childIDs.end())
+								set<DFSCode>::const_iterator got;
+
+								if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
 								{
-									isChild = true;
+									got = itFind->second.childIDs.find(iht->first);
+									if (got != itFind->second.childIDs.end())
+									{
+										isChild = true;
+									}
 								}
-								
-								if (isChild == false)
+								else
 								{
 									got = iht->second.childIDs.find(itTmpQ->code);
 									if (got != iht->second.childIDs.end())
@@ -932,7 +1024,7 @@ void CorrelatedGraph::write (ofstream & of, Graph& g1, Graph& g2, int id, double
 	of << endl;
 }
 
-void CorrelatedGraph::baseLineInducedSubgraph(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::baseLineInducedSubgraph(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	cout << "Running baseline for Induced Subgraphs" << endl;
 	this->directed = directed;
@@ -953,14 +1045,14 @@ void CorrelatedGraph::baseLineInducedSubgraph(bool directed, char * filenameInpu
 	cout << "Finished! in " << duration << " (s)";
 }
 
-void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	TopKQueue saveResult(k);
 	
 	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
-	for (int i = 0; i < graph.vertex_size(); i++)
+	for (unsigned int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
 		node.graph.directed = this->directed;
@@ -1020,22 +1112,28 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 		{
 			Hashtable::iterator itTable = table.find(it->code);
 			// Compute Correlated value
-			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 			{
-				colocated = 0;
-				confidence = 0;
-				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-				if (colocated >= theta && confidence >= phi)
+				if (iht != itTable)
 				{
-					++countPair;
-					CorrelatedResult res;
-					res.g1 = itTable->second.graphs[0];
-					res.g2 = iht->second.graphs[0];
-					res.colocatedvalue = colocated;
-					res.confidencevalue = confidence;
-					saveResult.insert(res);
-					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+					if (iht->second.graphs[0].size() < itTable->second.graphs[0].size() || (iht->second.graphs[0].size() == itTable->second.graphs[0].size() && iht->first < itTable->first))
+					{
+						colocated = 0;
+						confidence = 0;
+						table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+						if (colocated >= theta && confidence >= phi)
+						{
+							++countPair;
+							CorrelatedResult res;
+							res.g1 = itTable->second.graphs[0];
+							res.g2 = iht->second.graphs[0];
+							res.colocatedvalue = colocated;
+							res.confidencevalue = confidence;
+							saveResult.insert(res);
+							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+						}
+					}
 				}
 			}
 		}
@@ -1057,46 +1155,72 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 				current.ignoreList = iht->second.ignoreList;
 
 				// find all neighbouring nodes of the graph in current node
-				vector<Vertex> vertices;
-				for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
-				{
-					int idNode = graph.index(itG->id);
-					for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
-					{
-						Vertex candidate = graph[graph.index(itE->to)];
-						if (!current.graph.isExisedVertice(candidate) && !Utility::isExistVertexInList(vertices, candidate))
-						{
-							// add new vertex into the candidate set
-							vertices.push_back(candidate);
-						}
-					}
-				}
+				//vector<Vertex> vertices;
+				//for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
+				//{
+				//	int idNode = graph.index(itG->id);
+				//	for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
+				//	{
+				//		Vertex candidate = graph[graph.index(itE->to)];
+				//		if (!current.graph.isExisedVertice(candidate) && !Utility::isExistVertexInList(vertices, candidate))
+				//		{
+				//			// add new vertex into the candidate set
+				//			vertices.push_back(candidate);
+				//		}
+				//	}
+				//}
 
-				// Create new graph from the candidate set of nodes
-				for (int ii = 0; ii < vertices.size(); ii++)
+				//// Create new graph from the candidate set of nodes
+				//for (unsigned int ii = 0; ii < (unsigned int)vertices.size(); ii++)
+				//{
+				//	Graph gtmp = current.graph;
+				//	gtmp.directed = this->directed;
+				//	gtmp.extendByVertex(this->graph, vertices[ii]);
+				//	// Check new graph exists in tmpQ or not?
+				//	bool isExist = false;
+				//	for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				//	{
+				//		if (itTmpQ->isDuplicated(gtmp))
+				//		{
+				//			isExist = true;
+				//			itTmpQ->childIDs.insert(current.code);
+				//			itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		}
+				//	}
+
+				//	if (!isExist)
+				//	{
+				//		TreeNode newnode(id);
+				//		newnode.graph = gtmp;
+				//		newnode.graph.idGraph = id;
+				//		newnode.ignoreList = current.ignoreList;
+				//		++id;
+				//		newnode.childIDs.insert(current.code);
+				//		newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		tmpQ.push_back(newnode);
+				//	}
+				//}
+				vector<Graph> upGraphs = current.graph.getUpNeighborsInducedGraph(graph);
+				for (vector<Graph>::iterator itGr = upGraphs.begin(); itGr != upGraphs.end(); itGr++)
 				{
-					Graph gtmp = current.graph;
-					gtmp.directed = this->directed;
-					gtmp.extendByVertex(this->graph, vertices[ii]);
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
 					for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
 					{
-						if (itTmpQ->isDuplicated(gtmp))
+						if (itTmpQ->isDuplicated(*itGr))
 						{
 							isExist = true;
 							itTmpQ->childIDs.insert(current.code);
 							itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						}
 					}
-
 					if (!isExist)
 					{
 						TreeNode newnode(id);
-						newnode.graph = gtmp;
+						newnode.graph = *itGr;
 						newnode.graph.idGraph = id;
-						newnode.ignoreList = current.ignoreList;
 						++id;
+						newnode.ignoreList = current.ignoreList;
 						newnode.childIDs.insert(current.code);
 						newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						tmpQ.push_back(newnode);
@@ -1165,39 +1289,49 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 					{
 						Hashtable::iterator itFind = table.find(itTmpQ->code);
 						// Compute Correlated value
-						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 						{
-							bool isChild = false;
-							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
-							if (got != itFind->second.childIDs.end())
+							if (iht != itFind)
 							{
-								isChild = true;
-							}
-								
-							if (isChild == false)
-							{
-								got = iht->second.childIDs.find(itTmpQ->code);
-								if (got != iht->second.childIDs.end())
+								if (iht->second.graphs[0].size() < itFind->second.graphs[0].size() || (iht->second.graphs[0].size() == itFind->second.graphs[0].size() && iht->first < itFind->first))
 								{
-									isChild = true;
-								}
-							}
-			
-							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-							{
-								colocated = 0;
-								confidence = 0;
-								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+									bool isChild = false;
+									set<DFSCode>::const_iterator got;
 
-								if (colocated >= theta && confidence >= phi)
-								{
-									++countPair;
-									CorrelatedResult res;
-									res.g1 = itFind->second.graphs[0];
-									res.g2 = iht->second.graphs[0];
-									res.colocatedvalue = colocated;
-									res.confidencevalue = confidence;
-									saveResult.insert(res);
+									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
+									{
+										got = itFind->second.childIDs.find(iht->first);
+										if (got != itFind->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+									else
+									{
+										got = iht->second.childIDs.find(itTmpQ->code);
+										if (got != iht->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+			
+									if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+									{
+										colocated = 0;
+										confidence = 0;
+										table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+										if (colocated >= theta && confidence >= phi)
+										{
+											++countPair;
+											CorrelatedResult res;
+											res.g1 = itFind->second.graphs[0];
+											res.g2 = iht->second.graphs[0];
+											res.colocatedvalue = colocated;
+											res.confidencevalue = confidence;
+											saveResult.insert(res);
+										}
+									}
 								}
 							}
 						}
@@ -1221,7 +1355,7 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 	of.close();
 }
 
-void CorrelatedGraph::forwardPruningInducedSubgraph(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::forwardPruningInducedSubgraph(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	cout << "Running forward pruning for Induced Subgraphs" << endl;
 	this->directed = directed;
@@ -1242,7 +1376,7 @@ void CorrelatedGraph::forwardPruningInducedSubgraph(bool directed, char * filena
 	cout << "Finished! in " << duration << " (s)";
 }
 
-void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	TopKQueue saveResult(k);
 
@@ -1253,7 +1387,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 	double confidence = 0;
 	int countPair = 0;
 
-	for (int i = 0; i < graph.vertex_size(); i++)
+	for (unsigned int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
 		node.graph.directed = this->directed;
@@ -1309,22 +1443,28 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 			Hashtable::iterator itTable = table.find(it->code);
 			
 			// Compute Correlated value
-			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 			{
-				colocated = 0;
-				confidence = 0;
-				table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-				if (colocated >= theta && confidence >= phi)
+				if (iht != itTable)
 				{
-					++countPair;
-					CorrelatedResult res;
-					res.g1 = itTable->second.graphs[0];
-					res.g2 = iht->second.graphs[0];
-					res.colocatedvalue = colocated;
-					res.confidencevalue = confidence;
-					saveResult.insert(res);
-					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+					if (iht->second.graphs[0].size() < itTable->second.graphs[0].size() || (iht->second.graphs[0].size() == itTable->second.graphs[0].size() && iht->first < itTable->first))
+					{
+						colocated = 0;
+						confidence = 0;
+						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+						if (colocated >= theta && confidence >= phi)
+						{
+							++countPair;
+							CorrelatedResult res;
+							res.g1 = itTable->second.graphs[0];
+							res.g2 = iht->second.graphs[0];
+							res.colocatedvalue = colocated;
+							res.confidencevalue = confidence;
+							saveResult.insert(res);
+							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+						}
+					}
 				}
 			}
 		}
@@ -1347,48 +1487,76 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 				current.graph.sameHHop = iht->second.graphs[iht->second.mapIdToIndexGraph[current.graph.idGraph]].sameHHop;
 
 				// find all neighbouring nodes of the graph in current node
-				vector<Vertex> vertices;
-				for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
-				{
-					int idNode = graph.index(itG->id);
-					for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
-					{
-						Vertex candidate = graph[graph.index(itE->to)];
-						if (!current.graph.isExisedVertice(candidate) && !Utility::isExistVertexInList(vertices, candidate))
-						{
-							// add new vertex into the candidate set
-							vertices.push_back(candidate);
-						}
-					}
-				}
+				//vector<Vertex> vertices;
+				//for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
+				//{
+				//	int idNode = graph.index(itG->id);
+				//	for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
+				//	{
+				//		Vertex candidate = graph[graph.index(itE->to)];
+				//		if (!current.graph.isExisedVertice(candidate) && !Utility::isExistVertexInList(vertices, candidate))
+				//		{
+				//			// add new vertex into the candidate set
+				//			vertices.push_back(candidate);
+				//		}
+				//	}
+				//}
 
-				// Create new graph from the candidate set of nodes
-				for (int ii = 0; ii < vertices.size(); ii++)
+				//// Create new graph from the candidate set of nodes
+				//for (unsigned int ii = 0; ii < vertices.size(); ii++)
+				//{
+				//	Graph gtmp = current.graph;
+				//	gtmp.directed = this->directed;
+				//	gtmp.extendByVertex(this->graph, vertices[ii]);
+				//	// Check new graph exists in tmpQ or not?
+				//	bool isExist = false;
+				//	for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				//	{
+				//		if (itTmpQ->isDuplicated(gtmp))
+				//		{
+				//			isExist = true;
+				//			itTmpQ->childIDs.insert(current.code);
+				//			itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		}
+				//	}
+
+				//	if (!isExist)
+				//	{
+				//		TreeNode newnode(id);
+				//		newnode.graph = gtmp;
+				//		newnode.graph.idGraph = id;
+				//		newnode.ignoreList = current.ignoreList;
+				//		++id;
+				//		newnode.childIDs.insert(current.code);
+				//		newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		newnode.graph.sameHHop.insert(current.graph.sameHHop.begin(), current.graph.sameHHop.end());
+				//		tmpQ.push_back(newnode);
+				//	}
+				//}
+				vector<Graph> upGraphs = current.graph.getUpNeighborsInducedGraph(graph);
+				for (vector<Graph>::iterator itGr = upGraphs.begin(); itGr != upGraphs.end(); itGr++)
 				{
-					Graph gtmp = current.graph;
-					gtmp.directed = this->directed;
-					gtmp.extendByVertex(this->graph, vertices[ii]);
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
 					for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
 					{
-						if (itTmpQ->isDuplicated(gtmp))
+						if (itTmpQ->isDuplicated(*itGr))
 						{
 							isExist = true;
 							itTmpQ->childIDs.insert(current.code);
 							itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						}
 					}
-
 					if (!isExist)
 					{
 						TreeNode newnode(id);
-						newnode.graph = gtmp;
+						newnode.graph = *itGr;
 						newnode.graph.idGraph = id;
-						newnode.ignoreList = current.ignoreList;
 						++id;
+						newnode.ignoreList = current.ignoreList;
 						newnode.childIDs.insert(current.code);
 						newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+						newnode.graph.sameHHop.insert(current.graph.sameHHop.begin(), current.graph.sameHHop.end());
 						tmpQ.push_back(newnode);
 					}
 				}
@@ -1456,39 +1624,49 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 						Hashtable::iterator itFind = table.find(itTmpQ->code);
 			
 						// Compute Correlated value
-						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 						{
-							bool isChild = false;
-							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
-							if (got != itFind->second.childIDs.end())
+							if (iht != itFind)
 							{
-								isChild = true;
-							}
-								
-							if (isChild == false)
-							{
-								got = iht->second.childIDs.find(itTmpQ->code);
-								if (got != iht->second.childIDs.end())
+								if (iht->second.graphs[0].size() < itFind->second.graphs[0].size() || (iht->second.graphs[0].size() == itFind->second.graphs[0].size() && iht->first < itFind->first))
 								{
-									isChild = true;
-								}
-							}
-			
-							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-							{
-								colocated = 0;
-								confidence = 0;
-								table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+									bool isChild = false;
+									set<DFSCode>::const_iterator got;
 
-								if (colocated >= theta && confidence >= phi)
-								{
-									++countPair;
-									CorrelatedResult res;
-									res.g1 = itFind->second.graphs[0];
-									res.g2 = iht->second.graphs[0];
-									res.colocatedvalue = colocated;
-									res.confidencevalue = confidence;
-									saveResult.insert(res);
+									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
+									{
+										got = itFind->second.childIDs.find(iht->first);
+										if (got != itFind->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+									else
+									{
+										got = iht->second.childIDs.find(itTmpQ->code);
+										if (got != iht->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+			
+									if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+									{
+										colocated = 0;
+										confidence = 0;
+										table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+										if (colocated >= theta && confidence >= phi)
+										{
+											++countPair;
+											CorrelatedResult res;
+											res.g1 = itFind->second.graphs[0];
+											res.g2 = iht->second.graphs[0];
+											res.colocatedvalue = colocated;
+											res.confidencevalue = confidence;
+											saveResult.insert(res);
+										}
+									}
 								}
 							}
 						}
@@ -1515,7 +1693,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 	of.close();
 }
 
-void CorrelatedGraph::topKPruningInducedSubgraph(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::topKPruningInducedSubgraph(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	cout << "Running top-K pruning for Induced Subgraphs" << endl;
 	this->directed = directed;
@@ -1536,14 +1714,14 @@ void CorrelatedGraph::topKPruningInducedSubgraph(bool directed, char * filenameI
 	cout << "Finished! in " << duration << " (s)";
 }
 
-void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, int k)
+void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
 	TopKQueue topKqueue(k);
 
 	uint64_t id = 0;
 	deque<TreeNode> mainQ;
 
-	for (int i = 0; i < graph.vertex_size(); i++)
+	for (unsigned int i = 0; i < graph.vertex_size(); i++)
 	{
 		TreeNode node(id);
 		node.graph.directed = this->directed;
@@ -1602,22 +1780,28 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 		{
 			Hashtable::iterator itTable = table.find(it->code);
 			// Compute Correlated value
-			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 			{
-				colocated = 0;
-				confidence = 0;
-				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-				if (colocated >= theta && confidence >= phi)
+				if (iht != itTable)
 				{
-					++countPair;
-					CorrelatedResult res;
-					res.g1 = itTable->second.graphs[0];
-					res.g2 = iht->second.graphs[0];
-					res.colocatedvalue = colocated;
-					res.confidencevalue = confidence;
-					topKqueue.insert(res);
-					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+					if (iht->second.graphs[0].size() < itTable->second.graphs[0].size() || (iht->second.graphs[0].size() == itTable->second.graphs[0].size() && iht->first < itTable->first))
+					{
+						colocated = 0;
+						confidence = 0;
+						table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+						if (colocated >= theta && confidence >= phi)
+						{
+							++countPair;
+							CorrelatedResult res;
+							res.g1 = itTable->second.graphs[0];
+							res.g2 = iht->second.graphs[0];
+							res.colocatedvalue = colocated;
+							res.confidencevalue = confidence;
+							topKqueue.insert(res);
+							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+						}
+					}
 				}
 			}
 		}
@@ -1639,46 +1823,72 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 				current.ignoreList = iht->second.ignoreList;
 
 				// find all neighbouring nodes of the graph in current node
-				vector<Vertex> vertices;
-				for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
-				{
-					int idNode = graph.index(itG->id);
-					for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
-					{
-						Vertex candidate = graph[graph.index(itE->to)];
-						if (!current.graph.isExisedVertice(candidate) && !Utility::isExistVertexInList(vertices, candidate))
-						{
-							// add new vertex into the candidate set
-							vertices.push_back(candidate);
-						}
-					}
-				}
+				//vector<Vertex> vertices;
+				//for (vector<Vertex>::iterator itG = current.graph.begin(); itG != current.graph.end(); ++itG)
+				//{
+				//	int idNode = graph.index(itG->id);
+				//	for (Vertex::edge_iterator itE = graph[idNode].edge.begin(); itE != graph[idNode].edge.end(); itE++)
+				//	{
+				//		Vertex candidate = graph[graph.index(itE->to)];
+				//		if (!current.graph.isExisedVertice(candidate) && !Utility::isExistVertexInList(vertices, candidate))
+				//		{
+				//			// add new vertex into the candidate set
+				//			vertices.push_back(candidate);
+				//		}
+				//	}
+				//}
 
-				// Create new graph from the candidate set of nodes
-				for (int ii = 0; ii < vertices.size(); ii++)
+				//// Create new graph from the candidate set of nodes
+				//for (unsigned int ii = 0; ii < vertices.size(); ii++)
+				//{
+				//	Graph gtmp = current.graph;
+				//	gtmp.directed = this->directed;
+				//	gtmp.extendByVertex(this->graph, vertices[ii]);
+				//	// Check new graph exists in tmpQ or not?
+				//	bool isExist = false;
+				//	for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
+				//	{
+				//		if (itTmpQ->isDuplicated(gtmp))
+				//		{
+				//			isExist = true;
+				//			itTmpQ->childIDs.insert(current.code);
+				//			itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		}
+				//	}
+
+				//	if (!isExist)
+				//	{
+				//		TreeNode newnode(id);
+				//		newnode.graph = gtmp;
+				//		newnode.graph.idGraph = id;
+				//		newnode.ignoreList = current.ignoreList;
+				//		++id;
+				//		newnode.childIDs.insert(current.code);
+				//		newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
+				//		tmpQ.push_back(newnode);
+				//	}
+				//}
+				vector<Graph> upGraphs = current.graph.getUpNeighborsInducedGraph(graph);
+				for (vector<Graph>::iterator itGr = upGraphs.begin(); itGr != upGraphs.end(); itGr++)
 				{
-					Graph gtmp = current.graph;
-					gtmp.directed = this->directed;
-					gtmp.extendByVertex(this->graph, vertices[ii]);
 					// Check new graph exists in tmpQ or not?
 					bool isExist = false;
 					for (deque<TreeNode>::iterator itTmpQ = tmpQ.begin(); itTmpQ != tmpQ.end(); ++itTmpQ)
 					{
-						if (itTmpQ->isDuplicated(gtmp))
+						if (itTmpQ->isDuplicated(*itGr))
 						{
 							isExist = true;
 							itTmpQ->childIDs.insert(current.code);
 							itTmpQ->childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						}
 					}
-
 					if (!isExist)
 					{
 						TreeNode newnode(id);
-						newnode.graph = gtmp;
+						newnode.graph = *itGr;
 						newnode.graph.idGraph = id;
-						newnode.ignoreList = current.ignoreList;
 						++id;
+						newnode.ignoreList = current.ignoreList;
 						newnode.childIDs.insert(current.code);
 						newnode.childIDs.insert(current.childIDs.begin(), current.childIDs.end());
 						tmpQ.push_back(newnode);
@@ -1747,39 +1957,49 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 					{
 						Hashtable::iterator itFind = table.find(itTmpQ->code);
 						// Compute Correlated value
-						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 						{
-							bool isChild = false;
-							set<DFSCode>::const_iterator got = itFind->second.childIDs.find(iht->first);
-							if (got != itFind->second.childIDs.end())
+							if (iht != itFind)
 							{
-								isChild = true;
-							}
-								
-							if (isChild == false)
-							{
-								got = iht->second.childIDs.find(itTmpQ->code);
-								if (got != iht->second.childIDs.end())
+								if (iht->second.graphs[0].size() < itFind->second.graphs[0].size() || (iht->second.graphs[0].size() == itFind->second.graphs[0].size() && iht->first < itFind->first))
 								{
-									isChild = true;
-								}
-							}
-			
-							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-							{
-								colocated = 0;
-								confidence = 0;
-								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+									bool isChild = false;
+									set<DFSCode>::const_iterator got;
 
-								if (colocated >= theta && confidence >= phi)
-								{
-									++countPair;
-									CorrelatedResult res;
-									res.g1 = itFind->second.graphs[0];
-									res.g2 = iht->second.graphs[0];
-									res.colocatedvalue = colocated;
-									res.confidencevalue = confidence;
-									topKqueue.insert(res);
+									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
+									{
+										got = itFind->second.childIDs.find(iht->first);
+										if (got != itFind->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+									else
+									{
+										got = iht->second.childIDs.find(itTmpQ->code);
+										if (got != iht->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+			
+									if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+									{
+										colocated = 0;
+										confidence = 0;
+										table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+										if (colocated >= theta && confidence >= phi)
+										{
+											++countPair;
+											CorrelatedResult res;
+											res.g1 = itFind->second.graphs[0];
+											res.g2 = iht->second.graphs[0];
+											res.colocatedvalue = colocated;
+											res.confidencevalue = confidence;
+											topKqueue.insert(res);
+										}
+									}
 								}
 							}
 						}

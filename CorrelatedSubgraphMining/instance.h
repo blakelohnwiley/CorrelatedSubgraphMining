@@ -11,6 +11,7 @@
 #include <string>
 #include <set>
 #include <unordered_map>
+#include <stdint.h>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ public:
 	int freq;
 	//vector<int> independent_graphs;
 	set<CodeId> ignoreList;
-	unordered_map<double, int> mapIdToIndexGraph;
+	unordered_map<uint64_t, int> mapIdToIndexGraph;
 
 	Instance()
 	{
@@ -34,6 +35,7 @@ public:
 	void push(Graph& g, set<DFSCode> child, set<CodeId> ignore);
 	void push(Graph& g);
 	void assign(vector<Graph>& listGraph);
+	void assign(vector<Graph>& listGraph, int freq_);
 	void assign(vector<Graph>& listGraph, set<CodeId> ignore);
 	void insertIgnoreList(set<CodeId>& ignore);
 	int computeFrequency();

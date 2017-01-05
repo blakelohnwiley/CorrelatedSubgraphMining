@@ -96,7 +96,7 @@ public:
 			return true;
 		else if (this->size() == d2.size())
 		{
-			for (int i = 0; i < this->size(); i++)
+			for (unsigned int i = 0; i < (unsigned int)this->size(); i++)
 			{
 				if ((*this)[i] < d2[i])
 				{
@@ -118,7 +118,7 @@ public:
 		if (this->size() != d2.size())
 			return false;
 
-		for (int i = 0; i < this->size(); i++)
+		for (unsigned int i = 0; i < (unsigned int)this->size(); i++)
 		{
 			if ((*this)[i] != d2[i])
 				return false;

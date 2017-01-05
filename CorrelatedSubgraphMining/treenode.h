@@ -5,6 +5,7 @@
 #include "graphcode.h"
 #include "graphtomindfscode.h"
 #include <set>
+#include <stdint.h>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ class TreeNode
 public:
 	Graph graph;
 	bool isStop;
-	double idnode;
+	uint64_t idnode;
 	set<DFSCode> childIDs;
 	DFSCode code;
 	set<CodeId> ignoreList;
@@ -26,7 +27,7 @@ public:
 		isSavedToTable = false;
 	}
 
-	TreeNode(double id)
+	TreeNode(uint64_t id)
 	{
 		idnode = id;
 		isStop = false;

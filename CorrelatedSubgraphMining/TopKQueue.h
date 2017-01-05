@@ -27,7 +27,7 @@ public:
 class TopKQueue
 {
 public:
-	TopKQueue(int k) : _k(k) {}
+	TopKQueue(unsigned int k) : _k(k) {}
 	void insert(CorrelatedResult & result);
 	void print(ofstream & of);
 	vector<CorrelatedResult> reverse();
@@ -35,7 +35,7 @@ public:
 	int minCorrelatedValue();
 
 private:
-	int _k;
+	unsigned int _k;
 	priority_queue<CorrelatedResult, vector<CorrelatedResult>, sortNodesByPrio> _queue;
 };
 

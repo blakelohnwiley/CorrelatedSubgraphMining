@@ -48,15 +48,15 @@ DFSCode Utility::computeDFSCode(Graph& g, DFSCode& code)
 
 bool Utility::isInHHop (Graph & bigGraph, Graph& g1, Graph& g2, int hop)
 {
-	for (int i = 0; i < g1.size(); i++)
+	for (unsigned int i = 0; i < g1.size(); i++)
 	{
 		// Find all neighboring node in h-hop
 		vector<Vertex> neighbor;
 		bigGraph.findNodeinHhop(g1[i].id, hop, neighbor);
 
-		for (int k = 0; k < neighbor.size(); k++)
+		for (unsigned int k = 0; k < neighbor.size(); k++)
 		{
-			for (int j = 0; j < g2.size(); j++)
+			for (unsigned int j = 0; j < g2.size(); j++)
 			{
 				if (neighbor[k].id == g2[j].id)
 					return true;
@@ -67,7 +67,7 @@ bool Utility::isInHHop (Graph & bigGraph, Graph& g1, Graph& g2, int hop)
 	return false;
 }
 
-void Utility::readConfigFile (const char * fileConfigName, int& theta, double& phi, int& hop, int &k)
+void Utility::readConfigFile (const char * fileConfigName, int& theta, double& phi, int& hop, unsigned int &k)
 {
 	ifstream is;
 	char line[1024];
@@ -86,7 +86,6 @@ void Utility::readConfigFile (const char * fileConfigName, int& theta, double& p
 	while (true)
 	{
 		//cout << "Read in : ";
-		unsigned int pos = is.tellg();
 		if (!is.getline(line,1024))
 		{
 			cerr << "read all lines in file" << endl;
@@ -107,16 +106,16 @@ void Utility::readConfigFile (const char * fileConfigName, int& theta, double& p
 			else if (linecount == 3)
 				hop = atoi(result[1].c_str());
 			else if (linecount == 4)
-				k = atoi(result[1].c_str());
+				k = (unsigned int) atoi(result[1].c_str());
 		}
 	}
 }
 
 void Utility::intersecPointTwoGraphs (Graph& g1, Graph& g2, vector<int> & label)
 {
-	for (int i = 0; i < g1.size(); i++)
+	for (unsigned int i = 0; i < g1.size(); i++)
 	{
-		for (int j = 0; j < g2.size(); j++)
+		for (unsigned int j = 0; j < g2.size(); j++)
 		{
 			if (g1[i] == g2[j])
 			{
@@ -145,10 +144,10 @@ bool Utility::isIgnore (Instance &ins1, Instance &ins2)
 	vector<bool> mark(ins2.graphs.size(), false);
 
 	//for (int i = 0; i < ins1.independent_graphs.size(); i++)
-	for (int i = 0; i < ins1.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins1.graphs.size(); i++)
 	{
 		bool isFound = false;
-		int j = 0;
+		unsigned int j = 0;
 		//for (; j < ins2.independent_graphs.size(); j++)
 		for (; j < ins2.graphs.size(); j++)
 		{
@@ -180,16 +179,16 @@ bool Utility::isIgnore (Instance &ins1, Instance &ins2)
 		}
 	}
 
-	for (int k = 0; k < mark.size(); k++)
+	for (unsigned int k = 0; k < mark.size(); k++)
 	{
 		if (mark[k] == false)
 			return false;
 	}
 
 	// Check the number of share nodes
-	int min = labelList[0].size();
+	unsigned int min = labelList[0].size();
 	int minIndex = 0;
-	for (int k = 1; k < labelList.size(); k++)
+	for (unsigned int k = 1; k < labelList.size(); k++)
 	{
 		if (labelList[k].size() < min)
 		{
@@ -198,19 +197,19 @@ bool Utility::isIgnore (Instance &ins1, Instance &ins2)
 		}
 	}
 
-	for (int i = 0; i < min; i++)
+	for (unsigned int i = 0; i < min; i++)
 	{
 		// count the number of same label of index i in current list
 		int countI = 0;
-		for (int j = 0; j < min; j++)
+		for (unsigned int j = 0; j < min; j++)
 			if (labelList[minIndex][i] == labelList[minIndex][j])
 				countI++;
-		for (int u = 0; u < labelList.size(); u++)
+		for (unsigned int u = 0; u < labelList.size(); u++)
 		{
 			if (u != minIndex)
 			{
 				int countU = 0;
-				for (int v = 0; v < labelList[u].size(); v++)
+				for (unsigned int v = 0; v < labelList[u].size(); v++)
 				{
 					if (labelList[minIndex][i] == labelList[u][v])
 						countU++;
@@ -245,9 +244,9 @@ vector<int> Utility::intersect(vector<int> f1, vector<int> f2)
 {
 	vector<int> result;
 
-	for (int i = 0; i < (int)f1.size(); i++)
+	for (unsigned int i = 0; i < (unsigned int)f1.size(); i++)
 	{
-		for (int j = 0; j < f2.size(); j++)
+		for (unsigned int j = 0; j < f2.size(); j++)
 		{
 			if (f1[i] == f2[j])
 			{
@@ -293,7 +292,7 @@ vector<int> Utility::unionSet(vector<int> f1, vector<int> f2)
 {
 	vector<int> result;
 
-	for (int i = 0; i < f1.size(); i++)
+	for (unsigned int i = 0; i < f1.size(); i++)
 	{
 		if (!contains(result, f1[i]))
 		{
@@ -301,7 +300,7 @@ vector<int> Utility::unionSet(vector<int> f1, vector<int> f2)
 		}
     }
 
-	for (int j = 0; j < f2.size(); j++)
+	for (unsigned int j = 0; j < f2.size(); j++)
 	{
 		if (!contains(result, f2[j]))
 		{

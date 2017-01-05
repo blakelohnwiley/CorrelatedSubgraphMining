@@ -40,16 +40,16 @@ public:
 
 	bool operator < (const CodeId & code) const
 	{
-		int min1 = (id1 < id2) ? id1 : id2;
-		int min2 = (code.id1 < code.id2) ? code.id1 : code.id2;
+		uint64_t min1 = (id1 < id2) ? id1 : id2;
+		uint64_t min2 = (code.id1 < code.id2) ? code.id1 : code.id2;
 
 		return (min1 < min2);
 	}
 
 	bool operator > (const CodeId & code) const
 	{
-		int max1 = (id1 > id2) ? id1 : id2;
-		int max2 = (code.id1 > code.id2) ? code.id1 : code.id2;
+		uint64_t max1 = (id1 > id2) ? id1 : id2;
+		uint64_t max2 = (code.id1 > code.id2) ? code.id1 : code.id2;
 
 		return (max1 > max2);
 	}

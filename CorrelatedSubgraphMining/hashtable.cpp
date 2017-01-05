@@ -20,6 +20,11 @@ void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph)
 	(*this)[dfs_code].assign(listGraph);
 }
 
+void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph, int freq_)
+{
+	(*this)[dfs_code].assign(listGraph, freq_);
+}
+
 void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph, set<CodeId> & ignore)
 {
 	(*this)[dfs_code].assign(listGraph, ignore);
@@ -63,9 +68,9 @@ void Hashtable::computeCorrelatedValue (Graph & bigGraph, Instance & ins1, Insta
 		for (int j = 0; j < ins2.independent_graphs.size(); j++)
 		{*/
 
-	for (int i = 0; i < ins1.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins1.graphs.size(); i++)
 	{
-		for (int j = 0; j < ins2.graphs.size(); j++)
+		for (unsigned int j = 0; j < ins2.graphs.size(); j++)
 		{
 			++numTestCollocated;
 
@@ -80,12 +85,12 @@ void Hashtable::computeCorrelatedValue (Graph & bigGraph, Instance & ins1, Insta
 	}
 
 	//for (int i = 0; i < ins2.independent_graphs.size(); i++)
-	for (int i = 0; i < ins2.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins2.graphs.size(); i++)
 	{
 		if (I2[i] == false)
 		{
 			//for (int j = 0; j < ins1.independent_graphs.size(); j++)
-			for (int j = 0; j < ins1.graphs.size(); j++)
+			for (unsigned int j = 0; j < ins1.graphs.size(); j++)
 			{
 				++numTestCollocated;
 
@@ -100,7 +105,7 @@ void Hashtable::computeCorrelatedValue (Graph & bigGraph, Instance & ins1, Insta
 	}
 
 	int tmpColo1 = 0, tmpColo2 = 0;
-	for (int i = 0; i < I1.size(); i++)
+	for (unsigned int i = 0; i < I1.size(); i++)
 	{
 		if (I1[i] == true)
 			++tmpColo1;
@@ -109,7 +114,7 @@ void Hashtable::computeCorrelatedValue (Graph & bigGraph, Instance & ins1, Insta
 	if (tmpColo1 > ins1.freq)
 		tmpColo1 = ins1.freq;
 
-	for (int i = 0; i < I2.size(); i++)
+	for (unsigned int i = 0; i < I2.size(); i++)
 	{
 		if (I2[i] == true)
 			++tmpColo2;
@@ -268,9 +273,9 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 	vector<bool> I1(ins1.graphs.size(), false);
 	vector<bool> I2(ins2.graphs.size(), false);
 
-	for (int i = 0; i < ins1.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins1.graphs.size(); i++)
 	{
-		for (int j = 0; j < ins2.graphs.size(); j++)
+		for (unsigned int j = 0; j < ins2.graphs.size(); j++)
 		{
 			for (unordered_set<uint64_t>::iterator it1 = ins1.graphs[i].sameHHop.begin(); it1 != ins1.graphs[i].sameHHop.end(); ++it1)
 			{
@@ -285,11 +290,11 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 		}
 	}
 
-	for (int i = 0; i < ins1.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins1.graphs.size(); i++)
 	{
 		if (I1[i] == false)
 		{
-			for (int j = 0; j < ins2.graphs.size(); j++)
+			for (unsigned int j = 0; j < ins2.graphs.size(); j++)
 			{
 			
 					++numTestCollocated;
@@ -312,31 +317,31 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 		}
 	}
 
-	for (int i = 0; i < ins2.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins2.graphs.size(); i++)
 	{
 		if (I2[i] == false)
 		{
-			for (int j = 0; j < ins1.graphs.size(); j++)
+			for (unsigned int j = 0; j < ins1.graphs.size(); j++)
 			{
-			for (unordered_set<uint64_t>::iterator it1 = ins1.graphs[j].sameHHop.begin(); it1 != ins1.graphs[j].sameHHop.end(); ++it1)
-			{
-				unordered_set<uint64_t>::const_iterator got = ins2.graphs[i].sameHHop.find(*it1);
-				if (got != ins2.graphs[i].sameHHop.end())
+				for (unordered_set<uint64_t>::iterator it1 = ins1.graphs[j].sameHHop.begin(); it1 != ins1.graphs[j].sameHHop.end(); ++it1)
 				{
-					//isTested = true;
-					I2[i] = true;
-					break;
+					unordered_set<uint64_t>::const_iterator got = ins2.graphs[i].sameHHop.find(*it1);
+					if (got != ins2.graphs[i].sameHHop.end())
+					{
+						//isTested = true;
+						I2[i] = true;
+						break;
+					}
 				}
-			}
 			}
 		}
 	}
 
-	for (int i = 0; i < ins2.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins2.graphs.size(); i++)
 	{
 		if (I2[i] == false)
 		{
-			for (int j = 0; j < ins1.graphs.size(); j++)
+			for (unsigned int j = 0; j < ins1.graphs.size(); j++)
 			{
 				
 					++numTestCollocated;
@@ -359,7 +364,7 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 	}
 
 	int tmpColo1 = 0, tmpColo2 = 0;
-	for (int i = 0; i < I1.size(); i++)
+	for (unsigned int i = 0; i < I1.size(); i++)
 	{
 		if (I1[i] == true)
 			++tmpColo1;
@@ -367,7 +372,7 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 	if (tmpColo1 > ins1.freq)
 		tmpColo1 = ins1.freq;
 
-	for (int i = 0; i < I2.size(); i++)
+	for (unsigned int i = 0; i < I2.size(); i++)
 	{
 		if (I2[i] == true)
 			++tmpColo2;

@@ -20,6 +20,7 @@ using namespace std;
 struct Sample
 {
 	Graph p;
+	DFSCode dfs_code;
 	vector<Graph> isomophisms;
 	bool status;
 	int freq;
@@ -35,6 +36,16 @@ private:
 
 public:
 	static uint64_t id;
+	static Hashtable saveGraph;
+	static set<DFSCode> noneFrequentGraph;
+
+	static void clearStaticVariable()
+	{
+		saveGraph.clear();
+		id = 0;
+		noneFrequentGraph.clear();
+	}
+
 	int computeFrequency(vector<Graph>& listGraph);
 
 	Sampling(char * fileInput, bool directed_);

@@ -44,6 +44,17 @@ void Instance::assign(vector<Graph>& listGraph)
 	}
 }
 
+void Instance::assign(vector<Graph>& listGraph, int freq_)
+{
+	graphs = listGraph;
+	mapIdToIndexGraph.clear();
+	for (int i = 0; i < (int) graphs.size(); i++)
+	{
+		mapIdToIndexGraph[graphs[i].idGraph] = i;
+	}
+	this->freq = freq_;
+}
+
 void Instance::assign(vector<Graph>& listGraph, set<CodeId> ignore)
 {
 	graphs = listGraph;
