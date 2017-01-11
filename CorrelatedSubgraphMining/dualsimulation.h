@@ -11,7 +11,7 @@ using namespace std;
 class DualSimulation
 {
 public:
-	vector< vector<int> > simulate(Graph& g, Graph& q, vector< vector<int> > & candidates);
+	vector< vector<unsigned int> > simulate(Graph& g, Graph& q, vector< vector<unsigned int> > & candidates);
 };
 
 #endif

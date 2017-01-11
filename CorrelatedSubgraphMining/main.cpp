@@ -751,6 +751,13 @@ int main (int argc, char * const  argv[]) {
 
 	srand(time(0));
 
+	char configName[80];
+	strcpy(configName, "../Data/");
+	char cfName[50];
+	cout << "Input config file name: ";
+	cin.getline(cfName, 50);
+	strcat(configName, cfName);
+
 	char* fname = new char [80];
 	strcpy(fname, "../Data/");
 	char * name = new char[50];
@@ -762,8 +769,6 @@ int main (int argc, char * const  argv[]) {
 	double phi;
 	int hop;
 	unsigned int k;
-
-	char * configName = "../Data/config.txt";
 
 	Utility::readConfigFile(configName, theta, phi, hop, k);
 	bool directed;
@@ -855,7 +860,9 @@ int main (int argc, char * const  argv[]) {
 		cout << "Maximal number of samples: ";
 		int maxIter;
 		cin >> maxIter;
-		Sampling sampl(fname, directed);
+		Sampling sampl(directed);
+		sampl.initGraph(fname);
+
 		char * resultfilename = new char[256];
 		strcpy(resultfilename, "../Data/result_uniform_sampling_exact_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
@@ -870,7 +877,8 @@ int main (int argc, char * const  argv[]) {
 		cout << "Maximal number of samples: ";
 		int maxIter;
 		cin >> maxIter;
-		Sampling sampl(fname, directed);
+		Sampling sampl(directed);
+		sampl.initGraph(fname);
 		char * resultfilename = new char[256];
 		strcpy(resultfilename, "../Data/result_supportbiased_sampling_exact_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
@@ -885,7 +893,8 @@ int main (int argc, char * const  argv[]) {
 		cout << "Maximal number of samples: ";
 		int maxIter;
 		cin >> maxIter;
-		Sampling sampl(fname, directed);
+		Sampling sampl(directed);
+		sampl.initGraph(fname);
 		char * resultfilename = new char[256];
 		strcpy(resultfilename, "../Data/result_uniform_sampling_induced_subgraphs_");
 		resultfilename = strcat(resultfilename, name);
@@ -900,7 +909,8 @@ int main (int argc, char * const  argv[]) {
 		cout << "Maximal number of samples: ";
 		int maxIter;
 		cin >> maxIter;
-		Sampling sampl(fname, directed);
+		Sampling sampl(directed);
+		sampl.initGraph(fname);
 		char * resultfilename = new char[256];
 		strcpy(resultfilename, "../Data/result_supportbiased_sampling_induced_subgraphs_");
 		resultfilename = strcat(resultfilename, name);

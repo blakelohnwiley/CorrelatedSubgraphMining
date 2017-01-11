@@ -17,10 +17,10 @@ private:
 	DualSimulation dualSimulation;
 	vector<Graph> matches;
 
-	void search(Graph & database, Graph & pattern, vector< vector<int> >& candidates, int depth);
-	Graph toGraph(Graph & database, Graph & pattern, vector<int>& candidate);
-	vector<int> getCandidate(vector< vector<int> >& candidates);
-	bool isFound(Graph & database, Graph & pattern, vector< vector<int> >& candidates, int depth);
+	void search(Graph & database, Graph & pattern, vector< vector<unsigned int> >& candidates, unsigned int depth);
+	Graph toGraph(Graph & database, Graph & pattern, vector<unsigned int>& candidate);
+	vector<unsigned int> getCandidate(vector< vector<unsigned int> >& candidates);
+	bool isFound(Graph & database, Graph & pattern, vector< vector<unsigned int> >& candidates, unsigned int depth);
 
 public:
 	vector<Graph> match(Graph& database, Graph& pattern);

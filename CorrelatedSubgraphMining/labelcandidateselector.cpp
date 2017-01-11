@@ -1,10 +1,12 @@
 #include "labelcandidateselector.h"
 
-vector< vector<int> > LabelCandidateSelector::getCandidates(Graph database, Graph pattern)
+vector< vector<unsigned int> > LabelCandidateSelector::getCandidates(Graph database, Graph pattern)
 {
-	vector< vector<int> > result(pattern.size());
+	unsigned int patternSize = pattern.size();
 
-	for (unsigned int id = 0; id < pattern.size(); id++)
+	vector< vector<unsigned int> > result(patternSize);
+
+	for (unsigned int id = 0; id < patternSize; id++)
 	{
 		int label = pattern[id].label;
 		result[id] = database.getVerticesByLabel(label);

@@ -9,7 +9,7 @@ using namespace std;
 class LabelCandidateSelector
 {
 public:
-	vector< vector<int> > getCandidates(Graph database, Graph pattern);
+	vector< vector<unsigned int> > getCandidates(Graph database, Graph pattern);
 };
 
 #endif

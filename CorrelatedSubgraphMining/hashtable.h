@@ -9,21 +9,23 @@
 #include <string>
 #include <set>
 #include <stdint.h>
+#include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
-class Hashtable : public map<DFSCode, Instance>
+class Hashtable : public unordered_map<DFSCode, Instance>
 {
 public:
-	typedef map<DFSCode, Instance>::iterator hastable_iterator;
+	typedef unordered_map<DFSCode, Instance>::iterator hastable_iterator;
 
-	void push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child);
-	void push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child, set<CodeId> & ignore);
+	void push(DFSCode& dfs_code, Graph& g, unordered_set<DFSCode>& child);
+	void push(DFSCode& dfs_code, Graph& g, unordered_set<DFSCode>& child, unordered_set<CodeId> & ignore);
 	void push(DFSCode& dfs_code, Graph& g);
 	void assign(DFSCode& dfs_code, vector<Graph>& listGraph);
 	void assign(DFSCode& dfs_code, vector<Graph>& listGraph, int freq_);
-	void assign(DFSCode& dfs_code, vector<Graph>& listGraph, set<CodeId> & ignore);
-	void insertIgnoreList(DFSCode& dfs_code, set<CodeId> & ignore);
+	void assign(DFSCode& dfs_code, vector<Graph>& listGraph, unordered_set<CodeId> & ignore);
+	void insertIgnoreList(DFSCode& dfs_code, unordered_set<CodeId> & ignore);
 	void computeFrequency();
 	void computeFrequency(Hashtable::hastable_iterator start);
 	int freq(DFSCode dfs_code);

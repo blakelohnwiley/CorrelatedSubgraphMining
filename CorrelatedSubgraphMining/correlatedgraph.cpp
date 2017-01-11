@@ -13,20 +13,9 @@ void CorrelatedGraph::baseLine(bool directed, char * filenameInput, char * filen
 	this->directed = directed;
 	graph.directed = directed;
 	initGraph(filenameInput);
-	clock_t start, end;
-
-	start = clock();
+	
 	computeCorrelatedValueBaseline(filenameOuput, theta, phi, hop, k);
 	//mineCorrelatedGraphFromHashTable(filenameOuput, theta, phi, hop, k);
-	end = clock();
-
-	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
-	ofstream of;
-	of.open(filenameOuput, std::ios::app);
-	of << endl << "Finished! in " << duration << " (s)";
-	of.close();
-
-	cout << "Finished! in " << duration << " (s)";
 }
 
 void CorrelatedGraph::forwardPruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
@@ -35,20 +24,8 @@ void CorrelatedGraph::forwardPruning(bool directed, char * filenameInput, char *
 	this->directed = directed;
 	graph.directed = directed;
 	initGraph(filenameInput);
-	clock_t start, end;
-
-	start = clock();
+	
 	ImprovedComputeCorrelatedGraph(filenameOuput, theta, phi, hop, k);
-	end = clock();
-
-	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
-
-	ofstream of;
-	of.open(filenameOuput, std::ios::app);
-	of << endl << "Finished! in " << duration << " (s)";
-	of.close();
-
-	cout << "Finished! in " << duration << " (s)";
 }
 
 void CorrelatedGraph::topkPruning(bool directed, char * filenameInput, char * filenameOuput, int theta, double phi, int hop, unsigned int k)
@@ -57,24 +34,16 @@ void CorrelatedGraph::topkPruning(bool directed, char * filenameInput, char * fi
 	this->directed = directed;
 	graph.directed = directed;
 	initGraph(filenameInput);
-	clock_t start, end;
-
-	start = clock();
+	
 	topKComputeCorrelatedGraph(filenameOuput, theta, phi, hop, k);
-	end = clock();
-
-	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
-
-	ofstream of;
-	of.open(filenameOuput, std::ios::app);
-	of << endl << "Finished! in " << duration << " (s)";
-	of.close();
-
-	cout << "Finished! in " << duration << " (s)";
 }
 
 void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
+	clock_t start, end;
+
+	start = clock();
+
 	TopKQueue topKqueue(k);
 
 	uint64_t id = 0;
@@ -139,22 +108,28 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 		{
 			Hashtable::iterator itTable = table.find(it->code);
 			// Compute Correlated value
-			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 			{
-				colocated = 0;
-				confidence = 0;
-				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-				if (colocated >= theta && confidence >= phi)
+				if (iht != itTable)
 				{
-					++countPair;
-					CorrelatedResult res;
-					res.g1 = itTable->second.graphs[0];
-					res.g2 = iht->second.graphs[0];
-					res.colocatedvalue = colocated;
-					res.confidencevalue = confidence;
-					topKqueue.insert(res);
-					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+					if (iht->second.graphs[0].edge_size() < itTable->second.graphs[0].edge_size() || (iht->second.graphs[0].edge_size() == itTable->second.graphs[0].edge_size() && iht->first < itTable->first))
+					{
+						colocated = 0;
+						confidence = 0;
+						table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+						if (colocated >= theta && confidence >= phi)
+						{
+							++countPair;
+							CorrelatedResult res;
+							res.g1 = itTable->second.graphs[0];
+							res.g2 = iht->second.graphs[0];
+							res.colocatedvalue = colocated;
+							res.confidencevalue = confidence;
+							topKqueue.insert(res);
+							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+						}
+					}
 				}
 			}
 		}
@@ -162,10 +137,10 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 
 	bool stop = false;
 
-	deque<TreeNode> tmpQ;
-
 	while (!stop)
 	{
+		deque<TreeNode> tmpQ;
+
 		while (!mainQ.empty())
 		{
 			TreeNode current = mainQ.front();
@@ -310,43 +285,49 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 					{
 						Hashtable::iterator itFind = table.find(itTmpQ->code);
 						// Compute Correlated value
-						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 						{
-							bool isChild = false;
-							set<DFSCode>::const_iterator got;
+							if (iht != itFind)
+							{
+								if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size() || (iht->second.graphs[0].edge_size() == itFind->second.graphs[0].edge_size() && iht->first < itFind->first))
+								{
+									bool isChild = false;
+									unordered_set<DFSCode>::const_iterator got;
 
-							if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
-							{
-								got = itFind->second.childIDs.find(iht->first);
-								if (got != itFind->second.childIDs.end())
-								{
-									isChild = true;
-								}
-							}
-							else
-							{
-								got = iht->second.childIDs.find(itTmpQ->code);
-								if (got != iht->second.childIDs.end())
-								{
-									isChild = true;
-								}
-							}
+									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
+									{
+										got = itFind->second.childIDs.find(iht->first);
+										if (got != itFind->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+									else
+									{
+										got = iht->second.childIDs.find(itTmpQ->code);
+										if (got != iht->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
 			
-							if (isChild == false  && Utility::isIgnore(itFind->second, iht->second) == false)
-							{
-								colocated = 0;
-								confidence = 0;
-								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+									if (isChild == false  && Utility::isIgnore(itFind->second, iht->second) == false)
+									{
+										colocated = 0;
+										confidence = 0;
+										table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
 
-								if (colocated >= theta && confidence >= phi)
-								{
-									++countPair;
-									CorrelatedResult res;
-									res.g1 = itFind->second.graphs[0];
-									res.g2 = iht->second.graphs[0];
-									res.colocatedvalue = colocated;
-									res.confidencevalue = confidence;
-									topKqueue.insert(res);
+										if (colocated >= theta && confidence >= phi)
+										{
+											++countPair;
+											CorrelatedResult res;
+											res.g1 = itFind->second.graphs[0];
+											res.g2 = iht->second.graphs[0];
+											res.colocatedvalue = colocated;
+											res.confidencevalue = confidence;
+											topKqueue.insert(res);
+										}
+									}
 								}
 							}
 						}
@@ -354,7 +335,7 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 				}
 
 				mainQ = tmpQ;
-				tmpQ.clear();
+				//tmpQ.clear();
 			}
 		}
 		else
@@ -363,16 +344,25 @@ void CorrelatedGraph::topKComputeCorrelatedGraph(char * filenameOuput, int theta
 		}
 	}
 
+	end = clock();
+
+	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
+
 	ofstream of;
 	of.open(filenameOuput);
 	topKqueue.print(of);
 
 	of << "No. call to H-hop Test: " << numTestHHop;
+	of << endl << "Finished! in " << duration << " (s)";
 	of.close();
 }
 
 void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
+	clock_t start, end;
+
+	start = clock();
+
 	TopKQueue saveResult(k);
 	
 	//ofstream of;
@@ -440,22 +430,28 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 		{
 			Hashtable::iterator itTable = table.find(it->code);
 			// Compute Correlated value
-			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 			{
-				colocated = 0;
-				confidence = 0;
-				table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-				if (colocated >= theta && confidence >= phi)
+				if (iht != itTable)
 				{
-					++countPair;
-					CorrelatedResult res;
-					res.g1 = itTable->second.graphs[0];
-					res.g2 = iht->second.graphs[0];
-					res.colocatedvalue = colocated;
-					res.confidencevalue = confidence;
-					saveResult.insert(res);
-					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+					if (iht->second.graphs[0].edge_size() < itTable->second.graphs[0].edge_size() || (iht->second.graphs[0].edge_size() == itTable->second.graphs[0].edge_size() && iht->first < itTable->first))
+					{
+						colocated = 0;
+						confidence = 0;
+						table.computeCorrelatedValue(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+						if (colocated >= theta && confidence >= phi)
+						{
+							++countPair;
+							CorrelatedResult res;
+							res.g1 = itTable->second.graphs[0];
+							res.g2 = iht->second.graphs[0];
+							res.colocatedvalue = colocated;
+							res.confidencevalue = confidence;
+							saveResult.insert(res);
+							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+						}
+					}
 				}
 			}
 		}
@@ -463,10 +459,10 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 
 	bool stop = false;
 
-	deque<TreeNode> tmpQ;
-
 	while (!stop)
 	{
+		deque<TreeNode> tmpQ;
+
 		while (!mainQ.empty())
 		{
 			TreeNode current = mainQ.front();
@@ -622,43 +618,49 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 					{
 						Hashtable::iterator itFind = table.find(itTmpQ->code);
 						// Compute Correlated value
-						for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+						for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 						{
-							bool isChild = false;
-							set<DFSCode>::const_iterator got;
+							if (iht != itFind)
+							{
+								if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size() || (iht->second.graphs[0].edge_size() == itFind->second.graphs[0].edge_size() && iht->first < itFind->first))
+								{
+									bool isChild = false;
+									unordered_set<DFSCode>::const_iterator got;
 
-							if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
-							{
-								got = itFind->second.childIDs.find(iht->first);
-								if (got != itFind->second.childIDs.end())
-								{
-									isChild = true;
-								}
-							}
-							else
-							{
-								got = iht->second.childIDs.find(itTmpQ->code);
-								if (got != iht->second.childIDs.end())
-								{
-									isChild = true;
-								}
-							}
+									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
+									{
+										got = itFind->second.childIDs.find(iht->first);
+										if (got != itFind->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
+									else
+									{
+										got = iht->second.childIDs.find(itTmpQ->code);
+										if (got != iht->second.childIDs.end())
+										{
+											isChild = true;
+										}
+									}
 			
-							if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-							{
-								colocated = 0;
-								confidence = 0;
-								table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+									if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+									{
+										colocated = 0;
+										confidence = 0;
+										table.computeCorrelatedValue(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
 
-								if (colocated >= theta && confidence >= phi)
-								{
-									++countPair;
-									CorrelatedResult res;
-									res.g1 = itFind->second.graphs[0];
-									res.g2 = iht->second.graphs[0];
-									res.colocatedvalue = colocated;
-									res.confidencevalue = confidence;
-									saveResult.insert(res);
+										if (colocated >= theta && confidence >= phi)
+										{
+											++countPair;
+											CorrelatedResult res;
+											res.g1 = itFind->second.graphs[0];
+											res.g2 = iht->second.graphs[0];
+											res.colocatedvalue = colocated;
+											res.confidencevalue = confidence;
+											saveResult.insert(res);
+										}
+									}
 								}
 							}
 						}
@@ -666,7 +668,7 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 				}
 
 				mainQ = tmpQ;
-				tmpQ.clear();
+				//tmpQ.clear();
 			}
 		}
 		else
@@ -675,15 +677,25 @@ void CorrelatedGraph::computeCorrelatedValueBaseline(char* filenameOuput, int th
 		}
 	}
 
+	end = clock();
+
+	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
+
 	ofstream of;
 	of.open(filenameOuput);
 	saveResult.print(of);
 	of << "No. call to H-hop Test: " << numTestHHop;
+	of << endl << "Finished! in " << duration << " (s)";
+
 	of.close();
 }
 
 void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
+	clock_t start, end;
+
+	start = clock();
+
 	TopKQueue saveResult(k);
 
 	cout << "Building hashtable....." << endl;
@@ -749,22 +761,28 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 		{
 			Hashtable::iterator itTable = table.find(it->code);
 			// Compute Correlated value
-			for (Hashtable::iterator iht = table.begin(); iht != itTable; ++iht)
+			for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 			{
-				colocated = 0;
-				confidence = 0;
-				table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
-
-				if (colocated >= theta && confidence >= phi)
+				if (iht != itTable)
 				{
-					++countPair;
-					CorrelatedResult res;
-					res.g1 = itTable->second.graphs[0];
-					res.g2 = iht->second.graphs[0];
-					res.colocatedvalue = colocated;
-					res.confidencevalue = confidence;
-					saveResult.insert(res);
-					//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+					if (iht->second.graphs[0].edge_size() < itTable->second.graphs[0].edge_size() || (iht->second.graphs[0].edge_size() == itTable->second.graphs[0].edge_size() && iht->first < itTable->first))
+					{
+						colocated = 0;
+						confidence = 0;
+						table.computeCorrelatedValueClose(graph, itTable->second, iht->second, colocated, confidence, hop, numTestHHop);
+
+						if (colocated >= theta && confidence >= phi)
+						{
+							++countPair;
+							CorrelatedResult res;
+							res.g1 = itTable->second.graphs[0];
+							res.g2 = iht->second.graphs[0];
+							res.colocatedvalue = colocated;
+							res.confidencevalue = confidence;
+							saveResult.insert(res);
+							//write(of, itTable->second.graphs[0], iht->second.graphs[0], countPair, colocated, confidence);
+						}
+					}
 				}
 			}
 		}
@@ -772,10 +790,10 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 
 	bool stop = false;
 
-	deque<TreeNode> tmpQ;
-
 	while (!stop)
 	{
+		deque<TreeNode> tmpQ;
+
 		while (!mainQ.empty())
 		{
 			TreeNode current = mainQ.front();
@@ -939,43 +957,49 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 						//{
 							Hashtable::iterator itFind = table.find(itTmpQ->code);
 							// Compute Correlated value
-							for (Hashtable::iterator iht = table.begin(); iht != itFind; ++iht)
+							for (Hashtable::iterator iht = table.begin(); iht != table.end(); ++iht)
 							{
-								bool isChild = false;
-								set<DFSCode>::const_iterator got;
+								if (iht != itFind)
+								{
+									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size() || (iht->second.graphs[0].edge_size() == itFind->second.graphs[0].edge_size() && iht->first < itFind->first))
+									{
+										bool isChild = false;
+										unordered_set<DFSCode>::const_iterator got;
 
-								if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
-								{
-									got = itFind->second.childIDs.find(iht->first);
-									if (got != itFind->second.childIDs.end())
-									{
-										isChild = true;
-									}
-								}
-								else
-								{
-									got = iht->second.childIDs.find(itTmpQ->code);
-									if (got != iht->second.childIDs.end())
-									{
-										isChild = true;
-									}
-								}
+										if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
+										{
+											got = itFind->second.childIDs.find(iht->first);
+											if (got != itFind->second.childIDs.end())
+											{
+												isChild = true;
+											}
+										}
+										else
+										{
+											got = iht->second.childIDs.find(itTmpQ->code);
+											if (got != iht->second.childIDs.end())
+											{
+												isChild = true;
+											}
+										}
 			
-								if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
-								{
-									colocated = 0;
-									confidence = 0;
-									table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
+										if (isChild == false && Utility::isIgnore(itFind->second, iht->second) == false)
+										{
+											colocated = 0;
+											confidence = 0;
+											table.computeCorrelatedValueClose(graph, itFind->second, iht->second, colocated, confidence, hop, numTestHHop);
 
-									if (colocated >= theta && confidence >= phi)
-									{
-										++countPair;
-										CorrelatedResult res;
-										res.g1 = itFind->second.graphs[0];
-										res.g2 = iht->second.graphs[0];
-										res.colocatedvalue = colocated;
-										res.confidencevalue = confidence;
-										saveResult.insert(res);
+											if (colocated >= theta && confidence >= phi)
+											{
+												++countPair;
+												CorrelatedResult res;
+												res.g1 = itFind->second.graphs[0];
+												res.g2 = iht->second.graphs[0];
+												res.colocatedvalue = colocated;
+												res.confidencevalue = confidence;
+												saveResult.insert(res);
+											}
+										}
 									}
 								}
 							}
@@ -993,7 +1017,7 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 				}
 
 				mainQ = tmpQ;
-				tmpQ.clear();
+				//tmpQ.clear();
 			}
 		}
 		else
@@ -1002,6 +1026,10 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 		}
 	}
 
+	end = clock();
+
+	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
+
 	ofstream of;
 	of.open(filenameOuput);
 
@@ -1009,6 +1037,7 @@ void CorrelatedGraph::ImprovedComputeCorrelatedGraph(char * filenameOuput, int t
 
 	//of << "Num pairs: " << countPair << endl;
 	of << "No. call to H-hop Test: " << numTestHHop;
+	of << endl << "Finished! in " << duration << " (s)";
 	of.close();
 }
 
@@ -1030,23 +1059,16 @@ void CorrelatedGraph::baseLineInducedSubgraph(bool directed, char * filenameInpu
 	this->directed = directed;
 	graph.directed = directed;
 	initGraph(filenameInput);
-	clock_t start, end;
-
-	start = clock();
+	
 	computeCorrelatedValueBaselineInducedSubgraph(filenameOuput, theta, phi, hop, k);
-	end = clock();
-
-	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
-	ofstream of;
-	of.open(filenameOuput, std::ios::app);
-	of << endl << "Finished! in " << duration << " (s)";
-	of.close();
-
-	cout << "Finished! in " << duration << " (s)";
 }
 
 void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
+	clock_t start, end;
+
+	start = clock();
+
 	TopKQueue saveResult(k);
 	
 	uint64_t id = 0;
@@ -1141,10 +1163,10 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 
 	bool stop = false;
 
-	deque<TreeNode> tmpQ;
-
 	while (!stop)
 	{
+		deque<TreeNode> tmpQ;
+
 		while (!mainQ.empty())
 		{
 			TreeNode current = mainQ.front();
@@ -1296,7 +1318,7 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 								if (iht->second.graphs[0].size() < itFind->second.graphs[0].size() || (iht->second.graphs[0].size() == itFind->second.graphs[0].size() && iht->first < itFind->first))
 								{
 									bool isChild = false;
-									set<DFSCode>::const_iterator got;
+									unordered_set<DFSCode>::const_iterator got;
 
 									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
 									{
@@ -1339,7 +1361,7 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 				}
 
 				mainQ = tmpQ;
-				tmpQ.clear();
+				//tmpQ.clear();
 			}
 		}
 		else
@@ -1348,10 +1370,15 @@ void CorrelatedGraph::computeCorrelatedValueBaselineInducedSubgraph(char* filena
 		}
 	}
 
+	end = clock();
+
+	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
+
 	ofstream of;
 	of.open(filenameOuput);
 	saveResult.print(of);
 	of << "No. call to H-hop Test: " << numTestHHop;
+	of << endl << "Finished! in " << duration << " (s)";
 	of.close();
 }
 
@@ -1361,23 +1388,16 @@ void CorrelatedGraph::forwardPruningInducedSubgraph(bool directed, char * filena
 	this->directed = directed;
 	graph.directed = directed;
 	initGraph(filenameInput);
-	clock_t start, end;
-
-	start = clock();
+	
 	computeCorrelatedForwardPruningInducedSubgraph(filenameOuput, theta, phi, hop, k);
-	end = clock();
-
-	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
-	ofstream of;
-	of.open(filenameOuput, std::ios::app);
-	of << endl << "Finished! in " << duration << " (s)";
-	of.close();
-
-	cout << "Finished! in " << duration << " (s)";
 }
 
 void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
+	clock_t start, end;
+
+	start = clock();
+
 	TopKQueue saveResult(k);
 
 	uint64_t id = 0;
@@ -1472,10 +1492,10 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 
 	bool stop = false;
 
-	deque<TreeNode> tmpQ;
-
 	while (!stop)
 	{
+		deque<TreeNode> tmpQ;
+
 		while (!mainQ.empty())
 		{
 			TreeNode current = mainQ.front();
@@ -1631,7 +1651,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 								if (iht->second.graphs[0].size() < itFind->second.graphs[0].size() || (iht->second.graphs[0].size() == itFind->second.graphs[0].size() && iht->first < itFind->first))
 								{
 									bool isChild = false;
-									set<DFSCode>::const_iterator got;
+									unordered_set<DFSCode>::const_iterator got;
 
 									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
 									{
@@ -1674,7 +1694,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 				}
 
 				mainQ = tmpQ;
-				tmpQ.clear();
+				//tmpQ.clear();
 			}
 		}
 		else
@@ -1683,6 +1703,10 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 		}
 	}
 
+	end = clock();
+
+	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
+
 	ofstream of;
 	of.open(filenameOuput);
 
@@ -1690,6 +1714,7 @@ void CorrelatedGraph::computeCorrelatedForwardPruningInducedSubgraph(char* filen
 
 	//of << "Num pairs: " << countPair << endl;
 	of << "No. call to H-hop Test: " << numTestHHop;
+	of << endl << "Finished! in " << duration << " (s)";
 	of.close();
 }
 
@@ -1699,23 +1724,16 @@ void CorrelatedGraph::topKPruningInducedSubgraph(bool directed, char * filenameI
 	this->directed = directed;
 	graph.directed = directed;
 	initGraph(filenameInput);
-	clock_t start, end;
-
-	start = clock();
+	
 	computeCorrelatedTopKPruningInducedSubgraph(filenameOuput, theta, phi, hop, k);
-	end = clock();
-
-	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
-	ofstream of;
-	of.open(filenameOuput, std::ios::app);
-	of << endl << "Finished! in " << duration << " (s)";
-	of.close();
-
-	cout << "Finished! in " << duration << " (s)";
 }
 
 void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filenameOuput, int theta, double phi, int hop, unsigned int k)
 {
+	clock_t start, end;
+
+	start = clock();
+
 	TopKQueue topKqueue(k);
 
 	uint64_t id = 0;
@@ -1809,10 +1827,10 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 
 	bool stop = false;
 
-	deque<TreeNode> tmpQ;
-
 	while (!stop)
 	{
+		deque<TreeNode> tmpQ;
+
 		while (!mainQ.empty())
 		{
 			TreeNode current = mainQ.front();
@@ -1964,7 +1982,7 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 								if (iht->second.graphs[0].size() < itFind->second.graphs[0].size() || (iht->second.graphs[0].size() == itFind->second.graphs[0].size() && iht->first < itFind->first))
 								{
 									bool isChild = false;
-									set<DFSCode>::const_iterator got;
+									unordered_set<DFSCode>::const_iterator got;
 
 									if (iht->second.graphs[0].edge_size() < itFind->second.graphs[0].edge_size())
 									{
@@ -2007,7 +2025,7 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 				}
 
 				mainQ = tmpQ;
-				tmpQ.clear();
+				//tmpQ.clear();
 			}
 		}
 		else
@@ -2016,10 +2034,15 @@ void CorrelatedGraph::computeCorrelatedTopKPruningInducedSubgraph(char* filename
 		}
 	}
 
+	end = clock();
+
+	double duration = (end-start) * 1.0 / CLOCKS_PER_SEC;
+
 	ofstream of;
 	of.open(filenameOuput);
 	topKqueue.print(of);
 
 	of << "No. call to H-hop Test: " << numTestHHop;
+	of << endl << "Finished! in " << duration << " (s)";
 	of.close();
 }

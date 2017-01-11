@@ -9,7 +9,7 @@
 #include "TopKQueue.h"
 #include "instance.h"
 #include "utility.h"
-
+#include <unordered_set>
 #include <vector>
 #include <time.h>
 #include <cstdlib>
@@ -37,7 +37,7 @@ private:
 public:
 	static uint64_t id;
 	static Hashtable saveGraph;
-	static set<DFSCode> noneFrequentGraph;
+	static unordered_set<DFSCode> noneFrequentGraph;
 
 	static void clearStaticVariable()
 	{
@@ -48,7 +48,7 @@ public:
 
 	int computeFrequency(vector<Graph>& listGraph);
 
-	Sampling(char * fileInput, bool directed_);
+	Sampling(bool directed_);
 	Sample uniformSamplingExactGraph(int threshold, int miniter, int maxIter);
 	Sample uniformSamplingInducedGraph(int threshold, int miniter, int maxIter);
 	void computeCorrelatedValueUniformSamplingExactGraph(char* filenameOuput, int theta, double phi, int hop, int k, int miniter, int maxIteration);
@@ -59,6 +59,7 @@ public:
 	void computeCorrelatedValueSupportBiasedSamplingExactGraph(char* filenameOuput, int theta, double phi, int hop, int k, int miniter, int maxIteration);
 	void computeCorrelatedValueSupportBiasedSamplingInducedGraph(char* filenameOuput, int theta, double phi, int hop, int k, int miniter, int maxIteration);
 
+	void initGraph(char * fileInput);
 };
 
 #endif

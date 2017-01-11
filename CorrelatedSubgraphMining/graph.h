@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <time.h>
 #include <cstdlib>
+#include <algorithm>
 
 using namespace std;
 
@@ -54,6 +55,23 @@ public:
 		return (max1 > max2);
 	}
 };
+
+// custom specialization of std::hash can be injected in namespace std
+namespace std
+{
+    template<> struct hash<CodeId>
+    {
+        typedef CodeId argument_type;
+        typedef std::size_t result_type;
+        
+		result_type operator()(argument_type const& s) const
+        {
+            result_type const h1 ( std::hash<unsigned long long>() (s.id1) );
+            result_type const h2 ( std::hash<unsigned long long>() (s.id2) );
+            return h1 ^ (h2 << 1); // or use boost::hash_combine
+        }
+    };
+}
 
 class Edge
 {
@@ -130,7 +148,7 @@ class Graph : public vector<Vertex>
 {
 private:
 	// mapping from id of vertex to index in the stored vector
-	map<int, int> mapIdToIndex;
+	unordered_map<int, unsigned int> mapIdToIndex;
 	unsigned int edge_size_;
 	bool _isSorted;
 
@@ -141,7 +159,7 @@ public:
 	bool directed;
 
 	// hashtable with key: label of vertex, value: a list of index of vertices containing the same lable with key
-	unordered_map < int, vector<int> > labelIdx;
+	unordered_map < int, vector<unsigned int> > labelIdx;
 
 	typedef std::vector<Vertex>::iterator vertex_iterator;
 	
@@ -159,7 +177,7 @@ public:
 		return (unsigned int)size(); 
 	}
 	
-	int index(int id);
+	unsigned int index(int id);
 	void buildEdge();
 	void insertEdge(Graph& g, const Edge& e);
 	void insertEdge(Edge& e, int vertexStartLable, int vertexEndLable);
@@ -192,8 +210,8 @@ public:
 	void findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>& results);
 
 	// get neighbor of a node, return a list of index of neighboring vertices
-	vector<int> getNeighbor(int id);
-	vector<int> getVerticesByLabel(int label);
+	vector<unsigned int> getNeighbor(int id);
+	vector<unsigned int> getVerticesByLabel(int label);
 
 	bool operator==(const Graph& g) const;
 

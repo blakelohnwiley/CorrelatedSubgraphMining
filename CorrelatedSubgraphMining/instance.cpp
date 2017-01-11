@@ -1,8 +1,26 @@
 #include "instance.h"
 
+const Instance & Instance::operator = (const Instance & ins)
+{
+	if (this != &ins)
+	{
+		graphs.clear();
+		graphs = ins.graphs;
+		childIDs.clear();
+		childIDs = ins.childIDs;
+		freq = ins.freq;
+		ignoreList.clear();
+		ignoreList = ins.ignoreList;
+		mapIdToIndexGraph.clear();
+		mapIdToIndexGraph = ins.mapIdToIndexGraph;
+	}
+
+	return *this;
+}
+
 bool Instance::isExist(DFSCode& dfsCode)
 {
-	for (set<DFSCode>::iterator it = childIDs.begin(); it != childIDs.end(); ++it)
+	for (unordered_set<DFSCode>::iterator it = childIDs.begin(); it != childIDs.end(); ++it)
 	{
 		if (*it == dfsCode)
 			return true;
@@ -11,7 +29,7 @@ bool Instance::isExist(DFSCode& dfsCode)
 	return false;
 }
 
-void Instance::push(Graph& g, set<DFSCode> child)
+void Instance::push(Graph& g, unordered_set<DFSCode> child)
 {
 	graphs.push_back(g);
 	mapIdToIndexGraph[g.idGraph] = graphs.size() - 1;
@@ -19,7 +37,7 @@ void Instance::push(Graph& g, set<DFSCode> child)
 	childIDs.insert(child.begin(), child.end());
 }
 
-void Instance::push(Graph& g, set<DFSCode> child, set<CodeId> ignore)
+void Instance::push(Graph& g, unordered_set<DFSCode> child, unordered_set<CodeId> ignore)
 {
 	graphs.push_back(g);
 	mapIdToIndexGraph[g.idGraph] = graphs.size() - 1;
@@ -36,6 +54,7 @@ void Instance::push(Graph& g)
 
 void Instance::assign(vector<Graph>& listGraph)
 {
+	graphs.clear();
 	graphs = listGraph;
 	mapIdToIndexGraph.clear();
 	for (int i = 0; i < (int) graphs.size(); i++)
@@ -46,6 +65,7 @@ void Instance::assign(vector<Graph>& listGraph)
 
 void Instance::assign(vector<Graph>& listGraph, int freq_)
 {
+	graphs.clear();
 	graphs = listGraph;
 	mapIdToIndexGraph.clear();
 	for (int i = 0; i < (int) graphs.size(); i++)
@@ -55,8 +75,9 @@ void Instance::assign(vector<Graph>& listGraph, int freq_)
 	this->freq = freq_;
 }
 
-void Instance::assign(vector<Graph>& listGraph, set<CodeId> ignore)
+void Instance::assign(vector<Graph>& listGraph, unordered_set<CodeId> ignore)
 {
+	graphs.clear();
 	graphs = listGraph;
 	mapIdToIndexGraph.clear();
 	for (int i = 0; i < (int) graphs.size(); i++)
@@ -66,7 +87,7 @@ void Instance::assign(vector<Graph>& listGraph, set<CodeId> ignore)
 	ignoreList.insert(ignore.begin(), ignore.end());
 }
 
-void Instance::insertIgnoreList(set<CodeId>& ignore)
+void Instance::insertIgnoreList(unordered_set<CodeId>& ignore)
 {
 	ignoreList.insert(ignore.begin(), ignore.end());
 }

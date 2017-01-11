@@ -48,15 +48,18 @@ DFSCode Utility::computeDFSCode(Graph& g, DFSCode& code)
 
 bool Utility::isInHHop (Graph & bigGraph, Graph& g1, Graph& g2, int hop)
 {
-	for (unsigned int i = 0; i < g1.size(); i++)
+	unsigned int g1Size = g1.size();
+	unsigned int g2Size = g2.size();
+
+	for (unsigned int i = 0; i < g1Size; i++)
 	{
 		// Find all neighboring node in h-hop
 		vector<Vertex> neighbor;
 		bigGraph.findNodeinHhop(g1[i].id, hop, neighbor);
-
-		for (unsigned int k = 0; k < neighbor.size(); k++)
+		unsigned int neiborSize = neighbor.size();
+		for (unsigned int k = 0; k < neiborSize; k++)
 		{
-			for (unsigned int j = 0; j < g2.size(); j++)
+			for (unsigned int j = 0; j < g2Size; j++)
 			{
 				if (neighbor[k].id == g2[j].id)
 					return true;
@@ -129,9 +132,9 @@ void Utility::intersecPointTwoGraphs (Graph& g1, Graph& g2, vector<int> & label)
 bool Utility::isIgnore (Instance &ins1, Instance &ins2)
 {
 	// check ignore list first
-	for (set<CodeId>::const_iterator it1 = ins1.ignoreList.begin(); it1 != ins1.ignoreList.end(); ++it1)
+	for (unordered_set<CodeId>::const_iterator it1 = ins1.ignoreList.begin(); it1 != ins1.ignoreList.end(); ++it1)
 	{
-		set<CodeId>::const_iterator got = ins2.ignoreList.find(*it1);
+		unordered_set<CodeId>::const_iterator got = ins2.ignoreList.find(*it1);
 		if (got != ins2.ignoreList.end())
 		{
 			return true;
@@ -240,13 +243,16 @@ uint64_t Utility::pairFuntion (uint64_t k1, uint64_t k2)
 	return (k1 + k2) * (k1 + k2 + 1) / 2 + k2;
 }
 
-vector<int> Utility::intersect(vector<int> f1, vector<int> f2)
+vector<unsigned int> Utility::intersect(vector<unsigned int> f1, vector<unsigned int> f2)
 {
-	vector<int> result;
+	vector<unsigned int> result;
 
-	for (unsigned int i = 0; i < (unsigned int)f1.size(); i++)
+	unsigned int f1Size = f1.size();
+	unsigned int f2Size = f2.size();
+
+	for (unsigned int i = 0; i < f1Size; i++)
 	{
-		for (unsigned int j = 0; j < f2.size(); j++)
+		for (unsigned int j = 0; j < f2Size; j++)
 		{
 			if (f1[i] == f2[j])
 			{
@@ -258,15 +264,14 @@ vector<int> Utility::intersect(vector<int> f1, vector<int> f2)
 	return result;
 }
 
-vector<int> Utility::intersectSorted(vector<int> f1, vector<int> f2)
+vector<unsigned int> Utility::intersectSorted(vector<unsigned int> f1, vector<unsigned int> f2)
 {
-	vector<int> result;
+	vector<unsigned int> result;
 
-	int i = 0;
-    int j = 0;
-	int m = (int)f1.size();
-	int n = (int)f2.size();
-    int previous = -1;
+	unsigned int i = 0;
+    unsigned int j = 0;
+	unsigned int m = f1.size();
+	unsigned int n = f2.size();
 
 	while (i < m && j < n)
 	{
@@ -276,10 +281,7 @@ vector<int> Utility::intersectSorted(vector<int> f1, vector<int> f2)
 			++j;
 		else
 		{
-			if (f1[i] != previous)
-			{
-				result.push_back(f1[i]);
-			}
+			result.push_back(f1[i]);
 			++i;
 			++j;
 		}
@@ -288,11 +290,14 @@ vector<int> Utility::intersectSorted(vector<int> f1, vector<int> f2)
 	return result;
 }
 
-vector<int> Utility::unionSet(vector<int> f1, vector<int> f2)
+vector<unsigned int> Utility::unionSet(vector<unsigned int> f1, vector<unsigned int> f2)
 {
-	vector<int> result;
+	vector<unsigned int> result;
 
-	for (unsigned int i = 0; i < f1.size(); i++)
+	unsigned int f1Size = f1.size();
+	unsigned int f2Size = f2.size();
+
+	for (unsigned int i = 0; i < f1Size; i++)
 	{
 		if (!contains(result, f1[i]))
 		{
@@ -300,7 +305,7 @@ vector<int> Utility::unionSet(vector<int> f1, vector<int> f2)
 		}
     }
 
-	for (unsigned int j = 0; j < f2.size(); j++)
+	for (unsigned int j = 0; j < f2Size; j++)
 	{
 		if (!contains(result, f2[j]))
 		{
@@ -311,16 +316,16 @@ vector<int> Utility::unionSet(vector<int> f1, vector<int> f2)
 	return result;
 }
 
-vector<int> Utility::unionSortedSet(vector<int> f1, vector<int> f2)
+vector<unsigned int> Utility::unionSortedSet(vector<unsigned int> f1, vector<unsigned int> f2)
 {
-	vector<int> result;
+	vector<unsigned int> result;
 
-	int i = 0;
-    int j = 0;
-	int m = (int)f1.size();
-	int n = (int)f2.size();
-    int previous = -1;
-    
+	unsigned int i = 0;
+    unsigned int j = 0;
+	unsigned int m = f1.size();
+	unsigned int n = f2.size();
+    unsigned int previous = 0;
+
     while (i < m && j < n)
 	{
 		if (f1[i] < f2[j])
@@ -328,6 +333,10 @@ vector<int> Utility::unionSortedSet(vector<int> f1, vector<int> f2)
 			if (previous < f1[i])
 			{
 				previous = f1[i];
+				result.push_back(previous);
+			}
+			else if (result.empty() == true && previous == f1[i])
+			{
 				result.push_back(previous);
 			}
 
@@ -340,6 +349,10 @@ vector<int> Utility::unionSortedSet(vector<int> f1, vector<int> f2)
 				previous = f2[j];
 				result.push_back(previous);
 			}
+			else if (result.empty() == true && previous == f2[i])
+			{
+				result.push_back(previous);
+			}
 
 			j++;
 		}
@@ -348,6 +361,10 @@ vector<int> Utility::unionSortedSet(vector<int> f1, vector<int> f2)
 			if (previous < f1[i])
 			{
 				previous = f1[i];
+				result.push_back(previous);
+			}
+			else if (result.empty() == true && previous == f1[i])
+			{
 				result.push_back(previous);
 			}
 
@@ -371,11 +388,12 @@ vector<int> Utility::unionSortedSet(vector<int> f1, vector<int> f2)
 	return result;
 }
 
-bool Utility::contains(vector<int> & f, int e)
+bool Utility::contains(vector<unsigned int> & f, unsigned int e)
 {
 	bool res = false;
+	unsigned int fSize = f.size();
 
-	for (int i = 0; i < (int)f.size(); i++)
+	for (unsigned int i = 0; i < fSize; i++)
 	{
 		if (f[i] == e)
 		{
@@ -387,25 +405,25 @@ bool Utility::contains(vector<int> & f, int e)
     return res;
 }
 
-vector<int> Utility::removeElement(vector<int>& v, int e)
+vector<unsigned int> Utility::removeElement(vector<unsigned int>& v, unsigned int e)
 {
-	vector<int>::iterator position = std::find(v.begin(), v.end(), e);
+	vector<unsigned int>::iterator position = std::find(v.begin(), v.end(), e);
 	if (position != v.end())
 		v.erase(position);
 
 	return v;
 }
 
-bool Utility::contains(vector< vector<int> > f, int e, int row)
+bool Utility::contains(vector< vector<unsigned int> > f, unsigned int e, unsigned int row)
 {
 	bool res = false;
 
-    int bound = (int)f.size();
+    unsigned int bound = f.size();
 	bound = bound - 1;
 	if (bound > row)
 		bound = row;
 
-    for (int i = 0; i <= bound; i++)
+    for (unsigned int i = 0; i <= bound; i++)
 	{
 		if (contains(f[i], e))
 		{

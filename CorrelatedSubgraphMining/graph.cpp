@@ -30,10 +30,12 @@ void Graph::buildEdge()
 	sortGaph();
 
 	char buf[512];
-	map<string, unsigned int> tmp;
+	unordered_map<string, unsigned int> tmp;
 	unsigned int id = 0;
 
-	for (int from = 0; from < (int) size(); ++from) 
+	unsigned int size_ = size();
+
+	for (unsigned int from = 0; from < size_; ++from) 
 	{
 		for (Vertex::edge_iterator it = (*this)[from].edge.begin(); it != (*this)[from].edge.end(); ++it)
 		{
@@ -63,7 +65,7 @@ void Graph::buildEdge()
 //	sameHHop.insert(id);
 //}
 
-int Graph::index(int id)
+unsigned int Graph::index(int id)
 {
 	return mapIdToIndex[id];
 }
@@ -77,7 +79,8 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 {
 	// check if start point and end point of e exist?
 	bool isFound = false;
-	for (unsigned int i = 0; i < size(); i++)
+	unsigned int size_ = size();
+	for (unsigned int i = 0; i < size_; i++)
 	{
 		if ((*this)[i].id == e.from)
 		{
@@ -89,7 +92,7 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 	if (isFound == true)
 	{
 		isFound = false;
-		for (unsigned int i = 0; i < size(); i++)
+		for (unsigned int i = 0; i < size_; i++)
 		{
 			if ((*this)[i].id == e.to)
 			{
@@ -101,21 +104,25 @@ void Graph::insertEdge(Graph& g, const Edge& e)
 		if (!isFound)
 		{
 			// Insert a new vertex that is the end point of e
-			resize(size() + 1);
-			(*this)[size() - 1].id = e.to;
-			(*this)[size() - 1].label = g.vertexLabel(e.to);
-			mapIdToIndex[e.to] = size() - 1;
-			labelIdx[(*this)[size() - 1].label].push_back(size() - 1);
+			Vertex tmpV;
+			tmpV.id = e.to;
+			tmpV.label = g.vertexLabel(e.to);
+			this->push_back(tmpV);
+			size_ = size();
+			mapIdToIndex[e.to] = size_ - 1;
+			labelIdx[(*this)[size_ - 1].label].push_back(size_ - 1);
 		}
 	}
 	else
 	{
 		// Insert a new vertex that is the start point of e
-		resize(size() + 1);
-		(*this)[size() - 1].id = e.from;
-		(*this)[size() - 1].label = g.vertexLabel(e.from);
-		mapIdToIndex[e.from] = size() - 1;
-		labelIdx[(*this)[size() - 1].label].push_back(size() - 1);
+		Vertex tmpV;
+		tmpV.id = e.from;
+		tmpV.label = g.vertexLabel(e.from);
+		this->push_back(tmpV);
+		size_ = size();
+		mapIdToIndex[e.from] = size_ - 1;
+		labelIdx[(*this)[size_ - 1].label].push_back(size_ - 1);
 	}
 
 	// start point and end point of e existed, insert edge e
@@ -133,7 +140,8 @@ void Graph::insertEdge(Edge& e, int vertexStartLabel, int vertexEndLabel)
 {
 	// check if start point and end point of e exist?
 	bool isFound = false;
-	for (unsigned int i = 0; i < size(); i++)
+	unsigned int size_ = size();
+	for (unsigned int i = 0; i < size_; i++)
 	{
 		if ((*this)[i].id == e.from)
 		{
@@ -145,7 +153,7 @@ void Graph::insertEdge(Edge& e, int vertexStartLabel, int vertexEndLabel)
 	if (isFound == true)
 	{
 		isFound = false;
-		for (unsigned int i = 0; i < size(); i++)
+		for (unsigned int i = 0; i < size_; i++)
 		{
 			if ((*this)[i].id == e.to)
 			{
@@ -157,21 +165,27 @@ void Graph::insertEdge(Edge& e, int vertexStartLabel, int vertexEndLabel)
 		if (!isFound)
 		{
 			// Insert a new vertex that is the end point of e
-			resize(size() + 1);
-			(*this)[size() - 1].id = e.to;
-			(*this)[size() - 1].label = vertexEndLabel;
-			mapIdToIndex[e.to] = size() - 1;
-			labelIdx[vertexEndLabel].push_back(size() - 1);
+			Vertex tmpV;
+			tmpV.id = e.to;
+			tmpV.label = vertexEndLabel;
+			this->push_back(tmpV);
+
+			size_ = size();
+			mapIdToIndex[e.to] = size_ - 1;
+			labelIdx[vertexEndLabel].push_back(size_ - 1);
 		}
 	}
 	else
 	{
 		// Insert a new vertex that is the start point of e
-		resize(size() + 1);
-		(*this)[size() - 1].id = e.from;
-		(*this)[size() - 1].label = vertexStartLabel;
-		mapIdToIndex[e.from] = size() - 1;
-		labelIdx[vertexStartLabel].push_back(size() - 1);
+		Vertex tmpV;
+		tmpV.id = e.from;
+		tmpV.label = vertexStartLabel;
+		this->push_back(tmpV);
+
+		size_ = size();
+		mapIdToIndex[e.from] = size_ - 1;
+		labelIdx[vertexStartLabel].push_back(size_ - 1);
 	}
 
 	// start point and end point of e existed, insert edge e
@@ -187,32 +201,38 @@ void Graph::insertEdge(Edge& e, int vertexStartLabel, int vertexEndLabel)
 
 void Graph::extendByVertex(Graph& g, Vertex& v)
 {
-	resize(size() + 1);
-	(*this)[size() - 1].id = v.id;
-	(*this)[size() - 1].label = v.label;
-	mapIdToIndex[v.id] = size() - 1;
-	labelIdx[v.label].push_back(size() - 1);
+	Vertex tmpV;
+	tmpV.id = v.id;
+	tmpV.label = v.label;
+	this->push_back(tmpV);
+
+	unsigned int size_ = size();
+
+	mapIdToIndex[v.id] = size_ - 1;
+	labelIdx[v.label].push_back(size_ - 1);
 
 	// get all edges to and from this node from g
-	int indexBigGraph = g.mapIdToIndex[v.id];
+	unsigned int indexBigGraph = g.mapIdToIndex[v.id];
+
 	if (!g.directed)
 	{
 		for (vector<Edge>::iterator it = g[indexBigGraph].edge.begin(); it != g[indexBigGraph].edge.end(); ++it)
 		{
-			map<int, int>::iterator itMap = mapIdToIndex.find(it->to);
+			unordered_map<int, unsigned int>::iterator itMap = mapIdToIndex.find(it->to);
 			if (itMap != mapIdToIndex.end())
 			{
 				(*this)[itMap->second].push(it->to, it->from, it->elabel);
-				(*this)[size() - 1].push(it->from, it->to, it->elabel);
+				(*this)[size_ - 1].push(it->from, it->to, it->elabel);
 			}
 		}
 	}
 	else
 	{
 		// to v
-		for (unsigned int i = 0; i < size() - 1; i++)
+		for (unsigned int i = 0; i < size_ - 1; i++)
 		{
-			int indexG = g.mapIdToIndex[(*this)[i].id];
+			unsigned int indexG = g.mapIdToIndex[(*this)[i].id];
+
 			for (vector<Edge>::iterator it = g[indexG].edge.begin(); it != g[indexG].edge.end(); ++it)
 			{
 				if (it->to == v.id)
@@ -225,10 +245,10 @@ void Graph::extendByVertex(Graph& g, Vertex& v)
 		// from v
 		for (vector<Edge>::iterator it = g[indexBigGraph].edge.begin(); it != g[indexBigGraph].edge.end(); ++it)
 		{
-			map<int, int>::iterator itMap = mapIdToIndex.find(it->to);
+			unordered_map<int, unsigned int>::iterator itMap = mapIdToIndex.find(it->to);
 			if (itMap != mapIdToIndex.end())
 			{
-				(*this)[size() - 1].push(it->from, it->to, it->elabel);
+				(*this)[size_ - 1].push(it->from, it->to, it->elabel);
 			}
 		}
 	}
@@ -238,11 +258,16 @@ void Graph::extendByVertex(Graph& g, Vertex& v)
 
 void Graph::insertVertex(Vertex& v)
 {
-	this->resize(size() + 1);
-	(*this)[size() - 1].id = v.id;
-	(*this)[size() - 1].label = v.label;
-	mapIdToIndex[v.id] = size() - 1;
-	labelIdx[v.label].push_back(size() - 1);
+	Vertex tmpV;
+	tmpV.id = v.id;
+	tmpV.label = v.label;
+
+	this->push_back(tmpV);
+
+	unsigned int size_ = size();
+
+	mapIdToIndex[v.id] = size_ - 1;
+	labelIdx[v.label].push_back(size_ - 1);
 }
 
 void Graph::sortGaph()
@@ -252,7 +277,9 @@ void Graph::sortGaph()
 	mapIdToIndex.clear();
 	labelIdx.clear();
 
-	for (int i = 0; i < (int)size(); i++)
+	unsigned int size_ = size();
+
+	for (unsigned int i = 0; i < size_ ; i++)
 	{
 		mapIdToIndex[(*this)[i].id] = i;
 		labelIdx[(*this)[i].label].push_back(i);
@@ -263,7 +290,9 @@ void Graph::sortGaph()
 
 bool Graph::isExist(Edge& e)
 {
-	for (unsigned int i = 0; i < size(); i++)
+	unsigned int size_ = size();
+
+	for (unsigned int i = 0; i < size_; i++)
 	{
 		for (Vertex::edge_iterator it = (*this)[i].edge.begin(); it != (*this)[i].edge.end(); ++it)
 		{
@@ -279,7 +308,9 @@ bool Graph::isExist(Edge& e)
 
 bool Graph::isExisedVertice(Vertex& v)
 {
-	for (unsigned int i = 0; i < size(); i++)
+	unsigned int size_ = size();
+
+	for (unsigned int i = 0; i < size_; i++)
 	{
 		if ((*this)[i] == v)
 			return true;
@@ -290,9 +321,12 @@ bool Graph::isExisedVertice(Vertex& v)
 
 bool Graph::overlap (Graph& g)
 {
-	for (unsigned int i = 0; i < size(); i++)
+	unsigned int size_ = size();
+	unsigned int g_size = g.vertex_size();
+
+	for (unsigned int i = 0; i < size_; i++)
 	{
-		for (unsigned int j = 0; j < g.vertex_size(); j++)
+		for (unsigned int j = 0; j < g_size; j++)
 		{
 			if ((*this)[i] == g[j])
 			{
@@ -326,20 +360,24 @@ bool Graph::isDuplicated(const Graph& g) const
 		cp2.sortGaph();
 	}
 
-	for (int i = 0; i < (int)cp1.size(); i++)
+	unsigned int cp1_size = cp1.size();
+
+	for (unsigned int i = 0; i < cp1_size; i++)
 	{
 		if (cp1[i] != cp2[i])
 			return false;
 	}
 
 	// Check id and label of all edges
-	for (int i = 0; i < (int)cp1.size(); i++)
+	for (unsigned int i = 0; i < cp1_size; i++)
 	{
 		if (cp1[i].edge.size() != cp2[i].edge.size())
 			return false;
+
 		for (Vertex::edge_iterator it = cp1[i].edge.begin(); it != cp1[i].edge.end(); ++it)
 		{
 			bool isEdgeExist = false;
+
 			for (Vertex::edge_iterator it1 = cp2[i].edge.begin(); it1 != cp2[i].edge.end(); ++it1)
 			{
 				if (*it == *it1)
@@ -396,20 +434,25 @@ int Graph::read(char* _fname)
 			if (result[0] == "v" && result.size() >= 3) 
 			{
 				int id = atoi(result[1].c_str());
-				this->resize(size() + 1);
-				(*this)[size() - 1].id = id;
-				(*this)[size() - 1].label = atoi(result[2].c_str());
-				mapIdToIndex[id] = size() - 1;
-				labelIdx[id].push_back(size() - 1);
-				//cout<<"v "<< atoi(result[1].c_str()) << " " << atoi(result[2].c_str()) << " " << (*this)[id].label <<" added"<< endl;
+
+				Vertex tmpV;
+				tmpV.id = id;
+				tmpV.label = atoi(result[2].c_str());
+				this->push_back(tmpV);
+
+				unsigned int size_ = size();
+				mapIdToIndex[id] = size_ - 1;
+				labelIdx[tmpV.label].push_back(size_ - 1);
 			}
 			else if (result[0] == "e" && result.size() >= 4) 
 			{
 				int from = atoi(result[1].c_str());
 				int to = atoi(result[2].c_str());
 				int elabel = atoi(result[3].c_str());
-				//cout << "size:" << (int)size();
-				if((int)size() <= mapIdToIndex[from] || (int)size() <= mapIdToIndex[to])
+				
+				unsigned int size_ = size();
+
+				if(size_ <= mapIdToIndex[from] || size_ <= mapIdToIndex[to])
 				{
 					cerr << "Input Format Error: define vertex lists before edges" << endl;
 					exit(-1);
@@ -421,12 +464,11 @@ int Graph::read(char* _fname)
 				{
 					(*this)[mapIdToIndex[to]].push(to, from, elabel);
 				}
-				//cout<<"edge added"<<std::endl;
 			}
 		}
 	}
 
-	buildEdge();
+	//buildEdge();
 	
 	return linecnt;
 }
@@ -434,9 +476,11 @@ int Graph::read(char* _fname)
 ostream& Graph::write(ostream& os)
 {
 	char buf[512];
-	set<string> tmp;
+	unordered_set<string> tmp;
 	
-	for(int from = 0; from < (int)size(); ++from)
+	unsigned int size_ = size();
+
+	for(unsigned int from = 0; from < size_; ++from)
 	{
 		os << "v " << (*this)[from].id << " " << (*this)[from].label << endl;
 
@@ -454,7 +498,7 @@ ostream& Graph::write(ostream& os)
 		}
 	}
 	
-	for(set<string>::iterator it = tmp.begin(); it != tmp.end(); ++it)
+	for(unordered_set<string>::iterator it = tmp.begin(); it != tmp.end(); ++it)
 	{
 		os << "e " << *it << std::endl;
 	}
@@ -465,9 +509,11 @@ ostream& Graph::write(ostream& os)
 ofstream& Graph::write(ofstream& os)
 {
 	char buf[512];
-	set<string> tmp;
+	unordered_set<string> tmp;
 	
-	for (int from = 0; from < (int)size(); ++from)
+	unsigned int size_ = size();
+
+	for (unsigned int from = 0; from < size_; ++from)
 	{
 		os << "v " << (*this)[from].id << " " << (*this)[from].label << std::endl;
 		
@@ -485,7 +531,7 @@ ofstream& Graph::write(ofstream& os)
 		}
 	}
 	
-	for(set<string>::iterator it = tmp.begin(); it != tmp.end(); ++it)
+	for(unordered_set<string>::iterator it = tmp.begin(); it != tmp.end(); ++it)
 	{
 		os << "e " << *it << endl;
 	}
@@ -495,8 +541,11 @@ ofstream& Graph::write(ofstream& os)
 
 void Graph::check()
 {
-	for (int from = 0; from < (int)size(); ++from){
+	unsigned int size_ = size();
+
+	for (unsigned int from = 0; from < size_; ++from){
 		cout << "check vertex " << (*this)[from].id << ",label " << (*this)[from].label << endl;
+
 		for(Vertex::edge_iterator it = (*this)[from].edge.begin(); it != (*this)[from].edge.end(); ++it)
 		{
 			cout << "check edge from " << it->from << " to " << it->to << ", label " << it->elabel << endl; 
@@ -506,7 +555,7 @@ void Graph::check()
 
 void Graph::findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>& results)
 {
-	int ind = mapIdToIndex[vertexId];
+	unsigned int ind = mapIdToIndex[vertexId];
 
 	deque<Vertex> Queue;
 	(*this)[ind].depth = 0;
@@ -515,10 +564,11 @@ void Graph::findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>
 	while (!Queue.empty())
 	{
 		Vertex v = Queue.front();
+		unsigned int sizeV = v.edge.size();
 
-		for (unsigned int i = 0; i < v.edge.size(); i++)
+		for (unsigned int i = 0; i < sizeV; i++)
 		{
-			int idex = mapIdToIndex[v.edge[i].to];
+			unsigned int idex = mapIdToIndex[v.edge[i].to];
 			Vertex u = (*this)[idex];
 			bool notIn = true;
 
@@ -535,7 +585,8 @@ void Graph::findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>
 			if (notIn)
 			{
 				// check u is in Queue?
-				for (unsigned int j = 0; j < Queue.size(); j++)
+				unsigned int sizeQ = Queue.size();
+				for (unsigned int j = 0; j < sizeQ; j++)
 				{
 					if (Queue[j].id == u.id)
 					{
@@ -564,12 +615,13 @@ void Graph::findNodeinHhop(const int & vertexId, const int & hop, vector<Vertex>
 	}
 }
 
-vector<int> Graph::getNeighbor(int id)
+vector<unsigned int> Graph::getNeighbor(int id)
 {
-	int indexSource = index(id);
-	vector<int> result;
+	unsigned int indexSource = index(id);
+	vector<unsigned int> result;
+	unsigned int size_ = (*this)[indexSource].edge.size();
 
-	for (unsigned int i = 0; i < (*this)[indexSource].edge.size(); ++i)
+	for (unsigned int i = 0; i < size_; ++i)
 	{
 		result.push_back(index((*this)[indexSource].edge[i].to));
 	}
@@ -579,7 +631,7 @@ vector<int> Graph::getNeighbor(int id)
 	return result;
 }
 
-vector<int> Graph::getVerticesByLabel(int label)
+vector<unsigned int> Graph::getVerticesByLabel(int label)
 {
 	return labelIdx[label];
 }
@@ -591,11 +643,14 @@ bool Graph::operator==(const Graph& g) const
 
 vector<Graph> Graph::getDownNeighborsExactGraph()
 {
-	if (this->size() <= 1)
+	unsigned int currentSize = this->size();
+
+	if (currentSize <= 1)
 		return vector<Graph>();
+
 	vector<Graph> result;
 
-	if (this->size() == 2)
+	if (currentSize == 2)
 	{
 		if (directed)
 		{
@@ -641,9 +696,10 @@ vector<Graph> Graph::getDownNeighborsExactGraph()
 
 	//if undirect graph, remove edges having id to > id from (at the same time removing 2 directions)
 	// after removing edge, if vertex is isolated, then removing vertex
-	for (unsigned int i = 0; i < size(); i++)
+	for (unsigned int i = 0; i < currentSize; i++)
 	{
-		for (unsigned int j = 0; j < (*this)[i].edge.size(); j++)
+		unsigned int edgeSize = (*this)[i].edge.size();
+		for (unsigned int j = 0; j < edgeSize; j++)
 		{
 			if (directed)
 			{
@@ -652,15 +708,20 @@ vector<Graph> Graph::getDownNeighborsExactGraph()
 				g._isSorted = false;
 				g[i].edge.erase(g[i].edge.begin() + j);
 
-				int idx = g.index((*this)[i].edge[j].to);
+				unsigned int idx = g.index((*this)[i].edge[j].to);
+				
 				//if no edge to vertex[idx], delete it
 				bool isFound = false;
 
-				for (unsigned int tt = 0; tt < g.size(); tt++)
+				unsigned int g_size = g.size();
+
+				for (unsigned int tt = 0; tt < g_size; tt++)
 				{
 					if (tt != idx)
 					{
-						for (unsigned int kk = 0; kk < g[tt].edge.size(); kk++)
+						unsigned int edge_g_size = g[tt].edge.size();
+
+						for (unsigned int kk = 0; kk < edge_g_size; kk++)
 						{
 							if (g[tt].edge[kk].to == g[idx].id)
 							{
@@ -674,16 +735,20 @@ vector<Graph> Graph::getDownNeighborsExactGraph()
 					}
 				}
 
-				if (g[i].edge.size() == 0)
+				if (g[i].edge.empty() == true)
 				{
 					// remove i from g
-					g.erase(g.begin() + i);
+					g[i] = g.back();
+					g.pop_back();
+					//g.erase(g.begin() + i);
 					isDeleted = true;
 				}
 
 				if (isDeleted == false && isFound == false)
 				{
-					g.erase(g.begin() + idx);
+					g[idx] = g.back();
+					g.pop_back();
+					//g.erase(g.begin() + idx);
 					isDeleted = true;
 				}
 
@@ -712,9 +777,10 @@ vector<Graph> Graph::getDownNeighborsExactGraph()
 					//cout << "Starting Delete edge j" << endl;
 					g[i].edge.erase(g[i].edge.begin() + j);
 					//cout << "Deleted edge j" << endl;
-					int idx = g.index((*this)[i].edge[j].to);
+					unsigned int idx = g.index((*this)[i].edge[j].to);
 					//cout << "Index" << endl;
-					for (unsigned int k = 0; k < g[idx].edge.size(); k++)
+					unsigned int gidx_edge_size = g[idx].edge.size();
+					for (unsigned int k = 0; k < gidx_edge_size; k++)
 					{
 						if (g[idx].edge[k].to == (*this)[i].id)
 						{
@@ -723,19 +789,23 @@ vector<Graph> Graph::getDownNeighborsExactGraph()
 						}
 					}
 					//cout << "End Index" << endl;
-					if (g[i].edge.size() == 0)
+					if (g[i].edge.empty() == true)
 					{
 						// remove i from g
-						g.erase(g.begin() + i);
+						g[i] = g.back();
+						g.pop_back();
+						//g.erase(g.begin() + i);
 						isDeleted = true;
 						//cout << "Deleted vertex i" << endl;
 					}
 
 					if (isDeleted == false)
 					{
-						if (g[idx].edge.size() == 0)
+						if (g[idx].edge.empty())
 						{
-							g.erase(g.begin() + idx);
+							g[idx] = g.back();
+							g.pop_back();
+							//g.erase(g.begin() + idx);
 							isDeleted = true;
 							//cout << "Deleted vertex idx" << endl;
 						}
@@ -768,18 +838,20 @@ vector<Graph> Graph::getDownNeighborsExactGraph()
 vector<Graph> Graph::getUpNeigborsExactGraph(Graph& database)
 {
 	vector<Graph> result;
+	unsigned int currentSize = this->size();
 
 	unordered_set<int> idCurrentGraph;
-	for (unsigned int i = 0; i < this->size(); i++)
+	for (unsigned int i = 0; i < currentSize; i++)
 	{
 		idCurrentGraph.insert((*this)[i].id);
 	}
 
-	for (unsigned int i = 0; i < this->size(); i++)
+	for (unsigned int i = 0; i < currentSize; i++)
 	{
-		int indexSource = database.index((*this)[i].id);
+		unsigned int indexSource = database.index((*this)[i].id);
+		unsigned int edgeSizetmp = database[indexSource].edge.size();
 
-		for (unsigned int k = 0; k < database[indexSource].edge.size(); ++k)
+		for (unsigned int k = 0; k < edgeSizetmp; ++k)
 		{
 			int idDes = database[indexSource].edge[k].to;
 			unordered_set<int>::const_iterator itFi = idCurrentGraph.find(idDes);
@@ -794,7 +866,8 @@ vector<Graph> Graph::getUpNeigborsExactGraph(Graph& database)
 						// insert new edge (2 directions)
 						// check if the edge belonged to the current graph
 						bool isExisted = false;
-						for (unsigned int tt = 0; tt < (*this)[i].edge.size(); tt++)
+						unsigned int edgePatternG = (*this)[i].edge.size();
+						for (unsigned int tt = 0; tt < edgePatternG; tt++)
 						{
 							if ((*this)[i].edge[tt].to == idDes && (*this)[i].edge[tt].elabel == database[indexSource].edge[k].elabel)
 							{
@@ -807,7 +880,7 @@ vector<Graph> Graph::getUpNeigborsExactGraph(Graph& database)
 						{
 							Graph g = *this;
 							g[i].push((*this)[i].id, idDes, database[indexSource].edge[k].elabel);
-							int idx = this->index(idDes);
+							unsigned int idx = this->index(idDes);
 							g[idx].push(idDes, (*this)[i].id, database[indexSource].edge[k].elabel);
 							g.buildEdge();
 
@@ -818,7 +891,8 @@ vector<Graph> Graph::getUpNeigborsExactGraph(Graph& database)
 				else
 				{
 					bool isExisted = false;
-					for (unsigned int tt = 0; tt < (*this)[i].edge.size(); tt++)
+					unsigned int edgePatterSi = (*this)[i].edge.size();
+					for (unsigned int tt = 0; tt < edgePatterSi; tt++)
 					{
 						if ((*this)[i].edge[tt].to == idDes && (*this)[i].edge[tt].elabel == database[indexSource].edge[k].elabel)
 						{
@@ -844,7 +918,8 @@ vector<Graph> Graph::getUpNeigborsExactGraph(Graph& database)
 				Graph g = *this;
 				g._isSorted = false;
 
-				int idx = database.index(idDes);
+				unsigned int idx = database.index(idDes);
+
 				Vertex v;
 				v.id = idDes;
 				v.label = database[idx].label;
@@ -880,10 +955,11 @@ bool Graph::isReachable(int idSource, int idDes)
 
 	while(!queue.empty())
 	{
-		int indx = index(queue.front());
+		unsigned int indx = index(queue.front());
 		queue.pop_front();
 
-		for (unsigned int i = 0; i < (*this)[indx].edge.size(); i++)
+		unsigned int edgeSize = (*this)[indx].edge.size();
+		for (unsigned int i = 0; i < edgeSize; i++)
 		{
 			// If this adjacent node is the destination node, then 
             // return true
@@ -904,17 +980,20 @@ bool Graph::isReachable(int idSource, int idDes)
 
 vector<Graph> Graph::getDownNeighborsInducedGraph()
 {
-	if (this->size() <= 1)
+	unsigned int currentSize = this->size();
+
+	if (currentSize <= 1)
 		return vector<Graph>();
+
 	vector<Graph> result;
 
-	if (this->size() == 2)
+	if (currentSize == 2)
 	{
 		if (directed)
 		{
 			Graph g(this->directed);
 
-			if ((*this)[0].edge.size() > 0)
+			if ((*this)[0].edge.empty() == false)
 			{
 				Vertex v1;
 				v1.id = (*this)[0].id;
@@ -952,45 +1031,56 @@ vector<Graph> Graph::getDownNeighborsInducedGraph()
 		return result;
 	}
 
-	for (unsigned int i = 0; i < size(); i++)
+	for (unsigned int i = 0; i < currentSize; i++)
 	{
 		Graph g = *this;
 		// remove all edge to g[i]
 		if (directed == false)
 		{
-			for(unsigned int j = 0; j < g[i].edge.size(); j++)
+			unsigned int edge_i_size = g[i].edge.size();
+			for(unsigned int j = 0; j < edge_i_size; j++)
 			{
-				int indxTo = g.index(g[i].edge[j].to);
-				for (unsigned int k = 0; k < g[indxTo].edge.size(); k++)
+				unsigned int indxTo = g.index(g[i].edge[j].to);
+				unsigned int edgeTmpSi = g[indxTo].edge.size();
+
+				for (unsigned int k = 0; k < edgeTmpSi; k++)
 				{
 					if (g[indxTo].edge[k].to == g[i].id)
 					{
-						g[indxTo].edge.erase(g[indxTo].edge.begin() + k);
+						g[indxTo].edge[k] = g[indxTo].edge.back();
+						g[indxTo].edge.pop_back();
 						break;
 					}
 				}
 			}
 
-			g.erase(g.begin() + i);
+			g[i] = g.back();
+			g.pop_back();
+			//g.erase(g.begin() + i);
 		}
 		else
 		{
-			for (unsigned int j = 0; j < size(); j++)
+			for (unsigned int j = 0; j < currentSize; j++)
 			{
 				if (j != i)
 				{
-					for (unsigned int k = 0; k < g[j].edge.size(); k++)
+					unsigned int tmpSize = g[j].edge.size();
+					for (unsigned int k = 0; k < tmpSize; k++)
 					{
 						if (g[j].edge[k].to == g[i].id)
 						{
-							g[j].edge.erase(g[j].edge.begin() + k);
+							g[j].edge[k] = g[j].edge.back();
+							g[j].edge.pop_back();
+							//g[j].edge.erase(g[j].edge.begin() + k);
 							break;
 						}
 					}
 				}
 			}
 
-			g.erase(g.begin() + i);
+			g[i] = g.back();
+			g.pop_back();
+			//g.erase(g.begin() + i);
 		}
 
 		g.buildEdge();
@@ -1029,9 +1119,10 @@ void Graph::DFSTraversal(int vId, unordered_set<int> & visitedId)
 		return;
 	visitedId.insert(vId);
 
-	int indx = this->index(vId);
+	unsigned int indx = this->index(vId);
+	unsigned int sizeTmp = (*this)[indx].edge.size();
 
-	for (unsigned int i = 0; i < (*this)[indx].edge.size(); i++)
+	for (unsigned int i = 0; i < sizeTmp; i++)
 	{
 		if (visitedId.find((*this)[indx].edge[i].to) == visitedId.end())
 			DFSTraversal((*this)[indx].edge[i].to, visitedId);
@@ -1041,8 +1132,9 @@ void Graph::DFSTraversal(int vId, unordered_set<int> & visitedId)
 void Graph::convertDigraph2Undirect(unordered_set<int> & visitedId)
 {
 	Graph g = *this;
+	unsigned int size_ = size();
 
-	for (unsigned int i = 0; i < size(); i++)
+	for (unsigned int i = 0; i < size_; i++)
 	{
 		for (Vertex::edge_iterator it = (*this)[i].edge.begin(); it != (*this)[i].edge.end(); ++it)
 		{
@@ -1073,17 +1165,19 @@ vector<Graph> Graph::getUpNeighborsInducedGraph(Graph& database)
 
 	unordered_set<int> idCurrentGraph;
 	unordered_set<int> visited;
+	unsigned int size_ = this->size();
 
-	for (unsigned int i = 0; i < this->size(); i++)
+	for (unsigned int i = 0; i < size_; i++)
 	{
 		idCurrentGraph.insert((*this)[i].id);
 	}
 
-	for (unsigned int i = 0; i < this->size(); i++)
+	for (unsigned int i = 0; i < size_; i++)
 	{
 		int indexSource = database.index((*this)[i].id);
+		unsigned int edgeTmpSize = database[indexSource].edge.size();
 
-		for (unsigned int k = 0; k < database[indexSource].edge.size(); ++k)
+		for (unsigned int k = 0; k < edgeTmpSize; ++k)
 		{
 			int idDes = database[indexSource].edge[k].to;
 			unordered_set<int>::const_iterator itFi = idCurrentGraph.find(idDes);
@@ -1096,7 +1190,8 @@ vector<Graph> Graph::getUpNeighborsInducedGraph(Graph& database)
 					Graph g = *this;
 					g._isSorted = false;
 
-					int idx = database.index(idDes);
+					unsigned int idx = database.index(idDes);
+
 					Vertex v;
 					v.id = idDes;
 					v.label = database[idx].label;
@@ -1104,7 +1199,8 @@ vector<Graph> Graph::getUpNeighborsInducedGraph(Graph& database)
 					g.insertVertex(v);
 				
 					// find all edges from v to current vertices in the graph
-					for (unsigned int tt = 0; tt < database[idx].edge.size(); tt++)
+					unsigned int tmpS = database[idx].edge.size();
+					for (unsigned int tt = 0; tt < tmpS; tt++)
 					{
 						if (idCurrentGraph.find(database[idx].edge[tt].to) != idCurrentGraph.end())
 						{
@@ -1122,12 +1218,14 @@ vector<Graph> Graph::getUpNeighborsInducedGraph(Graph& database)
 						// find all edges from the current vertices to v
 						g[i].push((*this)[i].id, idDes, database[indexSource].edge[k].elabel);
 						
-						for (unsigned int tt = 0; tt < this->size(); tt++)
+						for (unsigned int tt = 0; tt < size_; tt++)
 						{
 							if (tt != i)
 							{
-								int idSour = database.index((*this)[tt].id);
-								for (unsigned int uu = 0; uu < database[idSour].edge.size(); uu++)
+								unsigned int idSour = database.index((*this)[tt].id);
+								unsigned int tmpS1 = database[idSour].edge.size();
+
+								for (unsigned int uu = 0; uu < tmpS1; uu++)
 								{
 									if (database[idSour].edge[uu].to == idDes)
 									{
@@ -1156,7 +1254,7 @@ Graph Graph::initAnyFrequentGraph(int threshold, int & outFreq)
 {
 	vector<int> label;
 
-	for (unordered_map< int, vector<int> >::const_iterator it = labelIdx.begin(); it != labelIdx.end(); ++it)
+	for (unordered_map< int, vector<unsigned int> >::const_iterator it = labelIdx.begin(); it != labelIdx.end(); ++it)
 	{
 		if ((int)it->second.size() >= threshold)
 			label.push_back(it->first);
@@ -1166,12 +1264,12 @@ Graph Graph::initAnyFrequentGraph(int threshold, int & outFreq)
 
 	if (label.size() > 0)
 	{
-		int idSelect = rand() % label.size();
+		unsigned int idSelect = rand() % label.size();
 		// select vertex
-		vector<int> vertices = labelIdx[label[idSelect]];
+		vector<unsigned int> vertices = labelIdx[label[idSelect]];
 
 		double rndDouble = rand() / (1.0 * RAND_MAX);
-		int indx = (int) (rndDouble * vertices.size());
+		unsigned int indx = rndDouble * vertices.size();
 
 		Vertex vert;
 		vert.id = (*this)[vertices[indx]].id;

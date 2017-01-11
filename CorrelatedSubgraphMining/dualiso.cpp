@@ -4,8 +4,8 @@ vector<Graph> DualISO::match(Graph & database, Graph & pattern)
 {
 	matches.clear();
 
-	vector< vector<int> > cand_0 = candidateSelector.getCandidates(database, pattern);
-    vector< vector<int> > cand = dualSimulation.simulate(database, pattern, cand_0);
+	vector< vector<unsigned int> > cand_0 = candidateSelector.getCandidates(database, pattern);
+    vector< vector<unsigned int> > cand = dualSimulation.simulate(database, pattern, cand_0);
 
 	if (!cand.empty())
 		search(database, pattern, cand, 0);
@@ -13,11 +13,11 @@ vector<Graph> DualISO::match(Graph & database, Graph & pattern)
     return matches;
 }
 
-void DualISO::search(Graph & database, Graph & pattern, vector< vector<int> >& candidates, int depth)
+void DualISO::search(Graph & database, Graph & pattern, vector< vector<unsigned int> >& candidates, unsigned int depth)
 {
 	if (depth == pattern.size())
 	{
-		vector<int> cnd = getCandidate(candidates);
+		vector<unsigned int> cnd = getCandidate(candidates);
 		Graph g = toGraph(database, pattern, cnd);
 		if (g.size() > 0)
 		{
@@ -30,13 +30,13 @@ void DualISO::search(Graph & database, Graph & pattern, vector< vector<int> >& c
 	{
 		for (unsigned int v_G = 0; v_G < candidates[depth].size(); v_G++)
 		{
-			if (Utility::contains(candidates, candidates[depth][v_G], depth - 1) == false)
+			if (depth == 0 || Utility::contains(candidates, candidates[depth][v_G], depth - 1) == false)
 			{
-				vector< vector<int> > cand_copy = candidates;
-				vector<int> tmp;
+				vector< vector<unsigned int> > cand_copy = candidates;
+				vector<unsigned int> tmp;
 				tmp.push_back(candidates[depth][v_G]);
 				cand_copy[depth] = tmp;
-				vector< vector<int> > cpy = dualSimulation.simulate(database, pattern, cand_copy);
+				vector< vector<unsigned int> > cpy = dualSimulation.simulate(database, pattern, cand_copy);
 
 				if(!cpy.empty())
 				{
@@ -47,13 +47,13 @@ void DualISO::search(Graph & database, Graph & pattern, vector< vector<int> >& c
     }
 }
 
-vector<int> DualISO::getCandidate(vector< vector<int> > & candidates)
+vector<unsigned int> DualISO::getCandidate(vector< vector<unsigned int> > & candidates)
 {
-	int m = candidates.size();
+	unsigned int m = candidates.size();
 
-    vector<int> result;
+    vector<unsigned int> result;
 
-    for (int i = 0; i < m; i++)
+    for (unsigned int i = 0; i < m; i++)
 	{
 		result.push_back(candidates[i][0]);
     }
@@ -61,19 +61,22 @@ vector<int> DualISO::getCandidate(vector< vector<int> > & candidates)
 	return result;
 }
 
-Graph DualISO::toGraph(Graph & database, Graph & pattern, vector<int>& candidate)
+Graph DualISO::toGraph(Graph & database, Graph & pattern, vector<unsigned int>& candidate)
 {
 	Graph g(database.directed);
+	unsigned int patternSize = pattern.size();
 
-	for (unsigned int i = 0; i < pattern.size(); i++)
+	for (unsigned int i = 0; i < patternSize; i++)
 	{
 		g.insertVertex(database[candidate[i]]);
 
 		unordered_map<int, int> idCandidate;
 
-		for (unsigned int j = 0; j < pattern[i].edge.size(); j++)
+		unsigned int tmpEdgeSize = pattern[i].edge.size();
+
+		for (unsigned int j = 0; j < tmpEdgeSize; j++)
 		{
-			int idx = pattern.index(pattern[i].edge[j].to);
+			unsigned int idx = pattern.index(pattern[i].edge[j].to);
 			idCandidate[database[candidate[idx]].id] = pattern[i].edge[j].elabel;
 		}
 
@@ -94,7 +97,9 @@ Graph DualISO::toGraph(Graph & database, Graph & pattern, vector<int>& candidate
 		}*/
 
 		// add edge to g
-		for (unsigned int k = 0; k < database[candidate[i]].edge.size(); ++k)
+		unsigned int tmpS = database[candidate[i]].edge.size();
+
+		for (unsigned int k = 0; k < tmpS; ++k)
 		{
 			unordered_map<int, int>::const_iterator it = idCandidate.find(database[candidate[i]].edge[k].to);
 
@@ -119,8 +124,8 @@ Graph DualISO::toGraph(Graph & database, Graph & pattern, vector<int>& candidate
 
 bool DualISO::isChild(Graph & database, Graph & pattern)
 {
-	vector< vector<int> > cand_0 = candidateSelector.getCandidates(database, pattern);
-    vector< vector<int> > cand = dualSimulation.simulate(database, pattern, cand_0);
+	vector< vector<unsigned int> > cand_0 = candidateSelector.getCandidates(database, pattern);
+    vector< vector<unsigned int> > cand = dualSimulation.simulate(database, pattern, cand_0);
 
 	bool ok = false;
 	if (!cand.empty())
@@ -129,11 +134,11 @@ bool DualISO::isChild(Graph & database, Graph & pattern)
 	return ok;
 }
 
-bool DualISO::isFound(Graph & database, Graph & pattern, vector< vector<int> >& candidates, int depth)
+bool DualISO::isFound(Graph & database, Graph & pattern, vector< vector<unsigned int> >& candidates, unsigned int depth)
 {
 	if (depth == pattern.size())
 	{
-		vector<int> cnd = getCandidate(candidates);
+		vector<unsigned int> cnd = getCandidate(candidates);
 		Graph g = toGraph(database, pattern, cnd);
 		if (g.size() == 0)
 			return false;
@@ -142,15 +147,17 @@ bool DualISO::isFound(Graph & database, Graph & pattern, vector< vector<int> >& 
     }
 	else
 	{
-		for (unsigned int v_G = 0; v_G < candidates[depth].size(); v_G++)
+		unsigned int tmpSize = candidates[depth].size();
+
+		for (unsigned int v_G = 0; v_G < tmpSize; v_G++)
 		{
-			if (Utility::contains(candidates, candidates[depth][v_G], depth - 1) == false)
+			if (depth == 0 || Utility::contains(candidates, candidates[depth][v_G], depth - 1) == false)
 			{
-				vector< vector<int> > cand_copy = candidates;
-				vector<int> tmp;
+				vector< vector<unsigned int> > cand_copy = candidates;
+				vector<unsigned int> tmp;
 				tmp.push_back(candidates[depth][v_G]);
 				cand_copy[depth] = tmp;
-				vector< vector<int> > cand_cpy = dualSimulation.simulate(database, pattern, cand_copy);
+				vector< vector<unsigned int> > cand_cpy = dualSimulation.simulate(database, pattern, cand_copy);
 
 				if(!cand_cpy.empty())
 				{

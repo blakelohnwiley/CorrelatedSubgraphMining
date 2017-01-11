@@ -3,12 +3,16 @@
 
 uint64_t Sampling::id = 0;
 Hashtable Sampling::saveGraph;
-set<DFSCode> Sampling::noneFrequentGraph;
+unordered_set<DFSCode> Sampling::noneFrequentGraph;
 
-Sampling::Sampling(char * fileInput, bool directed_)
+Sampling::Sampling(bool directed_)
 {
 	this->directed = directed_;
-	database.directed = directed;
+}
+
+void Sampling::initGraph(char * fileInput)
+{
+	database.directed = this->directed;
 	database.read(fileInput);
 }
 
@@ -240,7 +244,7 @@ Sample Sampling::uniformSamplingExactGraph(int threshold, int miniter, int maxIt
 
 	std::random_shuffle(neighbors.begin(), neighbors.end());
 
-	int dp = (int) neighbors.size();
+	unsigned int dp = neighbors.size();
 
 	if (dp == 0)
 	{
@@ -335,7 +339,7 @@ Sample Sampling::uniformSamplingExactGraph(int threshold, int miniter, int maxIt
 			std::random_shuffle(tmpNeighbors.begin(), tmpNeighbors.end());
 		}
 
-		int dq = (int) tmpNeighbors.size();
+		unsigned int dq = tmpNeighbors.size();
 		double accept_prob = 1;
 		double tmp = (dp * 1.0 / dq);
 		if (tmp < accept_prob)
@@ -377,7 +381,14 @@ Sample Sampling::uniformSamplingExactGraph(int threshold, int miniter, int maxIt
 				//cout << "Next" << endl;
 				neighbors.clear();
 				neighbors = tmpNeighbors;
-				dp = (int) tmpNeighbors.size();
+				dp = tmpNeighbors.size();
+
+				if (dp == 0)
+				{
+					Sample s;
+					s.status = false;
+					return s;
+				}
 			}
 		}
 		else
@@ -467,7 +478,7 @@ Sample Sampling::uniformSamplingInducedGraph(int threshold, int miniter, int max
 
 	std::random_shuffle(neighbors.begin(), neighbors.end());
 
-	int dp = (int) neighbors.size();
+	unsigned int dp = neighbors.size();
 
 	if (dp == 0)
 	{
@@ -562,7 +573,7 @@ Sample Sampling::uniformSamplingInducedGraph(int threshold, int miniter, int max
 			std::random_shuffle(tmpNeighbors.begin(), tmpNeighbors.end());
 		}
 
-		int dq = (int) tmpNeighbors.size();
+		unsigned int dq = tmpNeighbors.size();
 		double accept_prob = 1;
 		double tmp = (dp * 1.0 / dq);
 		if (tmp < accept_prob)
@@ -604,7 +615,14 @@ Sample Sampling::uniformSamplingInducedGraph(int threshold, int miniter, int max
 				//cout << "Next" << endl;
 				neighbors.clear();
 				neighbors = tmpNeighbors;
-				dp = (int) tmpNeighbors.size();
+				dp = tmpNeighbors.size();
+
+				if (dp == 0)
+				{
+					Sample s;
+					s.status = false;
+					return s;
+				}
 			}
 		}
 		else
@@ -661,7 +679,7 @@ void Sampling::computeCorrelatedValueUniformSamplingExactGraph(char* filenameOup
 						{
 							isChild = dualISO.isChild(it->second.graphs[0], sam.p);
 						}
-						else
+						else if (it->second.graphs[0].edge_size() < sam.p.edge_size())
 						{
 							isChild = dualISO.isChild(sam.p, it->second.graphs[0]);
 							if (isChild)
@@ -771,11 +789,11 @@ void Sampling::computeCorrelatedValueUniformSamplingInducedGraph(char* filenameO
 					for (Hashtable::hastable_iterator it = table.begin(); it != table.end(); it++)
 					{
 						bool isChild = false;
-						if (it->second.graphs[0].edge_size() > sam.p.edge_size())
+						if (it->second.graphs[0].size() > sam.p.size())
 						{
 							isChild = dualISO.isChild(it->second.graphs[0], sam.p);
 						}
-						else
+						else if (it->second.graphs[0].size() < sam.p.size())
 						{
 							isChild = dualISO.isChild(sam.p, it->second.graphs[0]);
 							if (isChild)
@@ -933,7 +951,7 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 	while (true)
 	{
 		double acceptRateMax = 0;
-		Graph q;
+		Graph q(database.directed);
 		vector<Graph> tmpDownNeighbors;
 		vector<Graph> tmpUpNeighbors;
 		vector<int> tmpUpSupportNeighbors;
@@ -944,7 +962,7 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 		double PuvDown;
 		double thr;
 
-		if (upNeighbors.size() > 0 && downNeighbors.size() > 0)
+		if (upNeighbors.empty() == false && downNeighbors.empty() == false)
 		{
 			PuvUp = alpha / upNeighbors.size();
 			PuvDown = (1 - alpha) / downNeighbors.size();
@@ -952,13 +970,13 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 		}
 		else
 		{
-			if (upNeighbors.size() == 0 && downNeighbors.size() > 0)
+			if (upNeighbors.empty() == true && downNeighbors.empty() == false)
 			{
 				PuvUp = 0;
 				PuvDown = (1 - alpha) / downNeighbors.size();
 				thr = -1;
 			}
-			else if (upNeighbors.size() > 0 && downNeighbors.size() == 0)
+			else if (upNeighbors.empty() == false && downNeighbors.empty() == true)
 			{
 				PuvDown = 0;
 				PuvUp = alpha / upNeighbors.size();
@@ -973,8 +991,7 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 		}
 
 		double rnd = rand() / (1.0 * RAND_MAX);
-		int t = upNeighbors.size();
-		int v = downNeighbors.size();
+		
 		if (rnd <= thr)
 		{
 			// Select Up
@@ -1304,7 +1321,7 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 	while (true)
 	{
 		double acceptRateMax = 0;
-		Graph q;
+		Graph q(database.directed);
 		vector<Graph> tmpDownNeighbors;
 		vector<Graph> tmpUpNeighbors;
 		vector<int> tmpUpSupportNeighbors;
@@ -1315,7 +1332,7 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 		double PuvDown;
 		double thr;
 
-		if (upNeighbors.size() > 0 && downNeighbors.size() > 0)
+		if (upNeighbors.empty() == false && downNeighbors.empty() == false)
 		{
 			PuvUp = alpha / upNeighbors.size();
 			PuvDown = (1 - alpha) / downNeighbors.size();
@@ -1323,13 +1340,13 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 		}
 		else
 		{
-			if (upNeighbors.size() == 0 && downNeighbors.size() > 0)
+			if (upNeighbors.empty() == true && downNeighbors.empty() == false)
 			{
 				PuvUp = 0;
 				PuvDown = (1 - alpha) / downNeighbors.size();
 				thr = -1;
 			}
-			else if (upNeighbors.size() > 0 && downNeighbors.size() == 0)
+			else if (upNeighbors.empty() == false && downNeighbors.empty() == true)
 			{
 				PuvDown = 0;
 				PuvUp = alpha / upNeighbors.size();
@@ -1630,7 +1647,7 @@ void Sampling::computeCorrelatedValueSupportBiasedSamplingExactGraph(char* filen
 						{
 							isChild = dualISO.isChild(it->second.graphs[0], sam.p);
 						}
-						else
+						else if (it->second.graphs[0].edge_size() < sam.p.edge_size())
 						{
 							isChild = dualISO.isChild(sam.p, it->second.graphs[0]);
 							if (isChild)
@@ -1740,11 +1757,11 @@ void Sampling::computeCorrelatedValueSupportBiasedSamplingInducedGraph(char* fil
 					for (Hashtable::hastable_iterator it = table.begin(); it != table.end(); it++)
 					{
 						bool isChild = false;
-						if (it->second.graphs[0].edge_size() > sam.p.edge_size())
+						if (it->second.graphs[0].size() > sam.p.size())
 						{
 							isChild = dualISO.isChild(it->second.graphs[0], sam.p);
 						}
-						else
+						else if (it->second.graphs[0].size() < sam.p.size())
 						{
 							isChild = dualISO.isChild(sam.p, it->second.graphs[0]);
 							if (isChild)

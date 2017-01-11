@@ -8,6 +8,8 @@
 #include<vector>
 #include<fstream>
 #include <string>
+#include <functional>
+#include <unordered_map>
 
 using namespace std;
 
@@ -115,10 +117,12 @@ public:
 
 	bool operator == (const DFSCode & d2) const
 	{
-		if (this->size() != d2.size())
+		unsigned int tmpSize = this->size();
+
+		if (tmpSize != d2.size())
 			return false;
 
-		for (unsigned int i = 0; i < (unsigned int)this->size(); i++)
+		for (unsigned int i = 0; i < tmpSize; i++)
 		{
 			if ((*this)[i] != d2[i])
 				return false;
@@ -150,6 +154,46 @@ struct PDFS
 	PDFS *prev;
 	PDFS() : id(0), edge(0), prev(0) {};
 };
+
+namespace std
+{
+	template <class T>
+	void hash_combine(std::size_t& seed, T v)
+	{
+		seed ^= std::hash<T>() (v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+	}
+
+    template<> struct hash<DFS>
+    {
+		std::size_t operator()(const DFS & s) const
+        {
+			std::size_t hash = 0;
+
+			hash_combine(hash, s.from);
+			hash_combine(hash, s.to);
+			hash_combine(hash, s.fromlabel);
+			hash_combine(hash, s.elabel);
+			hash_combine(hash, s.tolabel);
+            
+			return hash;
+        }
+    };
+
+	template<> struct hash<DFSCode>
+    {
+        std::size_t operator()(const DFSCode & s) const
+        {
+			std::size_t seed = s.size();
+            
+			for (DFS i : s)
+			{
+				hash_combine(seed, hash<DFS>() (i));
+			}
+
+			return seed;
+        }
+    };
+}
 
 class History : public vector<Edge*>
 {

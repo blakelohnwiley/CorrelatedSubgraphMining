@@ -6,6 +6,7 @@
 #include "graphtomindfscode.h"
 #include <set>
 #include <stdint.h>
+#include <unordered_set>
 
 using namespace std;
 
@@ -15,9 +16,9 @@ public:
 	Graph graph;
 	bool isStop;
 	uint64_t idnode;
-	set<DFSCode> childIDs;
+	unordered_set<DFSCode> childIDs;
 	DFSCode code;
-	set<CodeId> ignoreList;
+	unordered_set<CodeId> ignoreList;
 
 	bool isSavedToTable;
 	

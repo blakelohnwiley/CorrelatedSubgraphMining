@@ -1,11 +1,11 @@
 #include "hashtable.h"
 
-void Hashtable::push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child)
+void Hashtable::push(DFSCode& dfs_code, Graph& g, unordered_set<DFSCode>& child)
 {
 	(*this)[dfs_code].push(g, child);
 }
 
-void Hashtable::push(DFSCode& dfs_code, Graph& g, set<DFSCode>& child, set<CodeId> & ignore)
+void Hashtable::push(DFSCode& dfs_code, Graph& g, unordered_set<DFSCode>& child, unordered_set<CodeId> & ignore)
 {
 	(*this)[dfs_code].push(g, child, ignore);
 }
@@ -25,12 +25,12 @@ void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph, int freq_)
 	(*this)[dfs_code].assign(listGraph, freq_);
 }
 
-void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph, set<CodeId> & ignore)
+void Hashtable::assign(DFSCode& dfs_code, vector<Graph>& listGraph, unordered_set<CodeId> & ignore)
 {
 	(*this)[dfs_code].assign(listGraph, ignore);
 }
 
-void Hashtable::insertIgnoreList(DFSCode& dfs_code, set<CodeId> & ignore_)
+void Hashtable::insertIgnoreList(DFSCode& dfs_code, unordered_set<CodeId> & ignore_)
 {
 	(*this)[dfs_code].insertIgnoreList(ignore_);
 }
@@ -270,12 +270,15 @@ void Hashtable::computeCorrelatedValue (Graph & bigGraph, Instance & ins1, Insta
 
 void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, Instance& ins2, int & colocated, double & confidence, int hop, int& numTestCollocated)
 {
-	vector<bool> I1(ins1.graphs.size(), false);
-	vector<bool> I2(ins2.graphs.size(), false);
+	unsigned int ins1Size = ins1.graphs.size();
+	unsigned int ins2Size = ins2.graphs.size();
 
-	for (unsigned int i = 0; i < ins1.graphs.size(); i++)
+	vector<bool> I1(ins1Size, false);
+	vector<bool> I2(ins2Size, false);
+
+	for (unsigned int i = 0; i < ins1Size; i++)
 	{
-		for (unsigned int j = 0; j < ins2.graphs.size(); j++)
+		for (unsigned int j = 0; j < ins2Size; j++)
 		{
 			for (unordered_set<uint64_t>::iterator it1 = ins1.graphs[i].sameHHop.begin(); it1 != ins1.graphs[i].sameHHop.end(); ++it1)
 			{
@@ -290,38 +293,36 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 		}
 	}
 
-	for (unsigned int i = 0; i < ins1.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins1Size; i++)
 	{
 		if (I1[i] == false)
 		{
-			for (unsigned int j = 0; j < ins2.graphs.size(); j++)
-			{
-			
-					++numTestCollocated;
+			for (unsigned int j = 0; j < ins2Size; j++)
+			{	
+				++numTestCollocated;
 
-					if (Utility::isInHHop(bigGraph, ins1.graphs[i], ins2.graphs[j], hop) == true)
-					{
-						// create same code ID for each graph
-						uint64_t codeId;
+				if (Utility::isInHHop(bigGraph, ins1.graphs[i], ins2.graphs[j], hop) == true)
+				{
+					// create same code ID for each graph
+					uint64_t codeId;
 				
-						codeId = Utility::pairFuntion(ins1.graphs[i].idGraph, ins2.graphs[j].idGraph);
-						ins1.graphs[i].sameHHop.insert(codeId);
-						ins2.graphs[j].sameHHop.insert(codeId);
+					codeId = Utility::pairFuntion(ins1.graphs[i].idGraph, ins2.graphs[j].idGraph);
+					ins1.graphs[i].sameHHop.insert(codeId);
+					ins2.graphs[j].sameHHop.insert(codeId);
 
-						I1[i] = true;
-						I2[j] = true;
-						break;
-					}
-			
+					I1[i] = true;
+					I2[j] = true;
+					break;
+				}
 			}
 		}
 	}
 
-	for (unsigned int i = 0; i < ins2.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins2Size; i++)
 	{
 		if (I2[i] == false)
 		{
-			for (unsigned int j = 0; j < ins1.graphs.size(); j++)
+			for (unsigned int j = 0; j < ins1Size; j++)
 			{
 				for (unordered_set<uint64_t>::iterator it1 = ins1.graphs[j].sameHHop.begin(); it1 != ins1.graphs[j].sameHHop.end(); ++it1)
 				{
@@ -333,32 +334,33 @@ void Hashtable::computeCorrelatedValueClose (Graph & bigGraph, Instance& ins1, I
 						break;
 					}
 				}
+
+				if (I2[i] == true)
+					break;
 			}
 		}
 	}
 
-	for (unsigned int i = 0; i < ins2.graphs.size(); i++)
+	for (unsigned int i = 0; i < ins2Size; i++)
 	{
 		if (I2[i] == false)
 		{
-			for (unsigned int j = 0; j < ins1.graphs.size(); j++)
+			for (unsigned int j = 0; j < ins1Size; j++)
 			{
-				
-					++numTestCollocated;
+				++numTestCollocated;
 
-					if (Utility::isInHHop(bigGraph, ins1.graphs[j], ins2.graphs[i], hop) == true)
-					{
-						// create same code ID for each graph
-						uint64_t codeId;
+				if (Utility::isInHHop(bigGraph, ins1.graphs[j], ins2.graphs[i], hop) == true)
+				{
+					// create same code ID for each graph
+					uint64_t codeId;
 						
-						codeId = Utility::pairFuntion(ins1.graphs[j].idGraph, ins2.graphs[i].idGraph);
-						ins1.graphs[j].sameHHop.insert(codeId);
-						ins2.graphs[i].sameHHop.insert(codeId);
+					codeId = Utility::pairFuntion(ins1.graphs[j].idGraph, ins2.graphs[i].idGraph);
+					ins1.graphs[j].sameHHop.insert(codeId);
+					ins2.graphs[i].sameHHop.insert(codeId);
 
-						I2[i] = true;
-						break;
-					}
-				
+					I2[i] = true;
+					break;
+				}
 			}
 		}
 	}
