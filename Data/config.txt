@@ -1,3 +1,0 @@
-theta: 3
-phi: 0.1
-hop: 1
