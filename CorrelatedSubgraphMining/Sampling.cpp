@@ -199,11 +199,18 @@ Sample Sampling::uniformSamplingExactGraph(int threshold, int miniter, int maxIt
 			if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int freq_ = computeFrequency(insts);
-				if (freq_ >= threshold)
+				if (insts.size() >= threshold)
 				{
-					neighbors.push_back(*gr);
-					saveGraph.assign(dfs_code, insts, freq_);
+					int freq_ = computeFrequency(insts);
+					if (freq_ >= threshold)
+					{
+						neighbors.push_back(*gr);
+						saveGraph.assign(dfs_code, insts, freq_);
+					}
+					else
+					{
+						noneFrequentGraph.insert(dfs_code);
+					}
 				}
 				else
 				{
@@ -228,11 +235,18 @@ Sample Sampling::uniformSamplingExactGraph(int threshold, int miniter, int maxIt
 			if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int freq_ = computeFrequency(insts);
-				if (freq_ >= threshold)
+				if (insts.size() >= threshold)
 				{
-					neighbors.push_back(*gr);
-					saveGraph.assign(dfs_code, insts, freq_);
+					int freq_ = computeFrequency(insts);
+					if (freq_ >= threshold)
+					{
+						neighbors.push_back(*gr);
+						saveGraph.assign(dfs_code, insts, freq_);
+					}
+					else
+					{
+						noneFrequentGraph.insert(dfs_code);
+					}
 				}
 				else
 				{
@@ -294,11 +308,18 @@ Sample Sampling::uniformSamplingExactGraph(int threshold, int miniter, int maxIt
 					if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int freq_ = computeFrequency(insts);
-						if (freq_ >= threshold)
+						if (insts.size() >= threshold)
 						{
-							tmpNeighbors.push_back(*gr);
-							saveGraph.assign(dfs_code, insts, freq_);
+							int freq_ = computeFrequency(insts);
+							if (freq_ >= threshold)
+							{
+								tmpNeighbors.push_back(*gr);
+								saveGraph.assign(dfs_code, insts, freq_);
+							}
+							else
+							{
+								noneFrequentGraph.insert(dfs_code);
+							}
 						}
 						else
 						{
@@ -323,11 +344,18 @@ Sample Sampling::uniformSamplingExactGraph(int threshold, int miniter, int maxIt
 					if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int freq_ = computeFrequency(insts);
-						if (freq_ >= threshold)
+						if (insts.size() >= threshold)
 						{
-							tmpNeighbors.push_back(*gr);
-							saveGraph.assign(dfs_code, insts, freq_);
+							int freq_ = computeFrequency(insts);
+							if (freq_ >= threshold)
+							{
+								tmpNeighbors.push_back(*gr);
+								saveGraph.assign(dfs_code, insts, freq_);
+							}
+							else
+							{
+								noneFrequentGraph.insert(dfs_code);
+							}
 						}
 						else
 						{
@@ -433,11 +461,18 @@ Sample Sampling::uniformSamplingInducedGraph(int threshold, int miniter, int max
 			if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int freq_ = computeFrequency(insts);
-				if (freq_ >= threshold)
+				if (insts.size() >= threshold)
 				{
-					neighbors.push_back(*gr);
-					saveGraph.assign(dfs_code, insts, freq_);
+					int freq_ = computeFrequency(insts);
+					if (freq_ >= threshold)
+					{
+						neighbors.push_back(*gr);
+						saveGraph.assign(dfs_code, insts, freq_);
+					}
+					else
+					{
+						noneFrequentGraph.insert(dfs_code);
+					}
 				}
 				else
 				{
@@ -462,11 +497,18 @@ Sample Sampling::uniformSamplingInducedGraph(int threshold, int miniter, int max
 			if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int freq_ = computeFrequency(insts);
-				if (freq_ >= threshold)
+				if (insts.size() >= threshold)
 				{
-					neighbors.push_back(*gr);
-					saveGraph.assign(dfs_code, insts, freq_);
+					int freq_ = computeFrequency(insts);
+					if (freq_ >= threshold)
+					{
+						neighbors.push_back(*gr);
+						saveGraph.assign(dfs_code, insts, freq_);
+					}
+					else
+					{
+						noneFrequentGraph.insert(dfs_code);
+					}
 				}
 				else
 				{
@@ -528,11 +570,18 @@ Sample Sampling::uniformSamplingInducedGraph(int threshold, int miniter, int max
 					if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int freq_ = computeFrequency(insts);
-						if (freq_ >= threshold)
+						if (insts.size() >= threshold)
 						{
-							tmpNeighbors.push_back(*gr);
-							saveGraph.assign(dfs_code, insts, freq_);
+							int freq_ = computeFrequency(insts);
+							if (freq_ >= threshold)
+							{
+								tmpNeighbors.push_back(*gr);
+								saveGraph.assign(dfs_code, insts, freq_);
+							}
+							else
+							{
+								noneFrequentGraph.insert(dfs_code);
+							}
 						}
 						else
 						{
@@ -557,11 +606,18 @@ Sample Sampling::uniformSamplingInducedGraph(int threshold, int miniter, int max
 					if (noneFrequentGraph.find(dfs_code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int freq_ = computeFrequency(insts);
-						if (freq_ >= threshold)
+						if (insts.size() >= threshold)
 						{
-							tmpNeighbors.push_back(*gr);
-							saveGraph.assign(dfs_code, insts, freq_);
+							int freq_ = computeFrequency(insts);
+							if (freq_ >= threshold)
+							{
+								tmpNeighbors.push_back(*gr);
+								saveGraph.assign(dfs_code, insts, freq_);
+							}
+							else
+							{
+								noneFrequentGraph.insert(dfs_code);
+							}
 						}
 						else
 						{
@@ -900,12 +956,19 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 			if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int support = computeFrequency(insts);
-				if (support >= threshold)
+				if (insts.size() >= threshold)
 				{
-					upNeighbors.push_back(*gr);
-					upSupportNeigbors.push_back(support);
-					saveGraph.assign(code, insts, support);
+					int support = computeFrequency(insts);
+					if (support >= threshold)
+					{
+						upNeighbors.push_back(*gr);
+						upSupportNeigbors.push_back(support);
+						saveGraph.assign(code, insts, support);
+					}
+					else
+					{
+						noneFrequentGraph.insert(code);
+					}
 				}
 				else
 				{
@@ -930,12 +993,19 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 			if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int support = computeFrequency(insts);
-				if (support >= threshold)
+				if (insts.size() >= threshold)
 				{
-					downNeighbors.push_back(*gr);
-					downSupportNeighbors.push_back(support);
-					saveGraph.assign(code, insts, support);
+					int support = computeFrequency(insts);
+					if (support >= threshold)
+					{
+						downNeighbors.push_back(*gr);
+						downSupportNeighbors.push_back(support);
+						saveGraph.assign(code, insts, support);
+					}
+					else
+					{
+						noneFrequentGraph.insert(code);
+					}
 				}
 				else
 				{
@@ -1022,12 +1092,19 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 					if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int support = computeFrequency(insts);
-						if (support >= threshold)
+						if (insts.size() >= threshold)
 						{
-							tmpDownNeighbors.push_back(*gr);
-							tmpDownSupportNeighbors.push_back(support);
-							saveGraph.assign(code, insts, support);
+							int support = computeFrequency(insts);
+							if (support >= threshold)
+							{
+								tmpDownNeighbors.push_back(*gr);
+								tmpDownSupportNeighbors.push_back(support);
+								saveGraph.assign(code, insts, support);
+							}
+							else
+							{
+								noneFrequentGraph.insert(code);
+							}
 						}
 						else
 						{
@@ -1079,12 +1156,19 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 					if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int support = computeFrequency(insts);
-						if (support >= threshold)
+						if (insts.size() > threshold)
 						{
-							tmpUpNeighbors.push_back(*gr);
-							tmpUpSupportNeighbors.push_back(support);
-							saveGraph.assign(code, insts, support);
+							int support = computeFrequency(insts);
+							if (support >= threshold)
+							{
+								tmpUpNeighbors.push_back(*gr);
+								tmpUpSupportNeighbors.push_back(support);
+								saveGraph.assign(code, insts, support);
+							}
+							else
+							{
+								noneFrequentGraph.insert(code);
+							}
 						}
 						else
 						{
@@ -1159,12 +1243,19 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 							if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 							{
 								vector<Graph> insts = dualISO.match(database, *gr);
-								int support = computeFrequency(insts);
-								if (support >= threshold)
+								if (insts.size() >= threshold)
 								{
-									tmpUpNeighbors.push_back(*gr);
-									tmpUpSupportNeighbors.push_back(support);
-									saveGraph.assign(code, insts, support);
+									int support = computeFrequency(insts);
+									if (support >= threshold)
+									{
+										tmpUpNeighbors.push_back(*gr);
+										tmpUpSupportNeighbors.push_back(support);
+										saveGraph.assign(code, insts, support);
+									}
+									else
+									{
+										noneFrequentGraph.insert(code);
+									}
 								}
 								else
 								{
@@ -1197,12 +1288,19 @@ Sample Sampling::supportBiasedSamplingExactGraph(int threshold, int miniter, int
 							if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 							{
 								vector<Graph> insts = dualISO.match(database, *gr);
-								int support = computeFrequency(insts);
-								if (support >= threshold)
+								if (insts.size() >= threshold)
 								{
-									tmpDownNeighbors.push_back(*gr);
-									tmpDownSupportNeighbors.push_back(support);
-									saveGraph.assign(code, insts, support);
+									int support = computeFrequency(insts);
+									if (support >= threshold)
+									{
+										tmpDownNeighbors.push_back(*gr);
+										tmpDownSupportNeighbors.push_back(support);
+										saveGraph.assign(code, insts, support);
+									}
+									else
+									{
+										noneFrequentGraph.insert(code);
+									}
 								}
 								else
 								{
@@ -1270,12 +1368,19 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 			if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int support = computeFrequency(insts);
-				if (support >= threshold)
+				if (insts.size() >= threshold)
 				{
-					upNeighbors.push_back(*gr);
-					upSupportNeigbors.push_back(support);
-					saveGraph.assign(code, insts, support);
+					int support = computeFrequency(insts);
+					if (support >= threshold)
+					{
+						upNeighbors.push_back(*gr);
+						upSupportNeigbors.push_back(support);
+						saveGraph.assign(code, insts, support);
+					}
+					else
+					{
+						noneFrequentGraph.insert(code);
+					}
 				}
 				else
 				{
@@ -1300,12 +1405,19 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 			if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 			{
 				vector<Graph> insts = dualISO.match(database, *gr);
-				int support = computeFrequency(insts);
-				if (support >= threshold)
+				if (insts.size() >= threshold)
 				{
-					downNeighbors.push_back(*gr);
-					downSupportNeighbors.push_back(support);
-					saveGraph.assign(code, insts, support);
+					int support = computeFrequency(insts);
+					if (support >= threshold)
+					{
+						downNeighbors.push_back(*gr);
+						downSupportNeighbors.push_back(support);
+						saveGraph.assign(code, insts, support);
+					}
+					else
+					{
+						noneFrequentGraph.insert(code);
+					}
 				}
 				else
 				{
@@ -1392,12 +1504,19 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 					if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int support = computeFrequency(insts);
-						if (support >= threshold)
+						if (insts.size() >= threshold)
 						{
-							tmpDownNeighbors.push_back(*gr);
-							tmpDownSupportNeighbors.push_back(support);
-							saveGraph.assign(code, insts, support);
+							int support = computeFrequency(insts);
+							if (support >= threshold)
+							{
+								tmpDownNeighbors.push_back(*gr);
+								tmpDownSupportNeighbors.push_back(support);
+								saveGraph.assign(code, insts, support);
+							}
+							else
+							{
+								noneFrequentGraph.insert(code);
+							}
 						}
 						else
 						{
@@ -1449,12 +1568,19 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 					if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 					{
 						vector<Graph> insts = dualISO.match(database, *gr);
-						int support = computeFrequency(insts);
-						if (support >= threshold)
+						if (insts.size() >= threshold)
 						{
-							tmpUpNeighbors.push_back(*gr);
-							tmpUpSupportNeighbors.push_back(support);
-							saveGraph.assign(code, insts, support);
+							int support = computeFrequency(insts);
+							if (support >= threshold)
+							{
+								tmpUpNeighbors.push_back(*gr);
+								tmpUpSupportNeighbors.push_back(support);
+								saveGraph.assign(code, insts, support);
+							}
+							else
+							{
+								noneFrequentGraph.insert(code);
+							}
 						}
 						else
 						{
@@ -1529,12 +1655,19 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 							if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 							{
 								vector<Graph> insts = dualISO.match(database, *gr);
-								int support = computeFrequency(insts);
-								if (support >= threshold)
+								if (insts.size() >= threshold)
 								{
-									tmpUpNeighbors.push_back(*gr);
-									tmpUpSupportNeighbors.push_back(support);
-									saveGraph.assign(code, insts, support);
+									int support = computeFrequency(insts);
+									if (support >= threshold)
+									{
+										tmpUpNeighbors.push_back(*gr);
+										tmpUpSupportNeighbors.push_back(support);
+										saveGraph.assign(code, insts, support);
+									}
+									else
+									{
+										noneFrequentGraph.insert(code);
+									}
 								}
 								else
 								{
@@ -1567,12 +1700,19 @@ Sample Sampling::supportBiasedSamplingInducedGraph(int threshold, int miniter, i
 							if (noneFrequentGraph.find(code) == noneFrequentGraph.end())
 							{
 								vector<Graph> insts = dualISO.match(database, *gr);
-								int support = computeFrequency(insts);
-								if (support >= threshold)
+								if (insts.size() >= threshold)
 								{
-									tmpDownNeighbors.push_back(*gr);
-									tmpDownSupportNeighbors.push_back(support);
-									saveGraph.assign(code, insts, support);
+									int support = computeFrequency(insts);
+									if (support >= threshold)
+									{
+										tmpDownNeighbors.push_back(*gr);
+										tmpDownSupportNeighbors.push_back(support);
+										saveGraph.assign(code, insts, support);
+									}
+									else
+									{
+										noneFrequentGraph.insert(code);
+									}
 								}
 								else
 								{
